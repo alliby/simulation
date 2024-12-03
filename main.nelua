@@ -1,0 +1,378 @@
+## pragma{nogc=true}
+## require "./build.lua"
+
+require "glad"
+require "glfw"
+require "nanovg"
+
+require "math"
+require "vector"
+
+## if debug then
+   require "windows"
+
+   local glfw_lib = LoadLibraryA(#[glfw_output]#)
+   if not glfw_lib then
+      print("could not load the GLFW dynamic library")
+      return -1;
+   end
+   defer FreeLibrary(glfw_lib) end
+
+   local function get_proc_address(lib: HMODULE, fn_name: cstring <comptime>): auto <inline>
+     local f = #|fn_name.value|#
+     local f_type = #[f.possibletypes[1]]#
+     local address = (@f_type)(GetProcAddress(lib, fn_name))
+     if not address then
+	print("Could not found symbol: ", fn_name)
+     end
+     return address
+   end
+   
+   ## local glfw_calls = extract_calls(scope.node.src.content, "glfw[%w]+")
+
+   ## for _, fn in ipairs(glfw_calls) do
+     local #|fn|# = get_proc_address(glfw_lib, #[fn]#)
+   ## end
+## end
+
+
+## local function unpack_fields(value)
+   ## local t = value.type
+   ## for _, field in ipairs(t.fields) do
+      local #|field.name|# = #|value.name|#.#|field.name|#
+   ## end
+## end
+
+local function errorcb(error: cint, desc: cstring)
+   print("GLFW error", error, string(desc))
+end
+
+local function key(window: *GLFWwindow, key: cint, scancode: cint, action: cint, mods: cint)
+   if key == GLFW_KEY_ESCAPE and action == GLFW_RELEASE then
+      glfwSetWindowShouldClose(window, GL_TRUE)
+   end
+end
+
+local Vec2 = @record {
+   x: float32,
+   y: float32,
+}
+
+local Size = @record {
+   w: float32, -- width
+   h: float32, -- height
+}
+
+local Ground = @record {
+   position: Vec2,
+   size: Size,
+   rotation: float32,
+   hatchStep: float32
+}
+
+local Pendulum = @record {
+   position: Vec2,
+   length: float32,
+   rotation: float32,
+   ball_radius: float32,
+}
+
+local Dash = @record {
+   start_point: Vec2,
+   length: float32,
+   rotation: float32,
+   gap: float32,
+   segment_num: integer,
+}
+
+local function drawDashedLine(vg: *NVGcontext, dash: Dash)
+   ## unpack_fields(dash)
+   if segment_num == 0 then segment_num = 5 end
+
+   nvgTranslate(vg, start_point.x, start_point.y)
+   nvgRotate(vg, rotation)
+   defer nvgResetTransform(vg) end
+   nvgStrokeWidth(vg, 2.0)
+   nvgStrokeColor(vg, nvgRGB(120, 120, 120))
+   nvgLineCap(vg, NVG_ROUND)
+   local l = length / segment_num
+   assert(gap < l)
+   for i=0,segment_num do
+      nvgBeginPath(vg)
+      nvgMoveTo(vg, l * i, 0)
+      nvgLineTo(vg, l * (i+1) - gap, 0)
+      nvgStroke(vg)
+   end
+end
+
+local function drawGround(vg: *NVGcontext, ground: Ground)
+   ## unpack_fields(ground)
+
+   if hatchStep == 0 then hatchStep = 7 end
+   if size.h == 0 then size.h = 30 end
+
+   if rotation ~= 0 then
+      nvgTranslate(vg, position.x + size.w/2, position.y + size.h/2)
+      nvgRotate(vg, rotation)
+      nvgTranslate(vg, -size.w/2, -size.h/2)
+   else
+      nvgTranslate(vg, position.x, position.y)
+   end 
+
+   defer nvgResetTransform(vg) end
+   -- Scissoring
+   nvgScissor(vg, 0 , 0, size.w, size.h)
+   defer nvgResetScissor(vg) end
+   -- Drawing
+   nvgBeginPath(vg)
+   nvgStrokeWidth(vg, 10.0)
+   nvgMoveTo(vg, 0, size.h)
+   nvgLineTo(vg, size.w, size.h)
+   nvgStrokeColor(vg, nvgRGB(15, 15, 15))
+   nvgStroke(vg)
+   local hatch_x: float32 = 30 * math.cos(math.pi/6)
+   for i= -hatch_x, size.w + hatch_x, hatchStep  do
+      nvgBeginPath(vg)
+      nvgStrokeWidth(vg, 2.0)
+      nvgMoveTo(vg, i, size.h)
+      nvgLineTo(vg, i + hatch_x, 0)
+      nvgStroke(vg)
+   end
+end
+
+local function drawPendulum(vg: *NVGcontext, pendulum: Pendulum)
+   ## unpack_fields(pendulum)
+
+   if ball_radius == 0 then ball_radius = 25 end
+   
+   local dx = math.cos(rotation)
+   local dy = math.sin(rotation)
+
+   -- Transformations
+   nvgTranslate(vg, position.x, position.y)
+   defer nvgResetTransform(vg) end
+   -- Drawing
+   nvgBeginPath(vg)
+   nvgStrokeWidth(vg, 5.0)
+   nvgStrokeColor(vg, nvgRGB(15, 15, 15))
+   nvgLineCap(vg, NVG_ROUND)
+   nvgMoveTo(vg, 0, 0)
+   nvgLineTo(vg, length * dx, length * dy)
+   nvgStroke(vg)
+
+   nvgBeginPath(vg)
+   nvgCircle(vg, (length + ball_radius) * dx, (length + ball_radius) * dy, ball_radius)
+   nvgStroke(vg)
+end
+
+if glfwInit() == 0 then
+   print("failed to init GLFW")
+   return -1
+end
+
+glfwSetErrorCallback(errorcb)
+glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
+glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2)
+glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE)
+glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
+
+local window = glfwCreateWindow(1000, 600, "NanoVG")
+defer glfwTerminate() end
+
+if not window then
+   print("Could not initialze GLFW window")
+   return -1
+end
+
+glfwSetKeyCallback(window, key)
+glfwMakeContextCurrent(window)
+
+if gladLoadGLLoader((@GLADloadproc)(glfwGetProcAddress)) == 0 then
+   print("could not init glad")
+   return -1
+end
+
+local vg = nvgCreateGL3(NVG_STENCIL_STROKES | NVG_DEBUG | NVG_ANTIALIAS)
+defer nvgDeleteGL3(vg) end
+
+if vg == nilptr then
+   print("Could not init nanovg")
+   return -1
+end
+
+local winWidth: cint, winHeight: cint
+local fbWidth: cint, fbHeight: cint
+glfwGetWindowSize(window, &winWidth, &winHeight)
+glfwGetFramebufferSize(window, &fbWidth, &fbHeight)
+
+local pxRatio = fbWidth / winWidth
+local fb = nvgluCreateFramebuffer(vg, 100*pxRatio,100*pxRatio, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY)
+if fb == nilptr then
+   print("Could not create FBO.")
+   return -1
+end
+defer nvgluDeleteFramebuffer(fb) end
+
+glfwSwapInterval(1)
+glfwSetTime(0)
+local winWidth: cint, winHeight: cint
+local prev = glfwGetTime()
+
+local initialAngle = math.pi / 10
+local euler_angle = initialAngle
+local rk4_angle = initialAngle
+local euler_velocity = 0.0
+local rk4_velocity = 0.0
+
+local g = 9.81
+local L = 150.0
+local damping = 5.5
+
+local function accel(theta: float64): float64
+   return -(g/L) * math.sin(theta)
+end
+
+while glfwWindowShouldClose(window) == 0 do
+   local t = glfwGetTime()
+   local dt = (t - prev) * damping
+   prev = t
+
+   glfwGetWindowSize(window, &winWidth, &winHeight)
+   glfwGetFramebufferSize(window, &fbWidth, &fbHeight)
+
+   pxRatio = fbWidth / winWidth
+   glViewport(0, 0, fbWidth, fbHeight)
+   glClearColor(0.92, 0.92, 0.94, 1.0)
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT)
+
+   nvgBeginFrame(vg, winWidth, winHeight, pxRatio)
+
+   defer
+     nvgEndFrame(vg)
+     glfwSwapBuffers(window)
+     glfwPollEvents()
+   end
+
+   nvgSave(vg)
+   defer nvgRestore(vg) end
+
+   -- Optimized Solution for small range
+   local g1 = Ground {
+      position = { winWidth // 4 - 50, 200 },
+      size = { 100 },
+   }
+
+   local ref_line1 = Dash {
+      start_point = { winWidth // 4, 227.5 },
+      length = L + 100.0,
+      rotation = math.pi / 2,
+      gap = 5.0,
+      segment_num = 20,
+   }
+
+   local angle = (math.pi / 2) - (initialAngle * math.cos(math.sqrt(g/L) * t * damping))
+
+   local pendulum1 = Pendulum {
+      position = { winWidth // 4, 227.5 },
+      length = L,
+      rotation = angle,
+   }
+   -- using euler method
+   local euler_acceleration = accel(euler_angle)
+   euler_velocity = euler_velocity + (euler_acceleration * dt)
+   euler_angle = euler_angle + (euler_velocity * dt)
+
+   local g2 = Ground {
+      position = { winWidth // 2 - 50, 200 },
+      size = { 100 },
+   }
+
+   local ref_line2 = Dash {
+      start_point = { winWidth // 2, 227.5 },
+      length = L + 100.0,
+      rotation = math.pi / 2,
+      gap = 5.0,
+      segment_num = 20,
+   }
+   
+   local pendulum2 = Pendulum {
+      position = { winWidth // 2, 227.5 },
+      length = L,
+      rotation = (math.pi / 2) - euler_angle,
+   }
+
+   -- using Range-Kutta Method
+   local k1_vel = accel(dt * rk4_angle)
+   local k2_vel = accel(rk4_angle + (dt * 0.5 * k1_vel))
+   local k3_vel = accel(rk4_angle + (dt * 0.5 * k2_vel))
+   local k4_vel = accel(rk4_angle + (dt * k3_vel))
+ 
+   rk4_velocity = rk4_velocity + (dt * (k1_vel + 2 * k2_vel + 2 * k3_vel + k4_vel) / 6)
+
+   local k1_angle = rk4_velocity
+   local k2_angle = rk4_velocity + (dt * 0.5 * k1_angle)
+   local k3_angle = rk4_velocity + (dt * 0.5 * k2_angle)
+   local k4_angle = rk4_velocity + (dt * k3_angle)
+ 
+   rk4_angle = rk4_angle + (dt * (k1_angle + 2 * k2_angle + 2 * k3_angle + k4_angle) / 6)
+
+   local g3 = Ground {
+      position = { (3 * winWidth // 4) - 50, 200 },
+      size = { 100 },
+   }
+
+   local ref_line3 = Dash {
+      start_point = { 3 * winWidth // 4, 227.5 },
+      length = L + 100.0,
+      rotation = math.pi / 2,
+      gap = 5.0,
+      segment_num = 20,
+   }
+   
+   local pendulum3 = Pendulum {
+      position = { 3 * winWidth // 4, 227.5 },
+      length = L,
+      rotation = (math.pi / 2) - rk4_angle,
+   }
+
+   drawDashedLine(vg, ref_line1)
+   drawGround(vg, g1)
+   drawPendulum(vg, pendulum1)
+
+   drawDashedLine(vg, ref_line2)
+   drawGround(vg, g2)
+   drawPendulum(vg, pendulum2)
+
+   drawDashedLine(vg, ref_line3)
+   drawGround(vg, g3)
+   drawPendulum(vg, pendulum3)
+   
+   nvgFillColor(vg, nvgRGB(120, 120, 120))
+   nvgTranslate(vg, winWidth // 2, 227.5)
+   nvgRotate(vg, math.pi / 2)
+   nvgBeginPath(vg)
+   if euler_angle > 0 then
+      nvgArc(vg, 0, 0, 30, -euler_angle, 0, NVG_CW)
+      nvgArc(vg, 0, 0, 32, 0, -euler_angle, NVG_CCW)
+   else
+      nvgArc(vg, 0, 0, 30, 0, -euler_angle, NVG_CW)
+      nvgArc(vg, 0, 0, 32, -euler_angle, 0, NVG_CCW)
+   end
+   nvgClosePath(vg)
+   nvgFill(vg)
+   nvgResetTransform(vg)
+
+   nvgTranslate(vg, 3 * winWidth // 4, 227.5)
+   nvgRotate(vg, math.pi / 2)
+   nvgBeginPath(vg)
+   if rk4_angle > 0 then
+      nvgArc(vg, 0, 0, 30, -rk4_angle, 0, NVG_CW)
+      nvgArc(vg, 0, 0, 32, 0, -rk4_angle, NVG_CCW)
+   else
+      nvgArc(vg, 0, 0, 30, 0, -rk4_angle, NVG_CW)
+      nvgArc(vg, 0, 0, 32, -rk4_angle, 0, NVG_CCW)
+   end
+   nvgClosePath(vg)
+   nvgFill(vg)
+   nvgResetTransform(vg)
+end

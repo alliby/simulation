@@ -1,0 +1,61 @@
+##[[
+function rPrint(table, indent, depth)
+    -- Default parameters
+    indent = indent or ""
+    depth = depth or 2
+    
+    -- Check if max depth reached
+    if depth <= 0 then
+        print(indent .. "[Max depth reached]")
+        return
+    end
+    
+    -- Iterate through all keys in the table
+    for key, value in pairs(table) do
+        -- Handle different types of values
+        if type(value) == "table" then
+            -- If value is another table, print the key and recursively print its contents
+            print(indent .. tostring(key) .. " (table):")
+            rPrint(value, indent .. "  ", depth - 1)
+        else
+            -- Print primitive values directly
+            print(indent .. tostring(key) .. ": " .. tostring(value))
+        end
+    end
+end
+]]
+
+require "windows"
+require "glfw"
+
+## cincdir "glfw/include"
+## cinclude "GLFW/glfw3.h"
+
+local lib = LoadLibraryA("glfw/lib/gcc/libglfw3.dll")
+if not lib then
+   print("could not load the dynamic library")
+   return -1;
+end
+defer FreeLibrary(lib) end
+
+local function get_proc_address(lib: HMODULE, fn_name: cstring <comptime>): auto
+   local f = #|fn_name.value|#
+   local f_type = #[f.possibletypes[1]]#
+   return (@f_type)(GetProcAddress(lib, fn_name))
+end
+
+## for _, fn in ipairs({ "glfwInit", "glfwWindowHint", "glfwCreateWindow" }) do
+   local #|fn|# = get_proc_address(lib, #[fn]#)
+## end
+
+if glfwInit() == 0 then
+   print("Cannot Load glfw")
+   return -1
+end
+
+glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
+glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2)
+glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE)
+glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
+
+local window = glfwCreateWindow(1000, 600, "NanoVG")
