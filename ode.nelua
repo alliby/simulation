@@ -1,0 +1,30 @@
+## pragma{nogc=true}
+
+local R = @record { t: float64, y: float64 }
+local ode_fun_t = @function(t: float64, y: float64): float64
+
+global function rk4_step(f: ode_fun_t, y: float64, t: float64, h: float64): float64
+   local k1 = f(t, y)
+   local k2 = f(t + 0.5 * h, y + 0.5 * h * k1)
+   local k3 = f(t + 0.5 * h, y + 0.5 * h * k2)
+   local k4 = f(t + h, y + h * k3)
+   return y + h * (k1 + 2*k2 + 2*k3 + k4) / 6
+end
+
+local ode_2_fun_t = @function(t: float64, y1: float64, y2: float64): float64
+
+global function rk4_2_step(f: ode_2_fun_t, y: float64, dy: float64, t: float64, h: float64): (float64, float64)
+   local k1_1 = dy
+   local k1_2 = f(t, y, dy)
+   
+   local k2_1 = dy + 0.5*h*k1_2
+   local k2_2 = f(t + 0.5*h, y + 0.5*h*k1_1, dy + 0.5*h*k1_2)
+
+   local k3_1 = dy + 0.5*h*k2_2
+   local k3_2 = f(t + 0.5*h, y + 0.5*h*k2_1, dy + 0.5*h*k2_2)
+   
+   local k4_1 = dy + h*k3_2
+   local k4_2 = f(t + h, y + h * k3_1, dy + h * k3_2)
+   return y + h * (k1_1 + 2*k2_1 + 2*k3_1 + k4_1) / 6,
+        dy + h * (k1_2 + 2*k2_2 + 2*k3_2 + k4_2) / 6   
+end

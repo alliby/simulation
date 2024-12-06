@@ -1,0 +1,90 @@
+require "nanovg"
+require "math"
+
+global Vec2 = @record {
+   x: float32,
+   y: float32,
+}
+
+global Size = @record {
+   w: float32, -- width
+   h: float32, -- height
+}
+
+global Ground = @record {
+   position: Vec2,
+   size: Size,
+   rotation: float32,
+   hatchStep: float32
+}
+
+global Dash = @record {
+   start_point: Vec2,
+   length: float32,
+   rotation: float32,
+   gap: float32,
+   segment_num: integer,
+}
+
+global function drawDashedLine(vg: *NVGcontext, dash: Dash)
+   ## unpack_fields(dash)
+   if segment_num == 0 then segment_num = 5 end
+
+   nvgSave(vg)
+   defer nvgRestore(vg) end
+
+   nvgTranslate(vg, start_point.x, start_point.y)
+   nvgRotate(vg, rotation)
+   defer nvgResetTransform(vg) end
+
+   nvgStrokeWidth(vg, 2.0)
+   nvgStrokeColor(vg, nvgRGB(120, 120, 120))
+   nvgLineCap(vg, NVG_ROUND)
+   local l = length / segment_num
+   assert(gap < l)
+   for i=0,segment_num do
+      nvgBeginPath(vg)
+      nvgMoveTo(vg, l * i, 0)
+      nvgLineTo(vg, l * (i+1) - gap, 0)
+      nvgStroke(vg)
+   end
+end
+
+global function drawGround(vg: *NVGcontext, ground: Ground)
+   ## unpack_fields(ground)
+
+   nvgSave(vg)
+   defer nvgRestore(vg) end
+   
+   if hatchStep == 0 then hatchStep = 7 end
+   if size.h == 0 then size.h = 30 end
+
+   if rotation ~= 0 then
+      nvgTranslate(vg, position.x + size.w/2, position.y + size.h/2)
+      nvgRotate(vg, rotation)
+      nvgTranslate(vg, -size.w/2, -size.h/2)
+   else
+      nvgTranslate(vg, position.x, position.y)
+   end 
+   defer nvgResetTransform(vg) end
+
+   -- Scissoring
+   nvgScissor(vg, 0 , 0, size.w, size.h)
+   defer nvgResetScissor(vg) end
+
+   -- Drawing
+   nvgBeginPath(vg)
+   nvgStrokeWidth(vg, 10.0)
+   nvgMoveTo(vg, 0, size.h)
+   nvgLineTo(vg, size.w, size.h)
+   nvgStrokeColor(vg, nvgRGB(15, 15, 15))
+   nvgStroke(vg)
+   local hatch_x: float32 = 30 * math.cos(math.pi/6)
+   for i= -hatch_x, size.w + hatch_x, hatchStep  do
+      nvgBeginPath(vg)
+      nvgStrokeWidth(vg, 2.0)
+      nvgMoveTo(vg, i, size.h)
+      nvgLineTo(vg, i + hatch_x, 0)
+      nvgStroke(vg)
+   end
+end

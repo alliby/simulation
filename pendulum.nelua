@@ -1,0 +1,117 @@
+require "math"
+require "common"
+require "ode"
+
+global Pendulum = @record {
+   position: Vec2,
+   length: float32,
+   rotation: float32,
+   ball_radius: float32,
+}
+
+global function drawPendulum(vg: *NVGcontext, pendulum: Pendulum)
+   ## unpack_fields(pendulum)
+
+   nvgSave(vg)
+   defer nvgRestore(vg) end
+
+   if ball_radius == 0 then ball_radius = 25 end
+   
+   local dx = math.cos(rotation)
+   local dy = math.sin(rotation)
+
+   -- Transformations
+   nvgTranslate(vg, position.x, position.y)
+   defer nvgResetTransform(vg) end
+   -- Drawing
+   nvgBeginPath(vg)
+   nvgStrokeWidth(vg, 5.0)
+   nvgStrokeColor(vg, nvgRGB(15, 15, 15))
+   nvgLineCap(vg, NVG_ROUND)
+   nvgMoveTo(vg, 0, 0)
+   nvgLineTo(vg, length * dx, length * dy)
+   nvgStroke(vg)
+
+   nvgBeginPath(vg)
+   nvgCircle(vg, (length + ball_radius) * dx, (length + ball_radius) * dy, ball_radius)
+   nvgStroke(vg)
+end
+
+local initialAngle = math.pi / 2
+local euler_angle = initialAngle
+local rk4_angle = initialAngle
+local euler_velocity = 0.0
+local rk4_velocity = 0.0
+
+local g = 981.0
+local L = 150.0
+local b = 9000.0
+local a = 1.0
+local mass = 1.0
+local I = mass*L^2
+local omega = math.pi / 4
+
+local function accel(t: float64, theta: float64, dtheta: float64): float64
+   return -(b/I)*dtheta -(g/L) * math.sin(theta) + (a/I) * math.cos(omega * t)
+end
+
+local function simple_solution(t: float64): float64
+   return initialAngle * math.cos(math.sqrt(g/L) * t)
+end
+
+global function draw_pendulum_simulation(vg: *NVGcontext, t: float64, dt: float64, w: float64)
+
+   -- small angle solution 
+   local simple_angle = simple_solution(t)
+
+   -- using euler method
+   local euler_acceleration = accel(t, euler_angle, euler_velocity)
+   euler_velocity = euler_velocity + (euler_acceleration * dt)
+   euler_angle = euler_angle + (euler_velocity * dt)
+
+   -- using Range-Kutta Method
+   rk4_angle, rk4_velocity = rk4_2_step(accel, rk4_angle, rk4_velocity, t, dt)
+
+   local angles: []float64 = { euler_angle, rk4_angle }
+
+   for i=0,#angles-1 do
+      local angle = angles[i]
+      local g = Ground {
+	 position = { ((i+1) * w / (#angles+1) ) - 50, 200 },
+	 size = { 100 },
+      }
+      
+      local ref_line = Dash {
+	 start_point = { (i+1) * w / (#angles+1), 227.5 },
+	 length = L + 100.0,
+	 rotation = math.pi / 2,
+	 gap = 5.0,
+	 segment_num = 20,
+      }
+      
+      local pendulum = Pendulum {
+	 position = { (i+1) * w / (#angles+1), 227.5 },
+	 length = L,
+	 rotation = (math.pi / 2) - angle,
+      }
+
+      drawDashedLine(vg, ref_line)
+      drawGround(vg, g)
+      drawPendulum(vg, pendulum)
+      
+      nvgFillColor(vg, nvgRGB(120, 120, 120))
+      nvgTranslate(vg, (i+1) * w / (#angles+1), 227.5)
+      nvgRotate(vg, math.pi / 2)
+      nvgBeginPath(vg)
+      if angle > 0 then
+	 nvgArc(vg, 0, 0, 30, -angle, 0, NVG_CW)
+	 nvgArc(vg, 0, 0, 32, 0, -angle, NVG_CCW)
+      else
+	 nvgArc(vg, 0, 0, 30, 0, -angle, NVG_CW)
+ 	 nvgArc(vg, 0, 0, 32, -angle, 0, NVG_CCW)
+      end
+      nvgClosePath(vg)
+      nvgFill(vg)
+      nvgResetTransform(vg)
+   end
+end

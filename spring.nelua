@@ -1,0 +1,58 @@
+require "common"
+require "ode"
+require "math"
+
+global Spring = @record {
+   position: Vec2,
+   length: float32,
+   rotation: float32
+}
+
+global function drawSpring(vg: *NVGcontext, spring: Spring)
+   ## unpack_fields(spring)
+
+   nvgSave(vg)
+   defer nvgRestore(vg) end
+
+   -- Transformations
+   nvgTranslate(vg, position.x, position.y)
+   nvgRotate(vg, rotation)
+   defer nvgResetTransform(vg) end
+
+   -- Drawing
+   nvgStrokeWidth(vg, 3.0)
+   nvgStrokeColor(vg, nvgRGB(15, 15, 15))
+   nvgLineCap(vg, NVG_ROUND)
+   nvgBeginPath(vg)
+   nvgMoveTo(vg, 0, 0)
+
+   local pitch = 15
+   if length < 50 then
+      pitch = 2
+   elseif length < 100 then
+      pitch = 3
+   elseif length < 200 then
+      pitch = 7
+   end
+
+   for i=0,pitch do
+      local h
+      if i == 0 or i == pitch then
+	 h = 0.0
+      else
+         h = (i % 2 == 0) and 5.0 or -5.0
+      end
+      nvgLineTo(vg, length / 4 + i * length / (2*pitch), h)
+   end
+   nvgLineTo(vg, length, 0)
+   nvgStroke(vg)
+end
+
+global function draw_spring_simulation(vg: *NVGcontext, t: float64, dt: float64)
+   local spring = Spring {
+      position = { 100.0, 100.0 },
+      length = 200,
+      rotation = 0.0,
+   }
+   drawSpring(vg, spring)
+end

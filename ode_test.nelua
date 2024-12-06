@@ -1,0 +1,61 @@
+require "ode"
+require "math"
+
+do
+   local function dydt(t: float64, y: float64): float64
+      return -y
+   end
+
+   local function anal_solution(t: float64): float64
+      return math.exp(-t)
+   end
+
+   local t0 = 0.0
+   local tf = 2.0
+   local y0 = 1.0
+   local h = 0.1
+   
+   local t = t0
+   local y = y0
+
+   print("----- Range-Kutta Method for first order ODE -------")
+   while t <= tf do
+      print("error:", math.abs(y - anal_solution(t)))
+      print("analytical result:", anal_solution(t))
+      print("numerical result:", y)
+      y = rk4_step(dydt, y, t, h)
+      t = t + h
+   end
+end
+
+local c1 = 1/2 - #[math.sqrt(5)/2]#
+local c2 = 1/2 + #[math.sqrt(5)/2]#
+
+do
+   local function d2ydt(t: float64, y: float64, dy: float64): float64
+      return y + dy + t
+   end
+
+   local function anal_solution(t: float64): float64
+      return math.exp(c1*t) + math.exp(c2 * t) - t + 1
+   end
+
+   local dy0 = c1 + c2 - 1
+   local y0 = 3.0
+   local t0 = 0.0
+   local tf = 2.0
+   local h = 0.1
+
+   local t = t0
+   local y = y0
+   local dy = dy0
+
+   print("\n----- Range-Kutta Method for second order ODE -------")
+   while t <= tf do
+      print("error:", math.abs(y - anal_solution(t)))
+      print("analytical result:", anal_solution(t))
+      print("numerical result:", y)
+      y, dy = rk4_2_step(d2ydt, y, dy, t, h)
+      t = t + h
+   end
+end
