@@ -1,6 +1,26 @@
 ## pragma{nogc=true}
 ## require "./build.lua"
 
+## function default_values(r, values)
+   ## local t = r.name
+   ## local fields = r.value.fields
+
+   function #|t|#.new(v: #|t|#): #|t|# <inline>
+      local res: #|t|#
+      ## for _, f in ipairs(fields) do
+	 ## for name, value in pairs(values) do
+	    ## if f.name == name then
+	       res.#|name|# = v.#|name|# == 0 and #[value]# or v.#|name|#
+	       ## goto continue
+	    ## end
+         ## end
+	 res.#|f.name|# = v.#|f.name|#
+	 ## ::continue::
+      ## end
+      return res
+   end
+## end
+
 ## function unpack_fields(value)
    ## local t = value.type
    ## for _, field in ipairs(t.fields) do
@@ -99,6 +119,6 @@ while glfwWindowShouldClose(window) == 0 do
      glfwPollEvents()
    end
 
-   draw_pendulum_simulation(vg, t, dt, winWidth)
-   draw_spring_simulation(vg, t, dt)
+   -- draw_pendulum_simulation(vg, t, dt, winWidth)
+   draw_spring_simulation(vg, t, dt, winWidth, winHeight)
 end

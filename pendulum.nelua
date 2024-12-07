@@ -9,6 +9,34 @@ global Pendulum = @record {
    ball_radius: float32,
 }
 
+## default_values(Pendulum, { ball_radius = 25 })
+
+global function drawPendulum(vg: *NVGcontext, pendulum: Pendulum)
+   ## unpack_fields(pendulum)
+
+   nvgSave(vg)
+   defer nvgRestore(vg) end
+
+   local dx = math.cos(rotation)
+   local dy = math.sin(rotation)
+
+   -- Transformations
+   nvgTranslate(vg, position.x, position.y)
+   defer nvgResetTransform(vg) end
+   -- Drawing
+   nvgBeginPath(vg)
+   nvgStrokeWidth(vg, 5.0)
+   nvgStrokeColor(vg, nvgRGB(15, 15, 15))
+   nvgLineCap(vg, NVG_ROUND)
+   nvgMoveTo(vg, 0, 0)
+   nvgLineTo(vg, length * dx, length * dy)
+   nvgStroke(vg)
+
+   nvgBeginPath(vg)
+   nvgCircle(vg, (length + ball_radius) * dx, (length + ball_radius) * dy, ball_radius)
+   nvgStroke(vg)
+end
+
 global function drawPendulum(vg: *NVGcontext, pendulum: Pendulum)
    ## unpack_fields(pendulum)
 
@@ -46,13 +74,12 @@ local rk4_velocity = 0.0
 local g = 981.0
 local L = 150.0
 local b = 9000.0
-local a = 1.0
 local mass = 1.0
 local I = mass*L^2
 local omega = math.pi / 4
 
 local function accel(t: float64, theta: float64, dtheta: float64): float64
-   return -(b/I)*dtheta -(g/L) * math.sin(theta) + (a/I) * math.cos(omega * t)
+   return -(b/I)*dtheta -(g/L) * math.sin(theta)
 end
 
 local function simple_solution(t: float64): float64
@@ -76,20 +103,19 @@ global function draw_pendulum_simulation(vg: *NVGcontext, t: float64, dt: float6
 
    for i=0,#angles-1 do
       local angle = angles[i]
-      local g = Ground {
+      local g = Ground.new {
 	 position = { ((i+1) * w / (#angles+1) ) - 50, 200 },
-	 size = { 100 },
+	 size = { 100, 30 },
       }
       
-      local ref_line = Dash {
+      local ref_line = Dash.new {
 	 start_point = { (i+1) * w / (#angles+1), 227.5 },
 	 length = L + 100.0,
 	 rotation = math.pi / 2,
-	 gap = 5.0,
 	 segment_num = 20,
       }
       
-      local pendulum = Pendulum {
+      local pendulum = Pendulum.new {
 	 position = { (i+1) * w / (#angles+1), 227.5 },
 	 length = L,
 	 rotation = (math.pi / 2) - angle,

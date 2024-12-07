@@ -18,6 +18,8 @@ global Ground = @record {
    hatchStep: float32
 }
 
+## default_values(Ground, { hatchStep = 7 })
+
 global Dash = @record {
    start_point: Vec2,
    length: float32,
@@ -26,9 +28,10 @@ global Dash = @record {
    segment_num: integer,
 }
 
+## default_values(Dash, { segment_num = 5, gap = 5.0 })
+
 global function drawDashedLine(vg: *NVGcontext, dash: Dash)
    ## unpack_fields(dash)
-   if segment_num == 0 then segment_num = 5 end
 
    nvgSave(vg)
    defer nvgRestore(vg) end
@@ -56,9 +59,6 @@ global function drawGround(vg: *NVGcontext, ground: Ground)
    nvgSave(vg)
    defer nvgRestore(vg) end
    
-   if hatchStep == 0 then hatchStep = 7 end
-   if size.h == 0 then size.h = 30 end
-
    if rotation ~= 0 then
       nvgTranslate(vg, position.x + size.w/2, position.y + size.h/2)
       nvgRotate(vg, rotation)
