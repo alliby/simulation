@@ -25,37 +25,55 @@ function rPrint(table, indent, depth)
 end
 ]]
 
-require "windows"
-require "glfw"
+local Vec2 = @record {
+   x: float32,
+   y: float32
+}
 
-## cincdir "glfw/include"
-## cinclude "GLFW/glfw3.h"
+local Ground = @record {
+   position: Vec2,
+   rotation: float32,
+   h: float32
+}
 
-local lib = LoadLibraryA("glfw/lib/gcc/libglfw3.dll")
-if not lib then
-   print("could not load the dynamic library")
-   return -1;
-end
-defer FreeLibrary(lib) end
+-- function Ground.new(g: Ground): Ground <inline>
+--    return Ground {
+--       position = g.position,
+--       rotation = g.rotation,
+--       h = g.h == 0.0 and 25.0 or g.h,
+--    }
+-- end
 
-local function get_proc_address(lib: HMODULE, fn_name: cstring <comptime>): auto
-   local f = #|fn_name.value|#
-   local f_type = #[f.possibletypes[1]]#
-   return (@f_type)(GetProcAddress(lib, fn_name))
-end
+-- local g = Ground.new { position = {10, 10}, rotation = 20 }
 
-## for _, fn in ipairs({ "glfwInit", "glfwWindowHint", "glfwCreateWindow" }) do
-   local #|fn|# = get_proc_address(lib, #[fn]#)
+-- print(g.position.x, g.position.y)
+-- print(g.rotation)
+-- print(g.h)
+
+-- ## rPrint(Ground.value)
+
+## function default_values(r, values)
+   ## local t = r.name
+   ## local fields = r.value.fields
+
+   function #|t|#.new(v: #|t|#): #|t|#
+      local res: #|t|#
+      ## for _, f in ipairs(fields) do
+	 ## for name, value in pairs(values) do
+	    ## if f.name == name then
+	       res.#|name|# = v.#|name|# == 0 and #[value]# or v.#|name|#
+	       ## goto continue
+	    ## end
+         ## end
+	 res.#|f.name|# = v.#|f.name|#
+	 ## ::continue::
+      ## end
+      return res
+   end
 ## end
 
-if glfwInit() == 0 then
-   print("Cannot Load glfw")
-   return -1
-end
-
-glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
-glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2)
-glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE)
-glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
-
-local window = glfwCreateWindow(1000, 600, "NanoVG")
+## default_values(Ground, { h = 25.0, rotation = 20.0 })
+local g = Ground.new()
+print(g.position.x, g.position.y)
+print(g.rotation)
+print(g.h)
