@@ -26,14 +26,7 @@ global function drawSpring(vg: *NVGcontext, spring: Spring)
    nvgBeginPath(vg)
    nvgMoveTo(vg, 0, 0)
 
-   local pitch = 15
-   if length < 50 then
-      pitch = 2
-   elseif length < 100 then
-      pitch = 3
-   elseif length < 200 then
-      pitch = 7
-   end
+   local pitch = 25
 
    for i=0,pitch do
       local h
@@ -42,17 +35,50 @@ global function drawSpring(vg: *NVGcontext, spring: Spring)
       else
          h = (i % 2 == 0) and 5.0 or -5.0
       end
-      nvgLineTo(vg, length / 4 + i * length / (2*pitch), h)
+      nvgLineTo(vg, length / 8 + 6 * i * length / (8*pitch), h)
    end
    nvgLineTo(vg, length, 0)
    nvgStroke(vg)
 end
 
-global function draw_spring_simulation(vg: *NVGcontext, t: float64, dt: float64)
+local L = 150.0
+local dx = 100.0
+local dv = -100.0
+local mass = 1.0
+local k = 3000.0
+local b = 0.5
+
+local function accel(t: float64, x: float64, dx: float64): float64
+   return -(k/mass) * x - (b/mass) * dx
+end
+
+global function draw_spring_simulation(vg: *NVGcontext, t: float64, dt: float64, w: float64, h: float64)
+   dx, dv = rk4_2_step(accel, dx, dv, t, dt)
+   
    local spring = Spring {
-      position = { 100.0, 100.0 },
-      length = 200,
+      position = { w / 4 - 7.5, h / 2 + 10.0 },
+      length = L + dx,
       rotation = 0.0,
    }
+
+   local h_ground = Ground.new {
+      position = { w / 4 - 70.0, h / 2 },
+      size = { 100.0, 30.0 },
+      rotation = -math.pi / 2
+   }
+
+   local v_ground = Ground.new {
+      position = { w / 4, h / 2 + 70.0 },
+      size = { 500.0, 30.0 },
+      rotation = math.pi
+   }
+   
+   drawGround(vg, h_ground)
+   drawGround(vg, v_ground)
    drawSpring(vg, spring)
+
+   nvgBeginPath(vg)
+   nvgStrokeWidth(vg, 5.0)
+   nvgRect(vg, w / 4 + dx + L - 7.5, h / 2 - 27.5, 100, 75)
+   nvgStroke(vg)
 end
