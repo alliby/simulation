@@ -86,7 +86,7 @@ glfwGetWindowSize(window, &winWidth, &winHeight)
 glfwGetFramebufferSize(window, &fbWidth, &fbHeight)
 
 local pxRatio = fbWidth / winWidth
-local fb = nvgluCreateFramebuffer(vg, 100*pxRatio,100*pxRatio, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY)
+local fb = nvgluCreateFramebuffer(vg, 100.0*pxRatio,100.0*pxRatio, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY)
 if fb == nilptr then
    print("Could not create FBO.")
    return -1
@@ -119,6 +119,7 @@ while glfwWindowShouldClose(window) == 0 do
      glfwPollEvents()
    end
 
-   -- draw_pendulum_simulation(vg, t, dt, winWidth)
+   draw_pendulum_simulation(vg, t, dt, winWidth)
    draw_spring_simulation(vg, t, dt, winWidth, winHeight)
+   draw_double_pendulum_simulation(vg, t, dt, winWidth)
 end

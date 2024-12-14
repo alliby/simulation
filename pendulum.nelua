@@ -37,34 +37,6 @@ global function drawPendulum(vg: *NVGcontext, pendulum: Pendulum)
    nvgStroke(vg)
 end
 
-global function drawPendulum(vg: *NVGcontext, pendulum: Pendulum)
-   ## unpack_fields(pendulum)
-
-   nvgSave(vg)
-   defer nvgRestore(vg) end
-
-   if ball_radius == 0 then ball_radius = 25 end
-   
-   local dx = math.cos(rotation)
-   local dy = math.sin(rotation)
-
-   -- Transformations
-   nvgTranslate(vg, position.x, position.y)
-   defer nvgResetTransform(vg) end
-   -- Drawing
-   nvgBeginPath(vg)
-   nvgStrokeWidth(vg, 5.0)
-   nvgStrokeColor(vg, nvgRGB(15, 15, 15))
-   nvgLineCap(vg, NVG_ROUND)
-   nvgMoveTo(vg, 0, 0)
-   nvgLineTo(vg, length * dx, length * dy)
-   nvgStroke(vg)
-
-   nvgBeginPath(vg)
-   nvgCircle(vg, (length + ball_radius) * dx, (length + ball_radius) * dy, ball_radius)
-   nvgStroke(vg)
-end
-
 local initialAngle = math.pi / 2
 local euler_angle = initialAngle
 local rk4_angle = initialAngle
@@ -97,7 +69,7 @@ global function draw_pendulum_simulation(vg: *NVGcontext, t: float64, dt: float6
    euler_angle = euler_angle + (euler_velocity * dt)
 
    -- using Range-Kutta Method
-   rk4_angle, rk4_velocity = rk4_2_step(accel, rk4_angle, rk4_velocity, t, dt)
+   rk4_angle, rk4_velocity = rk4_2_step(accel, t, dt, rk4_angle, rk4_velocity)
 
    local angles: []float64 = { euler_angle, rk4_angle }
 
@@ -140,4 +112,52 @@ global function draw_pendulum_simulation(vg: *NVGcontext, t: float64, dt: float6
       nvgFill(vg)
       nvgResetTransform(vg)
    end
+end
+
+
+local initAngle1 = math.pi / 2
+local initAngle2 = math.pi / 2
+local angles = (@[2]float64)({ initAngle1, initAngle2 })
+local velocities = (@[2]float64)({ 0.0, 0.0 })
+
+local g = 9.81
+local L1 = 2.0
+local L2 = 3.0
+local m1 = 10.0
+local m2 = 1.0
+
+local function system(t: float64, y: [2]float64, dy: [2]float64): [2]float64
+   local a1, a2 = y[0], y[1]
+   local w1, w2 = dy[0], dy[1]
+   return {
+      (-g*(2*m1 + m2)*math.sin(a1) - g*m2*math.sin(a1-2*a2) - 2*math.sin(a1-a2)*m2*(w2^2*L2+w1^2*L1*math.cos(a1-a2))) / (L1*(2*m1+m2-m2*math.cos(2*a1-2*a2))),
+      2*math.sin(a1-a2)*(w1^2*L1*(m1+m2) + g*(m1+m2)*math.cos(a1) + w2^2*L2*m2*math.cos(a1-a2)) / (L2*(2*m1+m2-m2*math.cos(2*a1-2*a2)))
+   }
+end
+
+global function draw_double_pendulum_simulation(vg: *NVGcontext, t: float64, dt: float64, w: float64)
+   local accel = system(t, angles, velocities)
+   for i=0,#accel-1 do
+      velocities[i] = velocities[i] + accel[i] * dt
+      angles[i] = angles[i] + velocities[i] * dt
+   end
+
+   local angle1 = angles[0]
+   local angle2 = angles[1]
+
+   local p1 = Pendulum.new {
+      position = { w / 2, 100.0 },
+      length = 100 * L1,
+      rotation = math.pi/2 - angle1
+   }
+
+   local p2 = Pendulum.new {
+      position = { w / 2 + (p1.ball_radius+100*L1)*math.sin(angle1), 100.0 + (p1.ball_radius+100*L1)*math.cos(angle1)},
+      length = 100*L2,
+      rotation = math.pi/2 - angle2
+   }
+
+   drawPendulum(vg, p1);
+   drawPendulum(vg, p2);
+   
 end
