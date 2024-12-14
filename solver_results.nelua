@@ -1,0 +1,135 @@
+require "ode"
+require "math"
+
+local function test_1()
+   print("\n----- Range-Kutta Method for first order Single variable ODE -------")
+   print("dy/dt = -y")
+
+   local function dydt(t: float64, y: float64): float64
+      return -y
+   end
+
+   local function anal_solution(t: float64): float64
+      return math.exp(-t)
+   end
+
+   local t0 = 0.0
+   local tf = 2.0
+   local y0 = 1.0
+   local h = 0.1
+   
+   local t = t0
+   local y = y0
+
+   while t <= tf do
+      print("error:", math.abs(y - anal_solution(t)))
+      y = rk4_step(dydt, t, h, y)
+      t = t + h
+   end
+end
+
+local function test_2()
+   print("\n----- Range-Kutta Method for second order Single Variable ODE -------")
+   print("y'' = y + y' + t")
+
+   local function d2ydt(t: float64, y: float64, dy: float64): float64
+      return y + dy + t
+   end
+
+   local function anal_solution(t: float64): float64
+      local c1 = 1/2 - math.sqrt(5)/2
+      local c2 = 1/2 + math.sqrt(5)/2
+      return math.exp(c1*t) + math.exp(c2*t) - t + 1
+   end
+
+   local dy0 = 0.0
+   local y0 = 3.0
+   local t0 = 0.0
+   local tf = 2.0
+   local h = 0.1
+
+   local t = t0
+   local y = y0
+   local dy = dy0
+
+   while t <= tf do
+      print("error:", math.abs(y - anal_solution(t)))
+      y, dy = rk4_2_step(d2ydt, t, h, y, dy)
+      t = t + h
+   end
+end
+
+local function test_3()
+   print("\n----- Range-Kutta Method for first order multiple variables ODE -------")
+   print("y1' = y1")
+   print("y2' = y1 - y2")
+
+   local function system(t: float64, y: [2]float64): [2]float64
+      return {
+	 y[0],
+	 y[0] - y[1]
+      }
+   end
+
+   local function anal_solution(t: float64): [2]float64
+      return {
+	 math.exp(t),
+	 (math.exp(t) + 3 * math.exp(-t)) / 2
+      }
+   end
+   
+   local t0 = 0.0
+   local tf = 2.0
+   local y0 = (@[2]float64){1.0, 2.0}
+   local h = 0.1
+   
+   local t = t0
+   local y = y0
+
+   while t <= tf do
+      print("error 01:", math.abs(y[0] - anal_solution(t)[0]))
+      print("error 02:", math.abs(y[1] - anal_solution(t)[1]))
+      y = rk4_step(system, t, h, y)
+      t = t + h
+   end
+end
+
+local function test_4()
+   print("\n----- Range-Kutta Method for second order Multiple variable ODE -------")
+   print("y1'' =  -y1' - y1")
+   print("y2'' = y2' - y2")
+
+   local function system(t: float64, y: [2]float64, dy: [2]float64): [2]float64
+      return {
+        -dy[0] - y[0],
+	 dy[1] - y[1]
+      }
+   end
+
+   local function anal_solution(t: float64): [2]float64
+      local c = math.sqrt(3)/2
+      return {
+	 math.exp(-t/2) * (math.cos(c * t) + math.sin(c * t)),
+	 math.exp(t/2) * (math.cos(c * t) + math.sin(c * t)),
+      }
+   end
+   
+   local t0 = 0.0
+   local tf = 2.0
+   local y0 = (@[2]float64){1.0, 1.0}
+   local dy0 = (@[2]float64){math.sqrt(3)/2, math.sqrt(3)/2}
+   local h = 0.1
+   
+   local t = t0
+   local y = y0
+   local dy = dy0
+
+   while t <= tf do
+      print("error 01:", math.abs(y[0] - anal_solution(t)[0]))
+      print("error 02:", math.abs(y[1] - anal_solution(t)[1]))
+      y, dy = rk4_2_step(system, t, h, y, dy)
+      t = t + h
+   end
+end
+
+test_4()
