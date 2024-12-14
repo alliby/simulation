@@ -25,55 +25,47 @@ function rPrint(table, indent, depth)
 end
 ]]
 
-local Vec2 = @record {
-   x: float32,
-   y: float32
-}
+local function_concept: type = #[concept(function(x) return x.type.is_function end)]#
+   
+global function rk4_step(f: function_concept, t: float64, h: float64, y: auto): float64
+   ## local argnum = select("#", ...)
+   ## static_assert(argnum == #f.type.argattrs - 1, "expected that function args is the same for ODE solver")
+   ##[[
+     local k2 = {}
+     local k3 = {}
+     local k4 = {}
+     for i=1,argnum do
+        local arg = select(i, ...)
+        local mul_op = aster.BinaryOp {aster.Number {"0.5"}, "mul", aster.Id {"h"} }
+        local mul_op_1 = aster.BinaryOp { mul_op, "mul", aster.Id {"k1"} }
+        local mul_op_2 = aster.BinaryOp { mul_op, "mul", aster.Id {"k2"} }
+        k2[i] = aster.BinaryOp { arg, 'add', mul_op_1 }
+        k3[i] = aster.BinaryOp { arg, 'add', mul_op_2 }
+        k4[i] = aster.BinaryOp { arg, 'add', aster.BinaryOp { aster.Id {"h"}, "mul", aster.Id {"k3"} } }
+     end
+   ]]
 
-local Ground = @record {
-   position: Vec2,
-   rotation: float32,
-   h: float32
-}
+   local y = #[select(1, ...)]#
+   local k1 = f(t, ...)
+   local k2 = f(t + 0.5 * h, #[aster.unpack(k2)]#)
+   local k3 = f(t + 0.5 * h, #[aster.unpack(k3)]#)
+   local k4 = f(t + h, #[aster.unpack(k4)]#)
 
--- function Ground.new(g: Ground): Ground <inline>
---    return Ground {
---       position = g.position,
---       rotation = g.rotation,
---       h = g.h == 0.0 and 25.0 or g.h,
---    }
--- end
+   return y + h * (k1 + 2*k2 + 2*k3 + k4) / 6
+end
 
--- local g = Ground.new { position = {10, 10}, rotation = 20 }
+require "span"
 
--- print(g.position.x, g.position.y)
--- print(g.rotation)
--- print(g.h)
+local vec: type = @span(integer)
 
--- ## rPrint(Ground.value)
+function vec:len(): usize
+   return self.size
+end
 
-## function default_values(r, values)
-   ## local t = r.name
-   ## local fields = r.value.fields
+local base = (@[4]integer) {1, 2, 3, 4}
 
-   function #|t|#.new(v: #|t|#): #|t|#
-      local res: #|t|#
-      ## for _, f in ipairs(fields) do
-	 ## for name, value in pairs(values) do
-	    ## if f.name == name then
-	       res.#|name|# = v.#|name|# == 0 and #[value]# or v.#|name|#
-	       ## goto continue
-	    ## end
-         ## end
-	 res.#|f.name|# = v.#|f.name|#
-	 ## ::continue::
-      ## end
-      return res
-   end
-## end
+local a: vec = &base
+local b: span(int32) = &base
 
-## default_values(Ground, { h = 25.0, rotation = 20.0 })
-local g = Ground.new()
-print(g.position.x, g.position.y)
-print(g.rotation)
-print(g.h)
+print(a:len())
+print(b:len())
