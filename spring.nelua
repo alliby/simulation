@@ -8,6 +8,12 @@ global Spring = @record {
    rotation: float32
 }
 
+global Damper = @record {
+   position: Vec2,
+   length: float32,
+   rotation: float32
+}
+
 global function drawSpring(vg: *NVGcontext, spring: Spring)
    ## unpack_fields(spring)
 
@@ -41,24 +47,62 @@ global function drawSpring(vg: *NVGcontext, spring: Spring)
    nvgStroke(vg)
 end
 
+global function drawDamper(vg: *NVGcontext, damper: Damper)
+   ## unpack_fields(damper)
+
+   local cr = 20.0 -- cylinder radius
+   local cl = 30.0 -- cylinder length
+   local pl = 15.0 -- piston length
+   
+   nvgSave(vg)
+   defer nvgRestore(vg) end
+   
+   -- Transformations
+   nvgTranslate(vg, position.x, position.y)
+   nvgRotate(vg, rotation)
+   defer nvgResetTransform(vg) end
+
+   -- Drawing
+   nvgStrokeWidth(vg, 3.0)
+   nvgStrokeColor(vg, nvgRGB(0, 0, 0))
+   nvgLineCap(vg, NVG_SQUARE)
+
+   nvgBeginPath(vg)
+   nvgMoveTo(vg, (length - pl) / 2, -cr/2)
+   nvgLineTo(vg, (length + pl) / 2 - cl, -cr/2)
+   nvgMoveTo(vg, (length - pl) / 2, cr/2)
+   nvgLineTo(vg, (length + pl) / 2 - cl, cr/2)
+
+   nvgMoveTo(vg, 0, 0)
+   nvgLineTo(vg, (length - pl) / 2, 0)
+   nvgRect(vg, (length - pl) / 2, -cr / 2, pl, cr)
+   nvgMoveTo(vg, (length + pl) / 2, 0)
+   nvgLineTo(vg, length, 0)
+   nvgStroke(vg)
+end
+
 local L = 150.0
 local dx = 100.0
-local dv = -100.0
-local mass = 1.0
+local dv = 0.0
+local mass = 10.0
 local k = 3000.0
-local b = 0.5
+local b = 1.0
 
 local function accel(t: float64, x: float64, dx: float64): float64
    return -(k/mass) * x - (b/mass) * dx
 end
 
 global function draw_spring_simulation(vg: *NVGcontext, t: float64, dt: float64, w: float64, h: float64)
-   dx, dv = rk4_2_step(accel, dx, dv, t, dt)
+   dx, dv = rk4_2_step(accel, t, dt, dx, dv)
    
-   local spring = Spring {
-      position = { w / 4 - 7.5, h / 2 + 10.0 },
+   local damper = Damper {
+      position = { w / 4 - 7.5, h / 2 - 10.0 },
       length = L + dx,
-      rotation = 0.0,
+   }
+
+   local spring = Spring {
+      position = { w / 4 - 7.5, h / 2 + 30.0 },
+      length = L + dx,
    }
 
    local h_ground = Ground.new {
@@ -76,6 +120,7 @@ global function draw_spring_simulation(vg: *NVGcontext, t: float64, dt: float64,
    drawGround(vg, h_ground)
    drawGround(vg, v_ground)
    drawSpring(vg, spring)
+   drawDamper(vg, damper)
 
    nvgBeginPath(vg)
    nvgStrokeWidth(vg, 5.0)
