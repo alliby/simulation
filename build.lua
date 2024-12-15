@@ -11,18 +11,13 @@ function mergeTables(table1, table2)
     return result
 end
 
-if
-   not configer.maximum_performance and
-   not configer.release
-then
-   configer.cc = "tcc"
-end
-
 if configer.cc == "tcc" then
-   cflags "-D_WIN32_WINNT_VISTA"
-   cflags "-DMAPVK_VSC_TO_VK"
-   cflags "-DMAPVK_VK_TO_VSC"
-   cflags "-D_WIN32_WINNT_WIN7"
+   if ccinfo.is_windows then
+      cflags "-D_WIN32_WINNT_VISTA"
+      cflags "-DMAPVK_VSC_TO_VK"
+      cflags "-DMAPVK_VK_TO_VSC"
+      cflags "-D_WIN32_WINNT_WIN7"
+   end
    cincdir "glfw/deps"
    cincdir "glfw/deps/mingw"
    cinclude "math.h"
@@ -49,6 +44,9 @@ end
 cincdir "glfw/src"
 cincdir "glfw/include"
 cinclude "GLFW/glfw3.h"
+
+local use_x11 = true
+local use_wl = false
 
 local base_sources = {
    "glfw/src/context.c",
@@ -77,16 +75,67 @@ local windows_sources = {
    "glfw/src/win32_window.c",
 }
 
-local sources = mergeTables(base_sources, windows_sources)
+local linux_sources = {
+    "glfw/src/linux_joystick.c",
+    "glfw/src/posix_module.c",
+    "glfw/src/posix_poll.c",
+    "glfw/src/posix_thread.c",
+    "glfw/src/posix_time.c",
+    "glfw/src/xkb_unicode.c",
+}
+
+local linux_x11_sources = {
+    "glfw/src/glx_context.c",
+    "glfw/src/x11_init.c",
+    "glfw/src/x11_monitor.c",
+    "glfw/src/x11_window.c",
+}
+
+local linux_wl_sources = {
+    "glfw/src/wl_init.c",
+    "glfw/src/wl_monitor.c",
+    "glfw/src/wl_window.c",
+}
+
+if ccinfo.is_windows then
+   sources = mergeTables(base_sources, windows_sources)
+end
+
+if ccinfo.is_linux then
+   sources = mergeTables(base_sources, linux_sources)
+
+   if use_x11 then
+      sources = mergeTables(sources, linux_x11_sources)
+   end
+
+   if use_wl then
+      sources = mergeTables(sources, linux_wl_sources)
+   end
+end
+
 for _, src in ipairs(sources) do
    cfile(src)
 end
 
-cflags "-D_GLFW_WIN32"
-linklib "gdi32"
-linklib "opengl32"
-linklib "shell32"
-linklib "user32"
+if ccinfo.is_linux then
+   if use_x11 then
+      cflags "-D_GLFW_X11"
+      cincdir "x11-headers"
+   end
+
+   if use_wl then
+      cflags "-D_GLFW_WAYLAND"
+      cflags "-Wno-implicit-function-declaration"
+   end
+end
+
+if ccinfo.is_windows then
+   cflags "-D_GLFW_WIN32"
+   linklib "gdi32"
+   linklib "opengl32"
+   linklib "shell32"
+   linklib "user32"
+end
 
 -- Generate Bindings for GLFW
 if not fs.isfile('glfw/init.nelua') then
