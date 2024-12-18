@@ -1,138 +1,55 @@
 ## pragma{nogc=true}
 
+require "eq_system"
+
 local function_concept: type = #[concept(function(x)
   if x.type.is_function then return true end
   return false, "param must be a function type"
 end)]#
 
+-- Range-Kutta method for solving first order ODE with single or multiple variables
+-- y argument can be a scalar or an vector of scalars
 global function rk4_step(f: function_concept, t: float64, h: float64, y: auto): auto
    ## local f_ret = f.type.rettypes[1]
    ## if y.type.is_container then
       ## static_assert(y.type.is_container and f_ret.is_container)
-      local var_num <comptime> = #y
-      
-      local k1 = f(t, y)
-      for i=0,var_num-1 do
-	 k1[i] = h * k1[i]
-      end
-
-      local k2: [var_num]float64
-      for i=0,var_num-1 do
-	 k2[i] = y[i] + 0.5 * k1[i]
-      end
-      local f_k2 = f(t + 0.5 * h, k2)
-      for i=0,var_num-1 do
-	 k2[i] = h * f_k2[i]
-      end
-
-      local k3: [var_num]float64
-      for i = 0, var_num-1 do
-	 k3[i] = y[i] + 0.5 * k2[i]
-      end
-      local f_k3 = f(t + 0.5 * h, k3)
-      for i = 0, var_num-1 do
-	 k3[i] = h * f_k3[i]
-      end
-
-      local k4: [var_num]float64
-      for i = 0, var_num-1 do
-	 k4[i] = y[i] + k3[i]
-      end
-      local f_k4 = f(t + h, k4)
-      for i = 0, var_num-1 do
-	 k4[i] = h * f_k4[i]
-      end      
-
-      local res: [var_num]float64
-      for i = 0, var_num-1 do
-	 res[i] = y[i] + (k1[i] + 2*k2[i] + 2*k3[i] + k4[i]) / 6
-      end
-
-      return res
-      
    ## else
-      ## static_assert((y.type.is_integral or y.type.is_float) and (f_ret.is_integral or f_ret.is_float))
-      local k1 = f(t, y)
-      local k2 = f(t + 0.5 * h, y + 0.5 * h * k1)
-      local k3 = f(t + 0.5 * h, y + 0.5 * h * k2)
-      local k4 = f(t + h, y + h * k3)
-      return y + h * (k1 + 2*k2 + 2*k3 + k4) / 6
+      ## static_assert(y.type.is_scalar and f_ret.is_scalar)
    ## end
+
+   local k1 = MulSystem(h, f(t,y))
+   local k2 = MulSystem(h, f(t + 0.5*h, SumSystem(y, MulSystem(0.5, k1))))
+   local k3 = MulSystem(h, f(t + 0.5*h, SumSystem(y, MulSystem(0.5, k2))))
+   local k4 = MulSystem(h, f(t + h, SumSystem(y, k3)))
+   local res = SumSystem(y, DivSystem( SumSystem(k1, MulSystem(2.0, k2), MulSystem(2.0, k3), k4) , 6.0))
+
+   return res
 end
 
+-- Same Range-Kutta method for solving second order ODE with single or multiple variables
+-- y and dy arguments can be scalars or vectors of scalars
 global function rk4_2_step(f: function_concept, t: float64, h: float64, y: auto, dy: auto): (auto, auto)
+   ## static_assert(y.type == dy.type)
+
    ## local f_ret = f.type.rettypes[1]
    ## if y.type.is_container then
       ## static_assert(y.type.is_container and f_ret.is_container)
-      ## static_assert(#y == #dy)
-      local var_num <comptime> = #y
-
-      local k1_1 = dy
-      local k1_2 = f(t, y, dy)
-      for i=0,var_num-1 do
-	 k1_1[i] = h * k1_1[i]
-	 k1_2[i] = h * k1_2[i]
-      end
-
-      local k2_1: [var_num]float64
-      local k2_2: [var_num]float64
-      for i=0,var_num-1 do
-	 k2_1[i] = dy[i] + 0.5 * h * k1_2[i]
-	 k2_2[i] = y[i] + 0.5 * h * k1_1[i]
-      end
-      k2_2 = f(t + 0.5*h, k2_1, k2_2)
-      for i=0,var_num-1 do
-	 k2_1[i] = h * k2_1[i]
-	 k2_2[i] = h * k2_2[i]
-      end
-
-      local k3_1: [var_num]float64
-      local k3_2: [var_num]float64
-      for i=0,var_num-1 do
-	 k3_1[i] = dy[i] + 0.5 * h * k2_2[i]
-	 k3_2[i] = y[i] + 0.5 * h * k2_1[i]
-      end
-      k3_2 = f(t + 0.5*h, k3_1, k3_2)
-      for i=0,var_num-1 do
-	 k3_1[i] = h * k3_1[i]
-	 k3_2[i] = h * k3_2[i]
-      end
-
-      local k4_1: [var_num]float64
-      local k4_2: [var_num]float64
-      for i=0,var_num-1 do
-	 k4_1[i] = dy[i] + h * k3_2[i]
-	 k4_2[i] = y[i] + h * k3_1[i]
-      end
-      k4_2 = f(t + h, k4_1, k4_2)
-      for i=0,var_num-1 do
-	 k4_1[i] = h * k4_1[i]
-	 k4_2[i] = h * k4_2[i]
-      end
-
-      local Y: [var_num]float64
-      local dY: [var_num]float64
-      for i = 0, var_num-1 do
-	 Y[i] = y[i] + (k1_1[i] + 2*k2_1[i] + 2*k3_1[i] + k4_1[i]) / 6
-	 dY[i] = dy[i] + (k1_2[i] + 2*k2_2[i] + 2*k3_2[i] + k4_2[i]) / 6
-      end
-
-      return Y, dY
-
    ## else
-      ## static_assert((y.type.is_integral or y.type.is_float) and (f_ret.is_integral or f_ret.is_float))
-      local k1_1 = dy
-      local k1_2 = f(t, y, dy)
-      
-      local k2_1 = dy + 0.5*h*k1_2
-      local k2_2 = f(t + 0.5*h, y + 0.5*h*k1_1, dy + 0.5*h*k1_2)
-
-      local k3_1 = dy + 0.5*h*k2_2
-      local k3_2 = f(t + 0.5*h, y + 0.5*h*k2_1, dy + 0.5*h*k2_2)
-      
-      local k4_1 = dy + h*k3_2
-      local k4_2 = f(t + h, y + h * k3_1, dy + h * k3_2)
-      return y + h * (k1_1 + 2*k2_1 + 2*k3_1 + k4_1) / 6,
-	 dy + h * (k1_2 + 2*k2_2 + 2*k3_2 + k4_2) / 6   
+      ## static_assert(y.type.is_scalar and f_ret.is_scalar)
    ## end
+
+   local k1_1 = dy
+   local k1_2 = f(t, y, dy)
+
+   local k2_1 = SumSystem(dy, MulSystem(0.5*h, k1_2))
+   local k2_2 = f(t + 0.5*h, SumSystem(y, MulSystem(0.5*h, k1_1)), SumSystem(dy, MulSystem(0.5*h, k1_2)))
+
+   local k3_1 = SumSystem(dy, MulSystem(0.5*h, k2_2))
+   local k3_2 = f(t + 0.5*h, SumSystem(y, MulSystem(0.5*h, k2_1)), SumSystem(dy, MulSystem(0.5*h, k2_2)))
+
+   local k4_1 = SumSystem(dy, MulSystem(h, k3_2))
+   local k4_2 = f(t + h, SumSystem(y, MulSystem(h, k3_1)), SumSystem(dy, MulSystem(h, k3_2)))
+
+   return SumSystem(y, DivSystem(MulSystem(h, SumSystem(k1_1, MulSystem(2.0, k2_1), MulSystem(2.0, k3_1), k4_1)), 6.0)),
+      SumSystem(dy, DivSystem(MulSystem(h, SumSystem(k1_2, MulSystem(2.0, k2_2), MulSystem(2.0, k3_2), k4_2)), 6.0))
 end
