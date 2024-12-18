@@ -45,7 +45,7 @@ local rk4_velocity = 0.0
 
 local g = 981.0
 local L = 150.0
-local b = 9000.0
+local b = 900.0
 local mass = 1.0
 local I = mass*L^2
 local omega = math.pi / 4
