@@ -127,3 +127,83 @@ global function draw_spring_simulation(vg: *NVGcontext, t: float64, dt: float64,
    nvgRect(vg, w / 4 + dx + L - 7.5, h / 2 - 27.5, 100, 75)
    nvgStroke(vg)
 end
+
+local m1 = 3.0
+local m2 = 2.0
+local k1 = 100.0
+local k2 = 200.0
+local b1 = 1.0
+local b2 = 1.0
+local L1 = 150.0
+local L2 = 200.0
+local w1 = 70.0
+
+local x = (@[2]float64) { 50.0, 100.0 }
+local dx: [2]float64
+
+local function motion_system(t: float64, x: [2]float64, dx: [2]float64): [2]float64
+   local x1 = x[0]
+   local x2 = x[1]
+
+   local dx1 = dx[0]
+   local dx2 = dx[1]
+   
+   return {
+      (k2/m1) * (x2 - x1) - (k1/m1) * x1 - (b2/m1)*(dx2 - dx1) - (b1/m1)*dx1,
+      -(k2/m2) * (x2 - x1) - (b2/m2) * (dx2 - dx1)
+   }
+end
+
+global function draw_double_spring_simulation(vg: *NVGcontext, t: float64, dt: float64, w: float64, h: float64)
+   x, dx = rk4_2_step(motion_system, t, dt, x, dx)
+
+   local x1 = x[0]
+   local x2 = x[1]
+
+   local damper_1 = Damper {
+      position = { w / 4 - 7.5, h / 2 - 10.0 },
+      length = L1 + x1,
+   }
+
+   local damper_2 = Damper {
+      position = { w / 4 - 7.5 + L1 + x1 + w1, h / 2 - 10.0 },
+      length = L2 + x2,
+   }
+   
+   local spring_1 = Spring {
+      position = { w / 4 - 7.5, h / 2 + 30.0 },
+      length = L1 + x1,
+   }
+
+   local spring_2 = Spring {
+      position = { w / 4 - 7.5 + L1 + x1 + w1, h / 2 + 30.0 },
+      length = L2 + x2,
+   }
+
+   local h_ground = Ground.new {
+      position = { w / 4 - 70.0, h / 2 },
+      size = { 100.0, 30.0 },
+      rotation = -math.pi / 2
+   }
+
+   local v_ground = Ground.new {
+      position = { w / 4 - 5.0, h / 2 + 70.0 },
+      size = { 600.0, 30.0 },
+      rotation = math.pi
+   }
+   
+   drawGround(vg, h_ground)
+   drawGround(vg, v_ground)
+
+   drawSpring(vg, spring_1)
+   drawDamper(vg, damper_1)
+
+   drawSpring(vg, spring_2)
+   drawDamper(vg, damper_2)
+   
+   nvgBeginPath(vg)
+   nvgStrokeWidth(vg, 5.0)
+   nvgRect(vg, w / 4 + x1 + L1 - 7.5, h / 2 - 27.5, w1, 75)
+   nvgRect(vg, w / 4 + x1 + L1 - 7.5 + w1 + L2 + x2, h / 2 - 27.5, w1, 75)
+   nvgStroke(vg)
+end

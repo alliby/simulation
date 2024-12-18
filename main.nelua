@@ -119,7 +119,8 @@ while glfwWindowShouldClose(window) == 0 do
      glfwPollEvents()
    end
 
-   draw_pendulum_simulation(vg, t, dt, winWidth)
-   draw_spring_simulation(vg, t, dt, winWidth, winHeight)
-   draw_double_pendulum_simulation(vg, t, dt, winWidth)
+   -- draw_pendulum_simulation(vg, t, dt, winWidth)
+   -- draw_spring_simulation(vg, t, dt, winWidth, winHeight)
+   -- draw_double_pendulum_simulation(vg, t, dt, winWidth)
+   draw_double_spring_simulation(vg, t, dt, winWidth, winHeight)
 end
