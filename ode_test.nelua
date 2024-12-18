@@ -1,7 +1,7 @@
 require "ode"
 require "math"
 
-local function test_1()
+local function ode_test_1()
    print("\n----- Range-Kutta Method for first order Single variable ODE -------")
    print("dy/dt = -y")
 
@@ -28,7 +28,7 @@ local function test_1()
    end
 end
 
-local function test_2()
+local function ode_test_2()
    print("\n----- Range-Kutta Method for second order Single Variable ODE -------")
    print("y'' = y + y' + t")
 
@@ -59,7 +59,7 @@ local function test_2()
    end
 end
 
-local function test_3()
+local function ode_test_3()
    print("\n----- Range-Kutta Method for first order multiple variables ODE -------")
    print("y1' = y1")
    print("y2' = y1 - y2")
@@ -94,30 +94,32 @@ local function test_3()
    end
 end
 
-local function test_4()
+local function ode_test_4()
    print("\n----- Range-Kutta Method for second order Multiple variable ODE -------")
-   print("y1'' =  -y1' - y1")
-   print("y2'' = y2' - y2")
+   print("y1'' =  -2/3 * y1 + y2/3")
+   print("y2'' = y1/2 - y2/2")
 
    local function system(t: float64, y: [2]float64, dy: [2]float64): [2]float64
       return {
-        -dy[0] - y[0],
-	 dy[1] - y[1]
+	 -(2.0/3.0) * y[0] + y[1] / 3.0,
+	 y[0] / 2.0 - y[1] / 2.0
       }
    end
 
    local function anal_solution(t: float64): [2]float64
-      local c = math.sqrt(3)/2
+      local w1 = 1.0 / math.sqrt(6)
+      local w2 = 1.0
+
       return {
-	 math.exp(-t/2) * (math.cos(c * t) + math.sin(c * t)),
-	 math.exp(t/2) * (math.cos(c * t) + math.sin(c * t)),
+	 0.8 * math.cos(w1 * t) + 0.2 * math.cos(w2 * t),
+	 1.5 * 0.8 *  math.cos(w1 * t) -  0.2 * math.cos(w2 * t),
       }
    end
    
    local t0 = 0.0
    local tf = 2.0
    local y0 = (@[2]float64){1.0, 1.0}
-   local dy0 = (@[2]float64){math.sqrt(3)/2, math.sqrt(3)/2}
+   local dy0 : [2]float64
    local h = 0.1
    
    local t = t0
@@ -125,11 +127,13 @@ local function test_4()
    local dy = dy0
 
    while t <= tf do
-      print("error 01:", math.abs(y[0] - anal_solution(t)[0]))
-      print("error 02:", math.abs(y[1] - anal_solution(t)[1]))
+      print("error: ", math.abs(y[0] - anal_solution(t)[0]))
       y, dy = rk4_2_step(system, t, h, y, dy)
       t = t + h
    end
 end
 
-test_4()
+ode_test_1()
+ode_test_2()
+ode_test_3()
+ode_test_4()
