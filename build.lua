@@ -1,4 +1,5 @@
-local configer =  require 'nelua.configer'.get()
+local configer =  require 'nelua.configer'
+local config = configer.get()
 local nldecl = require 'nelua.plugins.nldecl'
 local fs = require 'nelua.utils.fs'
 local executor = require 'nelua.utils.executor'
@@ -11,7 +12,7 @@ function mergeTables(table1, table2)
     return result
 end
 
-if configer.cc == "tcc" then
+if config.cc == "tcc" then
    if ccinfo.is_windows then
       cflags "-D_WIN32_WINNT_VISTA"
       cflags "-DMAPVK_VSC_TO_VK"
