@@ -120,9 +120,15 @@ local initAngle2 = math.pi / 2
 local angles = (@[2]float64)({ initAngle1, initAngle2 })
 local velocities = (@[2]float64)({ 0.0, 0.0 })
 
+local euler_angles = angles
+local euler_velo = velocities
+
+local rk4_angles = angles
+local rk4_velo = velocities
+
 local g = 9.81
-local L1 = 2.0
-local L2 = 3.0
+local L1 = 1.5
+local L2 = 2.0
 local m1 = 10.0
 local m2 = 1.0
 
@@ -136,28 +142,35 @@ local function system(t: float64, y: [2]float64, dy: [2]float64): [2]float64
 end
 
 global function draw_double_pendulum_simulation(vg: *NVGcontext, t: float64, dt: float64, w: float64)
-   local accel = system(t, angles, velocities)
+   rk4_angles, rk4_velo = rk4_2_step(system, t, dt, rk4_angles, rk4_velo)
+   local accel = system(t, euler_angles, euler_velo)
    for i=0,#accel-1 do
-      velocities[i] = velocities[i] + accel[i] * dt
-      angles[i] = angles[i] + velocities[i] * dt
+      euler_velo[i] = euler_velo[i] + accel[i] * dt
+      euler_angles[i] = euler_angles[i] + euler_velo[i] * dt
    end
 
    local angle1 = angles[0]
    local angle2 = angles[1]
 
-   local p1 = Pendulum.new {
-      position = { w / 2, 100.0 },
-      length = 100 * L1,
-      rotation = math.pi/2 - angle1
-   }
+   local angles = (@[][2]float64){ euler_angles, rk4_angles}
 
-   local p2 = Pendulum.new {
-      position = { w / 2 + (p1.ball_radius+100*L1)*math.sin(angle1), 100.0 + (p1.ball_radius+100*L1)*math.cos(angle1)},
-      length = 100*L2,
-      rotation = math.pi/2 - angle2
-   }
-
-   drawPendulum(vg, p1);
-   drawPendulum(vg, p2);
+   for i=0,#angles-1 do
+      local angle1 = angles[i][0]
+      local angle2 = angles[i][1]
    
+      local p1 = Pendulum.new {
+	 position = { (1 + 2*i) * w / 4, 100.0 },
+	 length = 100 * L1,
+	 rotation = math.pi/2 - angle1
+      }
+
+      local p2 = Pendulum.new {
+	 position = { (1+2*i)*w / 4 + (p1.ball_radius+100*L1)*math.sin(angle1), 100.0 + (p1.ball_radius+100*L1)*math.cos(angle1)},
+	 length = 100*L2,
+	 rotation = math.pi/2 - angle2
+      }
+
+      drawPendulum(vg, p1);
+      drawPendulum(vg, p2);
+   end
 end
