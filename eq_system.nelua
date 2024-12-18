@@ -1,0 +1,82 @@
+local system_concept = #[concept(function(attr)
+    return (attr.type.is_container and attr.type.is_contiguous) or attr.type.is_scalar
+end)]#
+
+global function SumSystem(s: system_concept, ...: varargs): auto <inline>
+   local res: #[s.type]#
+   ## if s.type.is_container then
+      for i=0, #s - 1 do
+         ## for arg_idx=0,select('#', ...) do
+	    ## local arg
+	    ## if arg_idx == 0 then arg = s else arg = select(arg_idx, ...) end
+	    res[i] = res[i] + (#[arg]#)[i]
+         ## end
+      end
+   ## else
+      ## for arg_idx=0,select('#', ...) do
+         ## local arg
+         ## if arg_idx == 0 then arg = s else arg = select(arg_idx, ...) end
+	 res = res + #[arg]#
+      ## end
+   ## end
+
+   return res
+end
+
+global function MulSystem(s: system_concept, mul: system_concept): auto <inline>
+   ## if mul.type.is_container then
+      local res: #[mul.type]#
+   ## else
+      local res: #[s.type]#
+   ## end      
+      
+   ## if s.type.is_container and mul.type.is_container then
+     check(#s == #mul)
+     for i=0, #s - 1 do
+	res[i] = s[i] * mul[i]
+     end
+   ## elseif s.type.is_scalar and mul.type.is_scalar then
+     res = s * mul
+   ## elseif s.type.is_scalar or mul.type.is_scalar then
+      ## if s.type.is_container then
+	 for i=0, #s - 1 do
+	    res[i] = s[i] * mul
+	 end
+      ## else
+	 for i= 0, #mul - 1 do
+	    res[i] = mul[i] * s
+	 end
+      ## end
+   ## end
+
+   return res
+end
+
+global function DivSystem(s: system_concept, div: system_concept): auto <inline>
+   ## if div.type.is_container then
+      local res: #[div.type]#
+   ## else
+      local res: #[s.type]#
+   ## end      
+      
+   ## if s.type.is_container and div.type.is_container then
+     assert(#s == #div)
+     for i=0, #s - 1 do
+	res[i] = s[i] / div[i]
+     end
+   ## elseif s.type.is_scalar and div.type.is_scalar then
+     res = s / div
+   ## elseif s.type.is_scalar or div.type.is_scalar then
+      ## if s.type.is_container then
+	 for i=0, #s - 1 do
+	    res[i] = s[i] / div
+	 end
+      ## else
+	 for i= 0, #div - 1 do
+	    res[i] = s / div[i]
+	 end
+      ## end
+   ## end
+
+   return res
+end
