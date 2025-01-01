@@ -13,6 +13,7 @@ global function rk4_step(f: function_concept, t: float64, h: float64, y: auto): 
    ## local f_ret = f.type.rettypes[1]
    ## if y.type.is_container then
       ## static_assert(y.type.is_container and f_ret.is_container)
+      ## static_assert(y.type.subtype.is_scalar and f_ret.subtype.is_scalar)
    ## else
       ## static_assert(y.type.is_scalar and f_ret.is_scalar)
    ## end
