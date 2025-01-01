@@ -3,19 +3,18 @@ local system_concept = #[concept(function(attr)
 end)]#
 
 global function SumSystem(s: system_concept, ...: varargs): auto <inline>
-   local res: #[s.type]#
+   local res = s
+   ## local args_num = select("#", ...)
    ## if s.type.is_container then
       for i=0, #s - 1 do
-         ## for arg_idx=0,select('#', ...) do
-	    ## local arg
-	    ## if arg_idx == 0 then arg = s else arg = select(arg_idx, ...) end
+         ## for arg_idx=1,args_num do
+	    ## local arg = select(arg_idx, ...)
 	    res[i] = res[i] + (#[arg]#)[i]
          ## end
       end
-   ## else
-      ## for arg_idx=0,select('#', ...) do
-         ## local arg
-         ## if arg_idx == 0 then arg = s else arg = select(arg_idx, ...) end
+   ## elseif s.type.is_scalar then
+      ## for arg_idx=1,args_num do
+	 ## local arg = select(arg_idx, ...)
 	 res = res + #[arg]#
       ## end
    ## end
@@ -31,7 +30,7 @@ global function MulSystem(s: system_concept, mul: system_concept): auto <inline>
    ## end      
       
    ## if s.type.is_container and mul.type.is_container then
-     check(#s == #mul)
+     assert(#s == #mul)
      for i=0, #s - 1 do
 	res[i] = s[i] * mul[i]
      end
