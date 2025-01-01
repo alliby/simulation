@@ -30,6 +30,21 @@ global Dash = @record {
 
 ## default_values(Dash, { segment_num = 5, gap = 5.0 })
 
+global Rect = @record {
+   x: float32,
+   y: float32,
+   w: float32,
+   h: float32
+}
+
+global function drawRect(vg: *NVGcontext, rect: Rect)
+   ## unpack_fields(rect)
+   nvgBeginPath(vg)
+   nvgStrokeWidth(vg, 5.0)
+   nvgRect(vg, x, y, w, h)
+   nvgStroke(vg)
+end
+
 global function drawDashedLine(vg: *NVGcontext, dash: Dash)
    ## unpack_fields(dash)
 

@@ -121,11 +121,8 @@ global function draw_spring_simulation(vg: *NVGcontext, t: float64, dt: float64,
    drawGround(vg, v_ground)
    drawSpring(vg, spring)
    drawDamper(vg, damper)
+   drawRect(vg, { w / 4 + dx + L - 7.5, h / 2 - 27.5, 100, 75 })
 
-   nvgBeginPath(vg)
-   nvgStrokeWidth(vg, 5.0)
-   nvgRect(vg, w / 4 + dx + L - 7.5, h / 2 - 27.5, 100, 75)
-   nvgStroke(vg)
 end
 
 local m1 = 3.0
@@ -201,9 +198,6 @@ global function draw_double_spring_simulation(vg: *NVGcontext, t: float64, dt: f
    drawSpring(vg, spring_2)
    drawDamper(vg, damper_2)
    
-   nvgBeginPath(vg)
-   nvgStrokeWidth(vg, 5.0)
-   nvgRect(vg, w / 4 + x1 + L1 - 7.5, h / 2 - 27.5, w1, 75)
-   nvgRect(vg, w / 4 + x1 + L1 - 7.5 + w1 + L2 + x2, h / 2 - 27.5, w1, 75)
-   nvgStroke(vg)
+   drawRect(vg, { w / 4 + x1 + L1 - 7.5, h / 2 - 27.5, w1, 75 })
+   drawRect(vg, { w / 4 + x1 + L1 - 7.5 + w1 + L2 + x2, h / 2 - 27.5, w1, 75 })
 end
