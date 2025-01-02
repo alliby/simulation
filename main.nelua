@@ -28,18 +28,26 @@
    ## end
 ## end
 
+-- Include Libraries
 require "glad"
 require "glfw"
 require "nanovg"
 
+-- Global variables
+global cursor_x: float64, cursor_y: float64 -- cursor position
+global window_w: cint, window_h: cint = 800, 600 -- window dimensions
+global fb_w: cint, fb_h: cint = 800, 600 -- window dimensions
+
+-- load other files
 require "pendulum"
 require "spring"
+require "ui"
 
-local function errorcb(error: cint, desc: cstring)
+local function error_callback(error: cint, desc: cstring)
    print("GLFW error", error, string(desc))
 end
 
-local function key(window: *GLFWwindow, key: cint, scancode: cint, action: cint, mods: cint)
+local function key_callback(window: *GLFWwindow, key: cint, scancode: cint, action: cint, mods: cint)
    if key == GLFW_KEY_ESCAPE and action == GLFW_RELEASE then
       glfwSetWindowShouldClose(window, GL_TRUE)
    end
@@ -50,13 +58,13 @@ if glfwInit() == 0 then
    return -1
 end
 
-glfwSetErrorCallback(errorcb)
+glfwSetErrorCallback(error_callback)
 glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
 glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2)
 glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE)
 glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
 
-local window = glfwCreateWindow(1000, 600, "NanoVG")
+local window = glfwCreateWindow(1000, 600, "Simulation")
 defer glfwTerminate() end
 
 if not window then
@@ -64,8 +72,10 @@ if not window then
    return -1
 end
 
-glfwSetKeyCallback(window, key)
 glfwMakeContextCurrent(window)
+
+-- Enable VSYNC
+glfwSwapInterval(1)
 
 if gladLoadGLLoader((@GLADloadproc)(glfwGetProcAddress)) == 0 then
    print("could not init glad")
@@ -80,47 +90,55 @@ if vg == nilptr then
    return -1
 end
 
-local winWidth: cint, winHeight: cint
-local fbWidth: cint, fbHeight: cint
-glfwGetWindowSize(window, &winWidth, &winHeight)
-glfwGetFramebufferSize(window, &fbWidth, &fbHeight)
+-- Keyboard Callback
+glfwSetKeyCallback(window, key_callback)
 
-local pxRatio = fbWidth / winWidth
-local fb = nvgluCreateFramebuffer(vg, 100.0*pxRatio,100.0*pxRatio, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY)
+local pxRatio = fb_w / window_w
+local fb = nvgluCreateFramebuffer(vg, 100*pxRatio,100*pxRatio, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY)
 if fb == nilptr then
    print("Could not create FBO.")
    return -1
 end
 defer nvgluDeleteFramebuffer(fb) end
 
-glfwSwapInterval(1)
-glfwSetTime(0)
+local font_path = "/usr/share/fonts/TTF/Roboto-Medium.ttf"
+local font = nvgCreateFont(vg, "sans", font_path)
 
-local winWidth: cint, winHeight: cint
+-- Set the time
+glfwSetTime(0)
 local prev = glfwGetTime()
 
 while glfwWindowShouldClose(window) == 0 do
+   -- Cursor Position
+   glfwGetCursorPos(window, &cursor_x, &cursor_y)
+
+   -- Window Size
+   glfwGetWindowSize(window, &window_w, &window_h)
+   glfwGetFramebufferSize(window, &fb_w, &fb_h)
+
    local t = glfwGetTime()
    local dt = t - prev
    prev = t
 
-   glfwGetWindowSize(window, &winWidth, &winHeight)
-   glfwGetFramebufferSize(window, &fbWidth, &fbHeight)
-
-   pxRatio = fbWidth / winWidth
-   glViewport(0, 0, fbWidth, fbHeight)
-   glClearColor(0.92, 0.92, 0.94, 1.0)
+   pxRatio = fb_w / window_w
+   glViewport(0, 0, fb_w, fb_h)
+   glClearColor(.92, .92, .94, 1.0)
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT)
 
-   nvgBeginFrame(vg, winWidth, winHeight, pxRatio)
+   nvgBeginFrame(vg, window_w, window_h, pxRatio)
+
    defer
      nvgEndFrame(vg)
      glfwSwapBuffers(window)
      glfwPollEvents()
    end
 
-   -- draw_pendulum_simulation(vg, t, dt, winWidth)
+   -- draw_pendulum_simulation(vg, t, dt)
    -- draw_spring_simulation(vg, t, dt, winWidth, winHeight)
    -- draw_double_pendulum_simulation(vg, t, dt, winWidth)
-   draw_double_spring_simulation(vg, t, dt, winWidth, winHeight)
+   -- draw_double_spring_simulation(vg, t, dt, winWidth, winHeight)
+   for idx=0,5 do
+      local y = 50 + 40.0 * (idx+1) + idx * 100
+      drawButton(vg, { 20, y, 200, 80 }, "btn_" .. tostring(idx+1))
+   end
 end

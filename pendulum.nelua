@@ -37,7 +37,7 @@ global function drawPendulum(vg: *NVGcontext, pendulum: Pendulum)
    nvgStroke(vg)
 end
 
-local initialAngle = math.pi / 2
+local initialAngle = math.pi / 4
 local euler_angle = initialAngle
 local rk4_angle = initialAngle
 local euler_velocity = 0.0
@@ -58,20 +58,17 @@ local function simple_solution(t: float64): float64
    return initialAngle * math.cos(math.sqrt(g/L) * t)
 end
 
-global function draw_pendulum_simulation(vg: *NVGcontext, t: float64, dt: float64, w: float64)
-
-   -- small angle solution 
-   local simple_angle = simple_solution(t)
-
+global function draw_pendulum_simulation(vg: *NVGcontext, t: float64, dt: float64)
+   local w = window_w
    -- using euler method
-   local euler_acceleration = accel(t, euler_angle, euler_velocity)
-   euler_velocity = euler_velocity + (euler_acceleration * dt)
-   euler_angle = euler_angle + (euler_velocity * dt)
+   -- local euler_acceleration = accel(t, euler_angle, euler_velocity)
+   -- euler_velocity = euler_velocity + (euler_acceleration * dt)
+   -- euler_angle = euler_angle + (euler_velocity * dt)
 
    -- using Range-Kutta Method
-   rk4_angle, rk4_velocity = rk4_2_step(accel, t, dt, rk4_angle, rk4_velocity)
+   -- rk4_angle, rk4_velocity = rk4_2_step(accel, t, dt, rk4_angle, rk4_velocity)
 
-   local angles: []float64 = { euler_angle, rk4_angle }
+   local angles: []float64 = { euler_angle }
 
    for i=0,#angles-1 do
       local angle = angles[i]
@@ -94,23 +91,23 @@ global function draw_pendulum_simulation(vg: *NVGcontext, t: float64, dt: float6
       }
 
       drawDashedLine(vg, ref_line)
-      drawGround(vg, g)
+      -- drawGround(vg, g)
       drawPendulum(vg, pendulum)
       
-      nvgFillColor(vg, nvgRGB(120, 120, 120))
-      nvgTranslate(vg, (i+1) * w / (#angles+1), 227.5)
-      nvgRotate(vg, math.pi / 2)
-      nvgBeginPath(vg)
-      if angle > 0 then
-	 nvgArc(vg, 0, 0, 30, -angle, 0, NVG_CW)
-	 nvgArc(vg, 0, 0, 32, 0, -angle, NVG_CCW)
-      else
-	 nvgArc(vg, 0, 0, 30, 0, -angle, NVG_CW)
- 	 nvgArc(vg, 0, 0, 32, -angle, 0, NVG_CCW)
-      end
-      nvgClosePath(vg)
-      nvgFill(vg)
-      nvgResetTransform(vg)
+      -- nvgFillColor(vg, nvgRGB(120, 120, 120))
+      -- nvgTranslate(vg, (i+1) * w / (#angles+1), 227.5)
+      -- nvgRotate(vg, math.pi / 2)
+      -- nvgBeginPath(vg)
+      -- if angle > 0 then
+      -- 	 nvgArc(vg, 0, 0, 30, -angle, 0, NVG_CW)
+      -- 	 nvgArc(vg, 0, 0, 32, 0, -angle, NVG_CCW)
+      -- else
+      -- 	 nvgArc(vg, 0, 0, 30, 0, -angle, NVG_CW)
+      -- 	 nvgArc(vg, 0, 0, 32, -angle, 0, NVG_CCW)
+      -- end
+      -- nvgClosePath(vg)
+      -- nvgFill(vg)
+      -- nvgResetTransform(vg)
    end
 end
 
