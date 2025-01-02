@@ -1,5 +1,3 @@
-local configer =  require 'nelua.configer'
-local config = configer.get()
 local nldecl = require 'nelua.plugins.nldecl'
 local fs = require 'nelua.utils.fs'
 local executor = require 'nelua.utils.executor'
@@ -12,7 +10,7 @@ function mergeTables(table1, table2)
     return result
 end
 
-if config.cc == "tcc" then
+if ccinfo.is_tcc then
    if ccinfo.is_windows then
       cflags "-D_WIN32_WINNT_VISTA"
       cflags "-DMAPVK_VSC_TO_VK"
@@ -45,9 +43,6 @@ end
 cincdir "glfw/src"
 cincdir "glfw/include"
 cinclude "GLFW/glfw3.h"
-
-local use_x11 = true
-local use_wl = false
 
 local base_sources = {
    "glfw/src/context.c",
@@ -98,12 +93,17 @@ local linux_wl_sources = {
     "glfw/src/wl_window.c",
 }
 
+local sources = base_sources
+
 if ccinfo.is_windows then
-   sources = mergeTables(base_sources, windows_sources)
+   sources = mergeTables(sources, windows_sources)
 end
 
+local use_x11 = true
+local use_wl = false
+
 if ccinfo.is_linux then
-   sources = mergeTables(base_sources, linux_sources)
+   sources = mergeTables(sources, linux_sources)
 
    if use_x11 then
       sources = mergeTables(sources, linux_x11_sources)
