@@ -37,6 +37,11 @@ global Rect = @record {
    h: float32
 }
 
+function Rect:contains(point: Vec2): boolean
+   return point.x >= self.x and point.x <= self.x + self.w and
+      point.y >= self.y and point.y <= self.y + self.h
+end
+
 global function drawRect(vg: *NVGcontext, rect: Rect)
    ## unpack_fields(rect)
    nvgBeginPath(vg)
