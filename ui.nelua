@@ -1,0 +1,33 @@
+require "math"
+require "common"
+require "string"
+
+global function drawLabel(vg: *NVGcontext,rect: Rect, text: string)
+   nvgFontSize(vg, 30.0)
+   nvgFontFace(vg, "sans")
+   nvgFillColor(vg, nvgRGB(0, 0, 0))
+   nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+
+   -- Scissoring
+   nvgScissor(vg, rect.x , rect.y, rect.w, rect.h)
+   defer nvgResetScissor(vg) end
+
+   local text_bounds: [4]float32
+   nvgTextBounds(vg, rect.x, rect.y, text, nilptr, &text_bounds)
+   local text_width = text_bounds[2] - text_bounds[0]
+   local x = math.max(rect.x, rect.x + (rect.w - text_width) / 2)
+   local y = rect.y + rect.h / 2
+   drawRect(vg, rect)
+   nvgText(vg, x, y, text, nilptr);
+end
+
+global function drawButton(vg: *NVGcontext, rect: Rect, text: string): boolean
+   drawLabel(vg, rect, text)
+   nvgFontSize(vg, 20.0)
+   nvgText(vg, 10, 20, "cursor x: " .. tostring(cursor_x), nilptr)
+   nvgText(vg, 10, 40, "cursor y: " .. tostring(cursor_y), nilptr)
+   if rect:contains({ cursor_x, cursor_y }) then
+      nvgText(vg, 10, 60, "hovered", nilptr)
+   end
+   return false
+end
