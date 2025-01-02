@@ -22,3 +22,9 @@ function rPrint(table, indent, depth)
         end
     end
 end
+
+function metaPrint(table)
+   for k, v in pairs(getmetatable(table)) do
+      print(tostring(k) .. " : " .. tostring(v))
+   end
+end
