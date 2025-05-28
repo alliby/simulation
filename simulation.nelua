@@ -101,9 +101,6 @@ if fb == nilptr then
 end
 defer nvgluDeleteFramebuffer(fb) end
 
-local font_path = "/usr/share/fonts/TTF/Roboto-Medium.ttf"
-local font = nvgCreateFont(vg, "sans", font_path)
-
 -- Set the time
 glfwSetTime(0)
 local prev = glfwGetTime()
@@ -133,12 +130,12 @@ while glfwWindowShouldClose(window) == 0 do
      glfwPollEvents()
    end
 
-   -- draw_pendulum_simulation(vg, t, dt)
-   -- draw_spring_simulation(vg, t, dt, winWidth, winHeight)
-   -- draw_double_pendulum_simulation(vg, t, dt, winWidth)
-   -- draw_double_spring_simulation(vg, t, dt, winWidth, winHeight)
-   for idx=0,5 do
-      local y = 50 + 40.0 * (idx+1) + idx * 100
-      drawButton(vg, { 20, y, 200, 80 }, "btn_" .. tostring(idx+1))
-   end
+   draw_pendulum_simulation(vg, t, dt)
+   draw_spring_simulation(vg, t, dt, window_w, window_h)
+   draw_double_pendulum_simulation(vg, t, dt, window_w)
+   draw_double_spring_simulation(vg, t, dt, window_w, window_h)
+   -- for idx=0,5 do
+   --    local y = 50 + 40.0 * (idx+1) + idx * 100
+   --    drawButton(vg, { 20, y, 200, 80 }, "btn_" .. tostring(idx+1))
+   -- end
 end
