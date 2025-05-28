@@ -1,7 +1,5 @@
 local nldecl = require 'nelua.plugins.nldecl'
 local fs = require 'nelua.utils.fs'
-local executor = require 'nelua.utils.executor'
-local console = require 'nelua.utils.console'
 
 function mergeTables(table1, table2)
     local result = {}
@@ -30,7 +28,7 @@ cincdir "glad/include"
 
 -- generate bindings for glad
 if not fs.isfile('glad/init.nelua') then
-   nldecl.generate_bindings_file{
+   nldecl.generate_bindings_file {
       include_dirs = { 'glad/include' },
       output_file = 'glad/init.nelua',
       parse_includes = {'glad/glad.h'},
@@ -95,42 +93,57 @@ local linux_wl_sources = {
 
 local sources = base_sources
 
-if ccinfo.is_windows then
-   sources = mergeTables(sources, windows_sources)
-end
+local use_x11 = false
+local use_wl = true
 
-local use_x11 = true
-local use_wl = false
+-- Generate Wayland Headers
+function generate_wayland_protocol(protocol_file)
+   local protocol_path = "glfw/deps/wayland/" .. protocol_file
+   local out_dir = "wayland-headers/"
+   local header_file = out_dir .. string.gsub(protocol_file, "%.xml$", "-client-protocol.h")
+   local code_file = out_dir .. string.gsub(protocol_file, "%.xml$", "-client-protocol-code.h")
+   if not fs.isfile(header_file) then
+      local client_command = string.format("wayland-scanner client-header \"%s\" \"%s\"",
+					   protocol_path,
+					   header_file)
+      os.execute(client_command)
+   end
+   if not fs.isfile(code_file) then
+      local code_command = string.format("wayland-scanner private-code \"%s\" \"%s\"",
+					 protocol_path,
+					 code_file)
+      os.execute(code_command)
+   end
+end
 
 if ccinfo.is_linux then
    sources = mergeTables(sources, linux_sources)
 
    if use_x11 then
       sources = mergeTables(sources, linux_x11_sources)
-   end
-
-   if use_wl then
-      sources = mergeTables(sources, linux_wl_sources)
-   end
-end
-
-for _, src in ipairs(sources) do
-   cfile(src)
-end
-
-if ccinfo.is_linux then
-   if use_x11 then
       cflags "-D_GLFW_X11"
       cincdir "x11-headers"
    end
 
    if use_wl then
+      sources = mergeTables(sources, linux_wl_sources)
       cflags "-D_GLFW_WAYLAND"
       cflags "-Wno-implicit-function-declaration"
+      cflags "-Iwayland-headers"
+      generate_wayland_protocol("wayland.xml")
+      generate_wayland_protocol("viewporter.xml")
+      generate_wayland_protocol("xdg-shell.xml")
+      generate_wayland_protocol("idle-inhibit-unstable-v1.xml")
+      generate_wayland_protocol("pointer-constraints-unstable-v1.xml")
+      generate_wayland_protocol("relative-pointer-unstable-v1.xml")
+      generate_wayland_protocol("fractional-scale-v1.xml")
+      generate_wayland_protocol("xdg-activation-v1.xml")
+      generate_wayland_protocol("xdg-decoration-unstable-v1.xml")
    end
 end
 
 if ccinfo.is_windows then
+   sources = mergeTables(sources, windows_sources)
    cflags "-D_GLFW_WIN32"
    linklib "gdi32"
    linklib "opengl32"
@@ -138,9 +151,13 @@ if ccinfo.is_windows then
    linklib "user32"
 end
 
+for _, src in ipairs(sources) do
+   cfile(src)
+end
+
 -- Generate Bindings for GLFW
 if not fs.isfile('glfw/init.nelua') then
-   nldecl.generate_bindings_file{
+   nldecl.generate_bindings_file {
       include_dirs = { 'glfw/include' },
       output_file = 'glfw/init.nelua',
       parse_includes = {'GLFW/glfw3.h'},
@@ -150,6 +167,7 @@ end
 
 -- Compiling NanoVG
 --------------------------------------------------
+linklib "m"
 cdefine "_CRT_SECURE_NO_WARNINGS"
 cdefine "NANOVG_GL3_IMPLEMENTATION"
 
@@ -161,10 +179,10 @@ cinclude "nanovg_gl_utils.h"
 
 -- Generate Bindings for NanoVG
 if not fs.isfile('nanovg/init.nelua') then
-   nldecl.generate_bindings_file{
+   nldecl.generate_bindings_file {
       include_dirs = { 'nanovg/src', 'glad/include' },
       output_file = 'nanovg/init.nelua',
-      parse_includes = {'nanovg.h', 'nanovg_gl.h', 'nanovg_gl_utils.h' },
+      parse_includes = {'nanovg.h', 'nanovg_gl.h' },
    }
 end
 --------------------------------------------------
