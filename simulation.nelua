@@ -29,7 +29,6 @@
 ## end
 
 -- Include Libraries
-require "glad"
 require "glfw"
 require "nanovg"
 
