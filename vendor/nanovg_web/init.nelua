@@ -1,0 +1,1960 @@
+global intmax_t: type <cimport,nodecl> = @clonglong
+global uintmax_t: type <cimport,nodecl> = @culonglong
+global int_fast8_t: type <cimport,nodecl> = @cschar
+global int_fast16_t: type <cimport,nodecl> = @cshort
+global int_fast32_t: type <cimport,nodecl> = @cint
+global int_fast64_t: type <cimport,nodecl> = @clonglong
+global int_least8_t: type <cimport,nodecl> = @cschar
+global int_least16_t: type <cimport,nodecl> = @cshort
+global int_least32_t: type <cimport,nodecl> = @cint
+global int_least64_t: type <cimport,nodecl> = @clonglong
+global uint_fast8_t: type <cimport,nodecl> = @cuchar
+global uint_fast16_t: type <cimport,nodecl> = @cushort
+global uint_fast32_t: type <cimport,nodecl> = @cuint
+global uint_fast64_t: type <cimport,nodecl> = @culonglong
+global uint_least8_t: type <cimport,nodecl> = @cuchar
+global uint_least16_t: type <cimport,nodecl> = @cushort
+global uint_least32_t: type <cimport,nodecl> = @cuint
+global uint_least64_t: type <cimport,nodecl> = @culonglong
+global khronos_int32_t: type <cimport,nodecl> = @int32
+global khronos_uint32_t: type <cimport,nodecl> = @uint32
+global khronos_int64_t: type <cimport,nodecl> = @int64
+global khronos_uint64_t: type <cimport,nodecl> = @uint64
+global khronos_int8_t: type <cimport,nodecl> = @cschar
+global khronos_uint8_t: type <cimport,nodecl> = @cuchar
+global khronos_int16_t: type <cimport,nodecl> = @cshort
+global khronos_uint16_t: type <cimport,nodecl> = @cushort
+global khronos_intptr_t: type <cimport,nodecl> = @clong
+global khronos_uintptr_t: type <cimport,nodecl> = @culong
+global khronos_ssize_t: type <cimport,nodecl> = @clong
+global khronos_usize_t: type <cimport,nodecl> = @culong
+global khronos_float_t: type <cimport,nodecl> = @float32
+global khronos_utime_nanoseconds_t: type <cimport,nodecl> = @khronos_uint64_t
+global khronos_stime_nanoseconds_t: type <cimport,nodecl> = @khronos_int64_t
+global khronos_boolean_enum_t: type <cimport,nodecl,using> = @enum(cint){
+  KHRONOS_FALSE = 0,
+  KHRONOS_TRUE = 1,
+  KHRONOS_BOOLEAN_ENUM_FORCE_SIZE = 2147483647
+}
+global GLbyte: type <cimport,nodecl> = @khronos_int8_t
+global GLclampf: type <cimport,nodecl> = @khronos_float_t
+global GLfixed: type <cimport,nodecl> = @khronos_int32_t
+global GLshort: type <cimport,nodecl> = @khronos_int16_t
+global GLushort: type <cimport,nodecl> = @khronos_uint16_t
+global GLvoid: type <cimport,nodecl> = @void
+global __GLsync: type <cimport,nodecl,ctypedef'__GLsync',forwarddecl> = @record{}
+global GLsync: type <cimport,nodecl> = @*__GLsync
+global GLint64: type <cimport,nodecl> = @khronos_int64_t
+global GLuint64: type <cimport,nodecl> = @khronos_uint64_t
+global GLenum: type <cimport,nodecl> = @cuint
+global GLuint: type <cimport,nodecl> = @cuint
+global GLchar: type <cimport,nodecl> = @cchar
+global GLfloat: type <cimport,nodecl> = @khronos_float_t
+global GLsizeiptr: type <cimport,nodecl> = @khronos_ssize_t
+global GLintptr: type <cimport,nodecl> = @khronos_intptr_t
+global GLbitfield: type <cimport,nodecl> = @cuint
+global GLint: type <cimport,nodecl> = @cint
+global GLboolean: type <cimport,nodecl> = @cuchar
+global GLsizei: type <cimport,nodecl> = @cint
+global GLubyte: type <cimport,nodecl> = @khronos_uint8_t
+global PFNGLACTIVETEXTUREPROC: type <cimport,nodecl> = @function(texture: GLenum): void
+global PFNGLATTACHSHADERPROC: type <cimport,nodecl> = @function(program: GLuint, shader: GLuint): void
+global PFNGLBINDATTRIBLOCATIONPROC: type <cimport,nodecl> = @function(program: GLuint, index: GLuint, name: *GLchar): void
+global PFNGLBINDBUFFERPROC: type <cimport,nodecl> = @function(target: GLenum, buffer: GLuint): void
+global PFNGLBINDFRAMEBUFFERPROC: type <cimport,nodecl> = @function(target: GLenum, framebuffer: GLuint): void
+global PFNGLBINDRENDERBUFFERPROC: type <cimport,nodecl> = @function(target: GLenum, renderbuffer: GLuint): void
+global PFNGLBINDTEXTUREPROC: type <cimport,nodecl> = @function(target: GLenum, texture: GLuint): void
+global PFNGLBLENDCOLORPROC: type <cimport,nodecl> = @function(red: GLfloat, green: GLfloat, blue: GLfloat, alpha: GLfloat): void
+global PFNGLBLENDEQUATIONPROC: type <cimport,nodecl> = @function(mode: GLenum): void
+global PFNGLBLENDEQUATIONSEPARATEPROC: type <cimport,nodecl> = @function(modeRGB: GLenum, modeAlpha: GLenum): void
+global PFNGLBLENDFUNCPROC: type <cimport,nodecl> = @function(sfactor: GLenum, dfactor: GLenum): void
+global PFNGLBLENDFUNCSEPARATEPROC: type <cimport,nodecl> = @function(sfactorRGB: GLenum, dfactorRGB: GLenum, sfactorAlpha: GLenum, dfactorAlpha: GLenum): void
+global PFNGLBUFFERDATAPROC: type <cimport,nodecl> = @function(target: GLenum, size: GLsizeiptr, data: pointer, usage: GLenum): void
+global PFNGLBUFFERSUBDATAPROC: type <cimport,nodecl> = @function(target: GLenum, offset: GLintptr, size: GLsizeiptr, data: pointer): void
+global PFNGLCHECKFRAMEBUFFERSTATUSPROC: type <cimport,nodecl> = @function(target: GLenum): GLenum
+global PFNGLCLEARPROC: type <cimport,nodecl> = @function(mask: GLbitfield): void
+global PFNGLCLEARCOLORPROC: type <cimport,nodecl> = @function(red: GLfloat, green: GLfloat, blue: GLfloat, alpha: GLfloat): void
+global PFNGLCLEARDEPTHFPROC: type <cimport,nodecl> = @function(d: GLfloat): void
+global PFNGLCLEARSTENCILPROC: type <cimport,nodecl> = @function(s: GLint): void
+global PFNGLCOLORMASKPROC: type <cimport,nodecl> = @function(red: GLboolean, green: GLboolean, blue: GLboolean, alpha: GLboolean): void
+global PFNGLCOMPILESHADERPROC: type <cimport,nodecl> = @function(shader: GLuint): void
+global PFNGLCOMPRESSEDTEXIMAGE2DPROC: type <cimport,nodecl> = @function(target: GLenum, level: GLint, internalformat: GLenum, width: GLsizei, height: GLsizei, border: GLint, imageSize: GLsizei, data: pointer): void
+global PFNGLCOMPRESSEDTEXSUBIMAGE2DPROC: type <cimport,nodecl> = @function(target: GLenum, level: GLint, xoffset: GLint, yoffset: GLint, width: GLsizei, height: GLsizei, format: GLenum, imageSize: GLsizei, data: pointer): void
+global PFNGLCOPYTEXIMAGE2DPROC: type <cimport,nodecl> = @function(target: GLenum, level: GLint, internalformat: GLenum, x: GLint, y: GLint, width: GLsizei, height: GLsizei, border: GLint): void
+global PFNGLCOPYTEXSUBIMAGE2DPROC: type <cimport,nodecl> = @function(target: GLenum, level: GLint, xoffset: GLint, yoffset: GLint, x: GLint, y: GLint, width: GLsizei, height: GLsizei): void
+global PFNGLCREATEPROGRAMPROC: type <cimport,nodecl> = @function(): GLuint
+global PFNGLCREATESHADERPROC: type <cimport,nodecl> = @function(type: GLenum): GLuint
+global PFNGLCULLFACEPROC: type <cimport,nodecl> = @function(mode: GLenum): void
+global PFNGLDELETEBUFFERSPROC: type <cimport,nodecl> = @function(n: GLsizei, buffers: *GLuint): void
+global PFNGLDELETEFRAMEBUFFERSPROC: type <cimport,nodecl> = @function(n: GLsizei, framebuffers: *GLuint): void
+global PFNGLDELETEPROGRAMPROC: type <cimport,nodecl> = @function(program: GLuint): void
+global PFNGLDELETERENDERBUFFERSPROC: type <cimport,nodecl> = @function(n: GLsizei, renderbuffers: *GLuint): void
+global PFNGLDELETESHADERPROC: type <cimport,nodecl> = @function(shader: GLuint): void
+global PFNGLDELETETEXTURESPROC: type <cimport,nodecl> = @function(n: GLsizei, textures: *GLuint): void
+global PFNGLDEPTHFUNCPROC: type <cimport,nodecl> = @function(func: GLenum): void
+global PFNGLDEPTHMASKPROC: type <cimport,nodecl> = @function(flag: GLboolean): void
+global PFNGLDEPTHRANGEFPROC: type <cimport,nodecl> = @function(n: GLfloat, f: GLfloat): void
+global PFNGLDETACHSHADERPROC: type <cimport,nodecl> = @function(program: GLuint, shader: GLuint): void
+global PFNGLDISABLEPROC: type <cimport,nodecl> = @function(cap: GLenum): void
+global PFNGLDISABLEVERTEXATTRIBARRAYPROC: type <cimport,nodecl> = @function(index: GLuint): void
+global PFNGLDRAWARRAYSPROC: type <cimport,nodecl> = @function(mode: GLenum, first: GLint, count: GLsizei): void
+global PFNGLDRAWELEMENTSPROC: type <cimport,nodecl> = @function(mode: GLenum, count: GLsizei, type: GLenum, indices: pointer): void
+global PFNGLENABLEPROC: type <cimport,nodecl> = @function(cap: GLenum): void
+global PFNGLENABLEVERTEXATTRIBARRAYPROC: type <cimport,nodecl> = @function(index: GLuint): void
+global PFNGLFINISHPROC: type <cimport,nodecl> = @function(): void
+global PFNGLFLUSHPROC: type <cimport,nodecl> = @function(): void
+global PFNGLFRAMEBUFFERRENDERBUFFERPROC: type <cimport,nodecl> = @function(target: GLenum, attachment: GLenum, renderbuffertarget: GLenum, renderbuffer: GLuint): void
+global PFNGLFRAMEBUFFERTEXTURE2DPROC: type <cimport,nodecl> = @function(target: GLenum, attachment: GLenum, textarget: GLenum, texture: GLuint, level: GLint): void
+global PFNGLFRONTFACEPROC: type <cimport,nodecl> = @function(mode: GLenum): void
+global PFNGLGENBUFFERSPROC: type <cimport,nodecl> = @function(n: GLsizei, buffers: *GLuint): void
+global PFNGLGENERATEMIPMAPPROC: type <cimport,nodecl> = @function(target: GLenum): void
+global PFNGLGENFRAMEBUFFERSPROC: type <cimport,nodecl> = @function(n: GLsizei, framebuffers: *GLuint): void
+global PFNGLGENRENDERBUFFERSPROC: type <cimport,nodecl> = @function(n: GLsizei, renderbuffers: *GLuint): void
+global PFNGLGENTEXTURESPROC: type <cimport,nodecl> = @function(n: GLsizei, textures: *GLuint): void
+global PFNGLGETACTIVEATTRIBPROC: type <cimport,nodecl> = @function(program: GLuint, index: GLuint, bufSize: GLsizei, length: *GLsizei, size: *GLint, type: *GLenum, name: *GLchar): void
+global PFNGLGETACTIVEUNIFORMPROC: type <cimport,nodecl> = @function(program: GLuint, index: GLuint, bufSize: GLsizei, length: *GLsizei, size: *GLint, type: *GLenum, name: *GLchar): void
+global PFNGLGETATTACHEDSHADERSPROC: type <cimport,nodecl> = @function(program: GLuint, maxCount: GLsizei, count: *GLsizei, shaders: *GLuint): void
+global PFNGLGETATTRIBLOCATIONPROC: type <cimport,nodecl> = @function(program: GLuint, name: *GLchar): GLint
+global PFNGLGETBOOLEANVPROC: type <cimport,nodecl> = @function(pname: GLenum, data: *GLboolean): void
+global PFNGLGETBUFFERPARAMETERIVPROC: type <cimport,nodecl> = @function(target: GLenum, pname: GLenum, params: *GLint): void
+global PFNGLGETERRORPROC: type <cimport,nodecl> = @function(): GLenum
+global PFNGLGETFLOATVPROC: type <cimport,nodecl> = @function(pname: GLenum, data: *GLfloat): void
+global PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC: type <cimport,nodecl> = @function(target: GLenum, attachment: GLenum, pname: GLenum, params: *GLint): void
+global PFNGLGETINTEGERVPROC: type <cimport,nodecl> = @function(pname: GLenum, data: *GLint): void
+global PFNGLGETPROGRAMIVPROC: type <cimport,nodecl> = @function(program: GLuint, pname: GLenum, params: *GLint): void
+global PFNGLGETPROGRAMINFOLOGPROC: type <cimport,nodecl> = @function(program: GLuint, bufSize: GLsizei, length: *GLsizei, infoLog: *GLchar): void
+global PFNGLGETRENDERBUFFERPARAMETERIVPROC: type <cimport,nodecl> = @function(target: GLenum, pname: GLenum, params: *GLint): void
+global PFNGLGETSHADERIVPROC: type <cimport,nodecl> = @function(shader: GLuint, pname: GLenum, params: *GLint): void
+global PFNGLGETSHADERINFOLOGPROC: type <cimport,nodecl> = @function(shader: GLuint, bufSize: GLsizei, length: *GLsizei, infoLog: *GLchar): void
+global PFNGLGETSHADERPRECISIONFORMATPROC: type <cimport,nodecl> = @function(shadertype: GLenum, precisiontype: GLenum, range: *GLint, precision: *GLint): void
+global PFNGLGETSHADERSOURCEPROC: type <cimport,nodecl> = @function(shader: GLuint, bufSize: GLsizei, length: *GLsizei, source: *GLchar): void
+global PFNGLGETSTRINGPROC: type <cimport,nodecl> = @function(name: GLenum): *GLubyte
+global PFNGLGETTEXPARAMETERFVPROC: type <cimport,nodecl> = @function(target: GLenum, pname: GLenum, params: *GLfloat): void
+global PFNGLGETTEXPARAMETERIVPROC: type <cimport,nodecl> = @function(target: GLenum, pname: GLenum, params: *GLint): void
+global PFNGLGETUNIFORMFVPROC: type <cimport,nodecl> = @function(program: GLuint, location: GLint, params: *GLfloat): void
+global PFNGLGETUNIFORMIVPROC: type <cimport,nodecl> = @function(program: GLuint, location: GLint, params: *GLint): void
+global PFNGLGETUNIFORMLOCATIONPROC: type <cimport,nodecl> = @function(program: GLuint, name: *GLchar): GLint
+global PFNGLGETVERTEXATTRIBFVPROC: type <cimport,nodecl> = @function(index: GLuint, pname: GLenum, params: *GLfloat): void
+global PFNGLGETVERTEXATTRIBIVPROC: type <cimport,nodecl> = @function(index: GLuint, pname: GLenum, params: *GLint): void
+global PFNGLGETVERTEXATTRIBPOINTERVPROC: type <cimport,nodecl> = @function(index: GLuint, pname: GLenum, pointer: *pointer): void
+global PFNGLHINTPROC: type <cimport,nodecl> = @function(target: GLenum, mode: GLenum): void
+global PFNGLISBUFFERPROC: type <cimport,nodecl> = @function(buffer: GLuint): GLboolean
+global PFNGLISENABLEDPROC: type <cimport,nodecl> = @function(cap: GLenum): GLboolean
+global PFNGLISFRAMEBUFFERPROC: type <cimport,nodecl> = @function(framebuffer: GLuint): GLboolean
+global PFNGLISPROGRAMPROC: type <cimport,nodecl> = @function(program: GLuint): GLboolean
+global PFNGLISRENDERBUFFERPROC: type <cimport,nodecl> = @function(renderbuffer: GLuint): GLboolean
+global PFNGLISSHADERPROC: type <cimport,nodecl> = @function(shader: GLuint): GLboolean
+global PFNGLISTEXTUREPROC: type <cimport,nodecl> = @function(texture: GLuint): GLboolean
+global PFNGLLINEWIDTHPROC: type <cimport,nodecl> = @function(width: GLfloat): void
+global PFNGLLINKPROGRAMPROC: type <cimport,nodecl> = @function(program: GLuint): void
+global PFNGLPIXELSTOREIPROC: type <cimport,nodecl> = @function(pname: GLenum, param: GLint): void
+global PFNGLPOLYGONOFFSETPROC: type <cimport,nodecl> = @function(factor: GLfloat, units: GLfloat): void
+global PFNGLREADPIXELSPROC: type <cimport,nodecl> = @function(x: GLint, y: GLint, width: GLsizei, height: GLsizei, format: GLenum, type: GLenum, pixels: pointer): void
+global PFNGLRELEASESHADERCOMPILERPROC: type <cimport,nodecl> = @function(): void
+global PFNGLRENDERBUFFERSTORAGEPROC: type <cimport,nodecl> = @function(target: GLenum, internalformat: GLenum, width: GLsizei, height: GLsizei): void
+global PFNGLSAMPLECOVERAGEPROC: type <cimport,nodecl> = @function(value: GLfloat, invert: GLboolean): void
+global PFNGLSCISSORPROC: type <cimport,nodecl> = @function(x: GLint, y: GLint, width: GLsizei, height: GLsizei): void
+global PFNGLSHADERBINARYPROC: type <cimport,nodecl> = @function(count: GLsizei, shaders: *GLuint, binaryformat: GLenum, binary: pointer, length: GLsizei): void
+global PFNGLSHADERSOURCEPROC: type <cimport,nodecl> = @function(shader: GLuint, count: GLsizei, string: **GLchar, length: *GLint): void
+global PFNGLSTENCILFUNCPROC: type <cimport,nodecl> = @function(func: GLenum, ref: GLint, mask: GLuint): void
+global PFNGLSTENCILFUNCSEPARATEPROC: type <cimport,nodecl> = @function(face: GLenum, func: GLenum, ref: GLint, mask: GLuint): void
+global PFNGLSTENCILMASKPROC: type <cimport,nodecl> = @function(mask: GLuint): void
+global PFNGLSTENCILMASKSEPARATEPROC: type <cimport,nodecl> = @function(face: GLenum, mask: GLuint): void
+global PFNGLSTENCILOPPROC: type <cimport,nodecl> = @function(fail: GLenum, zfail: GLenum, zpass: GLenum): void
+global PFNGLSTENCILOPSEPARATEPROC: type <cimport,nodecl> = @function(face: GLenum, sfail: GLenum, dpfail: GLenum, dppass: GLenum): void
+global PFNGLTEXIMAGE2DPROC: type <cimport,nodecl> = @function(target: GLenum, level: GLint, internalformat: GLint, width: GLsizei, height: GLsizei, border: GLint, format: GLenum, type: GLenum, pixels: pointer): void
+global PFNGLTEXPARAMETERFPROC: type <cimport,nodecl> = @function(target: GLenum, pname: GLenum, param: GLfloat): void
+global PFNGLTEXPARAMETERFVPROC: type <cimport,nodecl> = @function(target: GLenum, pname: GLenum, params: *GLfloat): void
+global PFNGLTEXPARAMETERIPROC: type <cimport,nodecl> = @function(target: GLenum, pname: GLenum, param: GLint): void
+global PFNGLTEXPARAMETERIVPROC: type <cimport,nodecl> = @function(target: GLenum, pname: GLenum, params: *GLint): void
+global PFNGLTEXSUBIMAGE2DPROC: type <cimport,nodecl> = @function(target: GLenum, level: GLint, xoffset: GLint, yoffset: GLint, width: GLsizei, height: GLsizei, format: GLenum, type: GLenum, pixels: pointer): void
+global PFNGLUNIFORM1FPROC: type <cimport,nodecl> = @function(location: GLint, v0: GLfloat): void
+global PFNGLUNIFORM1FVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, value: *GLfloat): void
+global PFNGLUNIFORM1IPROC: type <cimport,nodecl> = @function(location: GLint, v0: GLint): void
+global PFNGLUNIFORM1IVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, value: *GLint): void
+global PFNGLUNIFORM2FPROC: type <cimport,nodecl> = @function(location: GLint, v0: GLfloat, v1: GLfloat): void
+global PFNGLUNIFORM2FVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, value: *GLfloat): void
+global PFNGLUNIFORM2IPROC: type <cimport,nodecl> = @function(location: GLint, v0: GLint, v1: GLint): void
+global PFNGLUNIFORM2IVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, value: *GLint): void
+global PFNGLUNIFORM3FPROC: type <cimport,nodecl> = @function(location: GLint, v0: GLfloat, v1: GLfloat, v2: GLfloat): void
+global PFNGLUNIFORM3FVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, value: *GLfloat): void
+global PFNGLUNIFORM3IPROC: type <cimport,nodecl> = @function(location: GLint, v0: GLint, v1: GLint, v2: GLint): void
+global PFNGLUNIFORM3IVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, value: *GLint): void
+global PFNGLUNIFORM4FPROC: type <cimport,nodecl> = @function(location: GLint, v0: GLfloat, v1: GLfloat, v2: GLfloat, v3: GLfloat): void
+global PFNGLUNIFORM4FVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, value: *GLfloat): void
+global PFNGLUNIFORM4IPROC: type <cimport,nodecl> = @function(location: GLint, v0: GLint, v1: GLint, v2: GLint, v3: GLint): void
+global PFNGLUNIFORM4IVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, value: *GLint): void
+global PFNGLUNIFORMMATRIX2FVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, transpose: GLboolean, value: *GLfloat): void
+global PFNGLUNIFORMMATRIX3FVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, transpose: GLboolean, value: *GLfloat): void
+global PFNGLUNIFORMMATRIX4FVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, transpose: GLboolean, value: *GLfloat): void
+global PFNGLUSEPROGRAMPROC: type <cimport,nodecl> = @function(program: GLuint): void
+global PFNGLVALIDATEPROGRAMPROC: type <cimport,nodecl> = @function(program: GLuint): void
+global PFNGLVERTEXATTRIB1FPROC: type <cimport,nodecl> = @function(index: GLuint, x: GLfloat): void
+global PFNGLVERTEXATTRIB1FVPROC: type <cimport,nodecl> = @function(index: GLuint, v: *GLfloat): void
+global PFNGLVERTEXATTRIB2FPROC: type <cimport,nodecl> = @function(index: GLuint, x: GLfloat, y: GLfloat): void
+global PFNGLVERTEXATTRIB2FVPROC: type <cimport,nodecl> = @function(index: GLuint, v: *GLfloat): void
+global PFNGLVERTEXATTRIB3FPROC: type <cimport,nodecl> = @function(index: GLuint, x: GLfloat, y: GLfloat, z: GLfloat): void
+global PFNGLVERTEXATTRIB3FVPROC: type <cimport,nodecl> = @function(index: GLuint, v: *GLfloat): void
+global PFNGLVERTEXATTRIB4FPROC: type <cimport,nodecl> = @function(index: GLuint, x: GLfloat, y: GLfloat, z: GLfloat, w: GLfloat): void
+global PFNGLVERTEXATTRIB4FVPROC: type <cimport,nodecl> = @function(index: GLuint, v: *GLfloat): void
+global PFNGLVERTEXATTRIBPOINTERPROC: type <cimport,nodecl> = @function(index: GLuint, size: GLint, type: GLenum, normalized: GLboolean, stride: GLsizei, pointer: pointer): void
+global PFNGLVIEWPORTPROC: type <cimport,nodecl> = @function(x: GLint, y: GLint, width: GLsizei, height: GLsizei): void
+global GLhalf: type <cimport,nodecl> = @khronos_uint16_t
+global PFNGLREADBUFFERPROC: type <cimport,nodecl> = @function(src: GLenum): void
+global PFNGLDRAWRANGEELEMENTSPROC: type <cimport,nodecl> = @function(mode: GLenum, start: GLuint, end_: GLuint, count: GLsizei, type: GLenum, indices: pointer): void
+global PFNGLTEXIMAGE3DPROC: type <cimport,nodecl> = @function(target: GLenum, level: GLint, internalformat: GLint, width: GLsizei, height: GLsizei, depth: GLsizei, border: GLint, format: GLenum, type: GLenum, pixels: pointer): void
+global PFNGLTEXSUBIMAGE3DPROC: type <cimport,nodecl> = @function(target: GLenum, level: GLint, xoffset: GLint, yoffset: GLint, zoffset: GLint, width: GLsizei, height: GLsizei, depth: GLsizei, format: GLenum, type: GLenum, pixels: pointer): void
+global PFNGLCOPYTEXSUBIMAGE3DPROC: type <cimport,nodecl> = @function(target: GLenum, level: GLint, xoffset: GLint, yoffset: GLint, zoffset: GLint, x: GLint, y: GLint, width: GLsizei, height: GLsizei): void
+global PFNGLCOMPRESSEDTEXIMAGE3DPROC: type <cimport,nodecl> = @function(target: GLenum, level: GLint, internalformat: GLenum, width: GLsizei, height: GLsizei, depth: GLsizei, border: GLint, imageSize: GLsizei, data: pointer): void
+global PFNGLCOMPRESSEDTEXSUBIMAGE3DPROC: type <cimport,nodecl> = @function(target: GLenum, level: GLint, xoffset: GLint, yoffset: GLint, zoffset: GLint, width: GLsizei, height: GLsizei, depth: GLsizei, format: GLenum, imageSize: GLsizei, data: pointer): void
+global PFNGLGENQUERIESPROC: type <cimport,nodecl> = @function(n: GLsizei, ids: *GLuint): void
+global PFNGLDELETEQUERIESPROC: type <cimport,nodecl> = @function(n: GLsizei, ids: *GLuint): void
+global PFNGLISQUERYPROC: type <cimport,nodecl> = @function(id: GLuint): GLboolean
+global PFNGLBEGINQUERYPROC: type <cimport,nodecl> = @function(target: GLenum, id: GLuint): void
+global PFNGLENDQUERYPROC: type <cimport,nodecl> = @function(target: GLenum): void
+global PFNGLGETQUERYIVPROC: type <cimport,nodecl> = @function(target: GLenum, pname: GLenum, params: *GLint): void
+global PFNGLGETQUERYOBJECTUIVPROC: type <cimport,nodecl> = @function(id: GLuint, pname: GLenum, params: *GLuint): void
+global PFNGLUNMAPBUFFERPROC: type <cimport,nodecl> = @function(target: GLenum): GLboolean
+global PFNGLGETBUFFERPOINTERVPROC: type <cimport,nodecl> = @function(target: GLenum, pname: GLenum, params: *pointer): void
+global PFNGLDRAWBUFFERSPROC: type <cimport,nodecl> = @function(n: GLsizei, bufs: *GLenum): void
+global PFNGLUNIFORMMATRIX2X3FVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, transpose: GLboolean, value: *GLfloat): void
+global PFNGLUNIFORMMATRIX3X2FVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, transpose: GLboolean, value: *GLfloat): void
+global PFNGLUNIFORMMATRIX2X4FVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, transpose: GLboolean, value: *GLfloat): void
+global PFNGLUNIFORMMATRIX4X2FVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, transpose: GLboolean, value: *GLfloat): void
+global PFNGLUNIFORMMATRIX3X4FVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, transpose: GLboolean, value: *GLfloat): void
+global PFNGLUNIFORMMATRIX4X3FVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, transpose: GLboolean, value: *GLfloat): void
+global PFNGLBLITFRAMEBUFFERPROC: type <cimport,nodecl> = @function(srcX0: GLint, srcY0: GLint, srcX1: GLint, srcY1: GLint, dstX0: GLint, dstY0: GLint, dstX1: GLint, dstY1: GLint, mask: GLbitfield, filter: GLenum): void
+global PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC: type <cimport,nodecl> = @function(target: GLenum, samples: GLsizei, internalformat: GLenum, width: GLsizei, height: GLsizei): void
+global PFNGLFRAMEBUFFERTEXTURELAYERPROC: type <cimport,nodecl> = @function(target: GLenum, attachment: GLenum, texture: GLuint, level: GLint, layer: GLint): void
+global PFNGLMAPBUFFERRANGEPROC: type <cimport,nodecl> = @function(target: GLenum, offset: GLintptr, length: GLsizeiptr, access: GLbitfield): pointer
+global PFNGLFLUSHMAPPEDBUFFERRANGEPROC: type <cimport,nodecl> = @function(target: GLenum, offset: GLintptr, length: GLsizeiptr): void
+global PFNGLBINDVERTEXARRAYPROC: type <cimport,nodecl> = @function(array: GLuint): void
+global PFNGLDELETEVERTEXARRAYSPROC: type <cimport,nodecl> = @function(n: GLsizei, arrays: *GLuint): void
+global PFNGLGENVERTEXARRAYSPROC: type <cimport,nodecl> = @function(n: GLsizei, arrays: *GLuint): void
+global PFNGLISVERTEXARRAYPROC: type <cimport,nodecl> = @function(array: GLuint): GLboolean
+global PFNGLGETINTEGERI_VPROC: type <cimport,nodecl> = @function(target: GLenum, index: GLuint, data: *GLint): void
+global PFNGLBEGINTRANSFORMFEEDBACKPROC: type <cimport,nodecl> = @function(primitiveMode: GLenum): void
+global PFNGLENDTRANSFORMFEEDBACKPROC: type <cimport,nodecl> = @function(): void
+global PFNGLBINDBUFFERRANGEPROC: type <cimport,nodecl> = @function(target: GLenum, index: GLuint, buffer: GLuint, offset: GLintptr, size: GLsizeiptr): void
+global PFNGLBINDBUFFERBASEPROC: type <cimport,nodecl> = @function(target: GLenum, index: GLuint, buffer: GLuint): void
+global PFNGLTRANSFORMFEEDBACKVARYINGSPROC: type <cimport,nodecl> = @function(program: GLuint, count: GLsizei, varyings: **GLchar, bufferMode: GLenum): void
+global PFNGLGETTRANSFORMFEEDBACKVARYINGPROC: type <cimport,nodecl> = @function(program: GLuint, index: GLuint, bufSize: GLsizei, length: *GLsizei, size: *GLsizei, type: *GLenum, name: *GLchar): void
+global PFNGLVERTEXATTRIBIPOINTERPROC: type <cimport,nodecl> = @function(index: GLuint, size: GLint, type: GLenum, stride: GLsizei, pointer: pointer): void
+global PFNGLGETVERTEXATTRIBIIVPROC: type <cimport,nodecl> = @function(index: GLuint, pname: GLenum, params: *GLint): void
+global PFNGLGETVERTEXATTRIBIUIVPROC: type <cimport,nodecl> = @function(index: GLuint, pname: GLenum, params: *GLuint): void
+global PFNGLVERTEXATTRIBI4IPROC: type <cimport,nodecl> = @function(index: GLuint, x: GLint, y: GLint, z: GLint, w: GLint): void
+global PFNGLVERTEXATTRIBI4UIPROC: type <cimport,nodecl> = @function(index: GLuint, x: GLuint, y: GLuint, z: GLuint, w: GLuint): void
+global PFNGLVERTEXATTRIBI4IVPROC: type <cimport,nodecl> = @function(index: GLuint, v: *GLint): void
+global PFNGLVERTEXATTRIBI4UIVPROC: type <cimport,nodecl> = @function(index: GLuint, v: *GLuint): void
+global PFNGLGETUNIFORMUIVPROC: type <cimport,nodecl> = @function(program: GLuint, location: GLint, params: *GLuint): void
+global PFNGLGETFRAGDATALOCATIONPROC: type <cimport,nodecl> = @function(program: GLuint, name: *GLchar): GLint
+global PFNGLUNIFORM1UIPROC: type <cimport,nodecl> = @function(location: GLint, v0: GLuint): void
+global PFNGLUNIFORM2UIPROC: type <cimport,nodecl> = @function(location: GLint, v0: GLuint, v1: GLuint): void
+global PFNGLUNIFORM3UIPROC: type <cimport,nodecl> = @function(location: GLint, v0: GLuint, v1: GLuint, v2: GLuint): void
+global PFNGLUNIFORM4UIPROC: type <cimport,nodecl> = @function(location: GLint, v0: GLuint, v1: GLuint, v2: GLuint, v3: GLuint): void
+global PFNGLUNIFORM1UIVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, value: *GLuint): void
+global PFNGLUNIFORM2UIVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, value: *GLuint): void
+global PFNGLUNIFORM3UIVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, value: *GLuint): void
+global PFNGLUNIFORM4UIVPROC: type <cimport,nodecl> = @function(location: GLint, count: GLsizei, value: *GLuint): void
+global PFNGLCLEARBUFFERIVPROC: type <cimport,nodecl> = @function(buffer: GLenum, drawbuffer: GLint, value: *GLint): void
+global PFNGLCLEARBUFFERUIVPROC: type <cimport,nodecl> = @function(buffer: GLenum, drawbuffer: GLint, value: *GLuint): void
+global PFNGLCLEARBUFFERFVPROC: type <cimport,nodecl> = @function(buffer: GLenum, drawbuffer: GLint, value: *GLfloat): void
+global PFNGLCLEARBUFFERFIPROC: type <cimport,nodecl> = @function(buffer: GLenum, drawbuffer: GLint, depth: GLfloat, stencil: GLint): void
+global PFNGLGETSTRINGIPROC: type <cimport,nodecl> = @function(name: GLenum, index: GLuint): *GLubyte
+global PFNGLCOPYBUFFERSUBDATAPROC: type <cimport,nodecl> = @function(readTarget: GLenum, writeTarget: GLenum, readOffset: GLintptr, writeOffset: GLintptr, size: GLsizeiptr): void
+global PFNGLGETUNIFORMINDICESPROC: type <cimport,nodecl> = @function(program: GLuint, uniformCount: GLsizei, uniformNames: **GLchar, uniformIndices: *GLuint): void
+global PFNGLGETACTIVEUNIFORMSIVPROC: type <cimport,nodecl> = @function(program: GLuint, uniformCount: GLsizei, uniformIndices: *GLuint, pname: GLenum, params: *GLint): void
+global PFNGLGETUNIFORMBLOCKINDEXPROC: type <cimport,nodecl> = @function(program: GLuint, uniformBlockName: *GLchar): GLuint
+global PFNGLGETACTIVEUNIFORMBLOCKIVPROC: type <cimport,nodecl> = @function(program: GLuint, uniformBlockIndex: GLuint, pname: GLenum, params: *GLint): void
+global PFNGLGETACTIVEUNIFORMBLOCKNAMEPROC: type <cimport,nodecl> = @function(program: GLuint, uniformBlockIndex: GLuint, bufSize: GLsizei, length: *GLsizei, uniformBlockName: *GLchar): void
+global PFNGLUNIFORMBLOCKBINDINGPROC: type <cimport,nodecl> = @function(program: GLuint, uniformBlockIndex: GLuint, uniformBlockBinding: GLuint): void
+global PFNGLDRAWARRAYSINSTANCEDPROC: type <cimport,nodecl> = @function(mode: GLenum, first: GLint, count: GLsizei, instancecount: GLsizei): void
+global PFNGLDRAWELEMENTSINSTANCEDPROC: type <cimport,nodecl> = @function(mode: GLenum, count: GLsizei, type: GLenum, indices: pointer, instancecount: GLsizei): void
+global PFNGLFENCESYNCPROC: type <cimport,nodecl> = @function(condition: GLenum, flags: GLbitfield): GLsync
+global PFNGLISSYNCPROC: type <cimport,nodecl> = @function(sync: GLsync): GLboolean
+global PFNGLDELETESYNCPROC: type <cimport,nodecl> = @function(sync: GLsync): void
+global PFNGLCLIENTWAITSYNCPROC: type <cimport,nodecl> = @function(sync: GLsync, flags: GLbitfield, timeout: GLuint64): GLenum
+global PFNGLWAITSYNCPROC: type <cimport,nodecl> = @function(sync: GLsync, flags: GLbitfield, timeout: GLuint64): void
+global PFNGLGETINTEGER64VPROC: type <cimport,nodecl> = @function(pname: GLenum, data: *GLint64): void
+global PFNGLGETSYNCIVPROC: type <cimport,nodecl> = @function(sync: GLsync, pname: GLenum, count: GLsizei, length: *GLsizei, values: *GLint): void
+global PFNGLGETINTEGER64I_VPROC: type <cimport,nodecl> = @function(target: GLenum, index: GLuint, data: *GLint64): void
+global PFNGLGETBUFFERPARAMETERI64VPROC: type <cimport,nodecl> = @function(target: GLenum, pname: GLenum, params: *GLint64): void
+global PFNGLGENSAMPLERSPROC: type <cimport,nodecl> = @function(count: GLsizei, samplers: *GLuint): void
+global PFNGLDELETESAMPLERSPROC: type <cimport,nodecl> = @function(count: GLsizei, samplers: *GLuint): void
+global PFNGLISSAMPLERPROC: type <cimport,nodecl> = @function(sampler: GLuint): GLboolean
+global PFNGLBINDSAMPLERPROC: type <cimport,nodecl> = @function(unit: GLuint, sampler: GLuint): void
+global PFNGLSAMPLERPARAMETERIPROC: type <cimport,nodecl> = @function(sampler: GLuint, pname: GLenum, param: GLint): void
+global PFNGLSAMPLERPARAMETERIVPROC: type <cimport,nodecl> = @function(sampler: GLuint, pname: GLenum, param: *GLint): void
+global PFNGLSAMPLERPARAMETERFPROC: type <cimport,nodecl> = @function(sampler: GLuint, pname: GLenum, param: GLfloat): void
+global PFNGLSAMPLERPARAMETERFVPROC: type <cimport,nodecl> = @function(sampler: GLuint, pname: GLenum, param: *GLfloat): void
+global PFNGLGETSAMPLERPARAMETERIVPROC: type <cimport,nodecl> = @function(sampler: GLuint, pname: GLenum, params: *GLint): void
+global PFNGLGETSAMPLERPARAMETERFVPROC: type <cimport,nodecl> = @function(sampler: GLuint, pname: GLenum, params: *GLfloat): void
+global PFNGLVERTEXATTRIBDIVISORPROC: type <cimport,nodecl> = @function(index: GLuint, divisor: GLuint): void
+global PFNGLBINDTRANSFORMFEEDBACKPROC: type <cimport,nodecl> = @function(target: GLenum, id: GLuint): void
+global PFNGLDELETETRANSFORMFEEDBACKSPROC: type <cimport,nodecl> = @function(n: GLsizei, ids: *GLuint): void
+global PFNGLGENTRANSFORMFEEDBACKSPROC: type <cimport,nodecl> = @function(n: GLsizei, ids: *GLuint): void
+global PFNGLISTRANSFORMFEEDBACKPROC: type <cimport,nodecl> = @function(id: GLuint): GLboolean
+global PFNGLPAUSETRANSFORMFEEDBACKPROC: type <cimport,nodecl> = @function(): void
+global PFNGLRESUMETRANSFORMFEEDBACKPROC: type <cimport,nodecl> = @function(): void
+global PFNGLGETPROGRAMBINARYPROC: type <cimport,nodecl> = @function(program: GLuint, bufSize: GLsizei, length: *GLsizei, binaryFormat: *GLenum, binary: pointer): void
+global PFNGLPROGRAMBINARYPROC: type <cimport,nodecl> = @function(program: GLuint, binaryFormat: GLenum, binary: pointer, length: GLsizei): void
+global PFNGLPROGRAMPARAMETERIPROC: type <cimport,nodecl> = @function(program: GLuint, pname: GLenum, value: GLint): void
+global PFNGLINVALIDATEFRAMEBUFFERPROC: type <cimport,nodecl> = @function(target: GLenum, numAttachments: GLsizei, attachments: *GLenum): void
+global PFNGLINVALIDATESUBFRAMEBUFFERPROC: type <cimport,nodecl> = @function(target: GLenum, numAttachments: GLsizei, attachments: *GLenum, x: GLint, y: GLint, width: GLsizei, height: GLsizei): void
+global PFNGLTEXSTORAGE2DPROC: type <cimport,nodecl> = @function(target: GLenum, levels: GLsizei, internalformat: GLenum, width: GLsizei, height: GLsizei): void
+global PFNGLTEXSTORAGE3DPROC: type <cimport,nodecl> = @function(target: GLenum, levels: GLsizei, internalformat: GLenum, width: GLsizei, height: GLsizei, depth: GLsizei): void
+global PFNGLGETINTERNALFORMATIVPROC: type <cimport,nodecl> = @function(target: GLenum, internalformat: GLenum, pname: GLenum, count: GLsizei, params: *GLint): void
+global NVGcontext: type <cimport,nodecl,forwarddecl> = @record{}
+global NVGcolor: type <cimport,nodecl> = @record{
+  __unnamed1: union{
+    rgba: [4]float32,
+    __unnamed2: record{
+      r: float32,
+      g: float32,
+      b: float32,
+      a: float32
+    }
+  }
+}
+global NVGpaint: type <cimport,nodecl> = @record{
+  xform: [6]float32,
+  extent: [2]float32,
+  radius: float32,
+  feather: float32,
+  innerColor: NVGcolor,
+  outerColor: NVGcolor,
+  image: cint
+}
+global NVGwinding: type <cimport,nodecl,using,ctypedef'NVGwinding'> = @enum(cint){
+  NVG_CCW = 1,
+  NVG_CW = 2
+}
+global NVGsolidity: type <cimport,nodecl,using,ctypedef'NVGsolidity'> = @enum(cint){
+  NVG_SOLID = 1,
+  NVG_HOLE = 2
+}
+global NVGlineCap: type <cimport,nodecl,using,ctypedef'NVGlineCap'> = @enum(cint){
+  NVG_BUTT = 0,
+  NVG_ROUND = 1,
+  NVG_SQUARE = 2,
+  NVG_BEVEL = 3,
+  NVG_MITER = 4
+}
+global NVGalign: type <cimport,nodecl,using,ctypedef'NVGalign'> = @enum(cint){
+  NVG_ALIGN_LEFT = 1,
+  NVG_ALIGN_CENTER = 2,
+  NVG_ALIGN_RIGHT = 4,
+  NVG_ALIGN_TOP = 8,
+  NVG_ALIGN_MIDDLE = 16,
+  NVG_ALIGN_BOTTOM = 32,
+  NVG_ALIGN_BASELINE = 64
+}
+global NVGblendFactor: type <cimport,nodecl,using,ctypedef'NVGblendFactor'> = @enum(cint){
+  NVG_ZERO = 1,
+  NVG_ONE = 2,
+  NVG_SRC_COLOR = 4,
+  NVG_ONE_MINUS_SRC_COLOR = 8,
+  NVG_DST_COLOR = 16,
+  NVG_ONE_MINUS_DST_COLOR = 32,
+  NVG_SRC_ALPHA = 64,
+  NVG_ONE_MINUS_SRC_ALPHA = 128,
+  NVG_DST_ALPHA = 256,
+  NVG_ONE_MINUS_DST_ALPHA = 512,
+  NVG_SRC_ALPHA_SATURATE = 1024
+}
+global NVGcompositeOperation: type <cimport,nodecl,using,ctypedef'NVGcompositeOperation'> = @enum(cint){
+  NVG_SOURCE_OVER = 0,
+  NVG_SOURCE_IN = 1,
+  NVG_SOURCE_OUT = 2,
+  NVG_ATOP = 3,
+  NVG_DESTINATION_OVER = 4,
+  NVG_DESTINATION_IN = 5,
+  NVG_DESTINATION_OUT = 6,
+  NVG_DESTINATION_ATOP = 7,
+  NVG_LIGHTER = 8,
+  NVG_COPY = 9,
+  NVG_XOR = 10
+}
+global NVGcompositeOperationState: type <cimport,nodecl> = @record{
+  srcRGB: cint,
+  dstRGB: cint,
+  srcAlpha: cint,
+  dstAlpha: cint
+}
+global NVGglyphPosition: type <cimport,nodecl> = @record{
+  str: cstring,
+  x: float32,
+  minx: float32,
+  maxx: float32
+}
+global NVGtextRow: type <cimport,nodecl> = @record{
+  start: cstring,
+  end_: cstring,
+  next: cstring,
+  width: float32,
+  minx: float32,
+  maxx: float32
+}
+global NVGimageFlags: type <cimport,nodecl,using,ctypedef'NVGimageFlags'> = @enum(cint){
+  NVG_IMAGE_GENERATE_MIPMAPS = 1,
+  NVG_IMAGE_REPEATX = 2,
+  NVG_IMAGE_REPEATY = 4,
+  NVG_IMAGE_FLIPY = 8,
+  NVG_IMAGE_PREMULTIPLIED = 16,
+  NVG_IMAGE_NEAREST = 32
+}
+global NVGtexture: type <cimport,nodecl,using,ctypedef'NVGtexture'> = @enum(cint){
+  NVG_TEXTURE_ALPHA = 1,
+  NVG_TEXTURE_RGBA = 2
+}
+global NVGscissor: type <cimport,nodecl> = @record{
+  xform: [6]float32,
+  extent: [2]float32
+}
+global NVGvertex: type <cimport,nodecl> = @record{
+  x: float32,
+  y: float32,
+  u: float32,
+  v: float32
+}
+global NVGpath: type <cimport,nodecl> = @record{
+  first: cint,
+  count: cint,
+  closed: cuchar,
+  nbevel: cint,
+  fill: *NVGvertex,
+  nfill: cint,
+  stroke: *NVGvertex,
+  nstroke: cint,
+  winding: cint,
+  convex: cint
+}
+global NVGparams: type <cimport,nodecl> = @record{
+  userPtr: pointer,
+  edgeAntiAlias: cint,
+  renderCreate: function(uptr: pointer): cint,
+  renderCreateTexture: function(uptr: pointer, type: cint, w: cint, h: cint, imageFlags: cint, data: *cuchar): cint,
+  renderDeleteTexture: function(uptr: pointer, image: cint): cint,
+  renderUpdateTexture: function(uptr: pointer, image: cint, x: cint, y: cint, w: cint, h: cint, data: *cuchar): cint,
+  renderGetTextureSize: function(uptr: pointer, image: cint, w: *cint, h: *cint): cint,
+  renderViewport: function(uptr: pointer, width: float32, height: float32, devicePixelRatio: float32): void,
+  renderCancel: function(uptr: pointer): void,
+  renderFlush: function(uptr: pointer): void,
+  renderFill: function(uptr: pointer, paint: *NVGpaint, compositeOperation: NVGcompositeOperationState, scissor: *NVGscissor, fringe: float32, bounds: *float32, paths: *NVGpath, npaths: cint): void,
+  renderStroke: function(uptr: pointer, paint: *NVGpaint, compositeOperation: NVGcompositeOperationState, scissor: *NVGscissor, fringe: float32, strokeWidth: float32, paths: *NVGpath, npaths: cint): void,
+  renderTriangles: function(uptr: pointer, paint: *NVGpaint, compositeOperation: NVGcompositeOperationState, scissor: *NVGscissor, verts: *NVGvertex, nverts: cint, fringe: float32): void,
+  renderDelete: function(uptr: pointer): void
+}
+global NVGcreateFlags: type <cimport,nodecl,using,ctypedef'NVGcreateFlags'> = @enum(cint){
+  NVG_ANTIALIAS = 1,
+  NVG_STENCIL_STROKES = 2,
+  NVG_DEBUG = 4
+}
+global NVGimageFlagsGL: type <cimport,nodecl,using,ctypedef'NVGimageFlagsGL'> = @enum(cint){
+  NVG_IMAGE_NODELETE = 65536
+}
+global div_t: type <cimport,nodecl> = @record{
+  quot: cint,
+  rem: cint
+}
+global ldiv_t: type <cimport,nodecl> = @record{
+  quot: clong,
+  rem: clong
+}
+global lldiv_t: type <cimport,nodecl> = @record{
+  quot: clonglong,
+  rem: clonglong
+}
+global max_align_t: type <cimport,nodecl> = @record{
+  __clang_max_align_nonce1: clonglong,
+  __clang_max_align_nonce2: clongdouble
+}
+global FILE: type <cimport,nodecl,forwarddecl> = @record{}
+global fpos_t: type <cimport,nodecl> = @union{
+  __opaque: [16]cchar,
+  __lldata: clonglong,
+  __align: float64
+}
+global GLNVGuniformLoc: type <cimport,nodecl,using,ctypedef'GLNVGuniformLoc'> = @enum(cint){
+  GLNVG_LOC_VIEWSIZE = 0,
+  GLNVG_LOC_TEX = 1,
+  GLNVG_LOC_FRAG = 2,
+  GLNVG_MAX_LOCS = 3
+}
+global GLNVGshaderType: type <cimport,nodecl,using,ctypedef'GLNVGshaderType'> = @enum(cint){
+  NSVG_SHADER_FILLGRAD = 0,
+  NSVG_SHADER_FILLIMG = 1,
+  NSVG_SHADER_SIMPLE = 2,
+  NSVG_SHADER_IMG = 3
+}
+global GLNVGshader: type <cimport,nodecl> = @record{
+  prog: GLuint,
+  frag: GLuint,
+  vert: GLuint,
+  loc: [3]GLint
+}
+global GLNVGtexture: type <cimport,nodecl> = @record{
+  id: cint,
+  tex: GLuint,
+  width: cint,
+  height: cint,
+  type: cint,
+  flags: cint
+}
+global GLNVGblend: type <cimport,nodecl> = @record{
+  srcRGB: GLenum,
+  dstRGB: GLenum,
+  srcAlpha: GLenum,
+  dstAlpha: GLenum
+}
+global GLNVGcallType: type <cimport,nodecl,using,ctypedef'GLNVGcallType'> = @enum(cint){
+  GLNVG_NONE = 0,
+  GLNVG_FILL = 1,
+  GLNVG_CONVEXFILL = 2,
+  GLNVG_STROKE = 3,
+  GLNVG_TRIANGLES = 4
+}
+global GLNVGcall: type <cimport,nodecl> = @record{
+  type: cint,
+  image: cint,
+  pathOffset: cint,
+  pathCount: cint,
+  triangleOffset: cint,
+  triangleCount: cint,
+  uniformOffset: cint,
+  blendFunc: GLNVGblend
+}
+global GLNVGpath: type <cimport,nodecl> = @record{
+  fillOffset: cint,
+  fillCount: cint,
+  strokeOffset: cint,
+  strokeCount: cint
+}
+global GLNVGfragUniforms: type <cimport,nodecl> = @record{
+  __unnamed1: union{
+    __unnamed1: record{
+      scissorMat: [12]float32,
+      paintMat: [12]float32,
+      innerCol: NVGcolor,
+      outerCol: NVGcolor,
+      scissorExt: [2]float32,
+      scissorScale: [2]float32,
+      extent: [2]float32,
+      radius: float32,
+      feather: float32,
+      strokeMult: float32,
+      strokeThr: float32,
+      texType: float32,
+      type: float32
+    },
+    uniformArray: [11][4]float32
+  }
+}
+global GLNVGcontext: type <cimport,nodecl> = @record{
+  shader: GLNVGshader,
+  textures: *GLNVGtexture,
+  view: [2]float32,
+  ntextures: cint,
+  ctextures: cint,
+  textureId: cint,
+  vertBuf: GLuint,
+  fragSize: cint,
+  flags: cint,
+  calls: *GLNVGcall,
+  ccalls: cint,
+  ncalls: cint,
+  paths: *GLNVGpath,
+  cpaths: cint,
+  npaths: cint,
+  verts: *NVGvertex,
+  cverts: cint,
+  nverts: cint,
+  uniforms: *cuchar,
+  cuniforms: cint,
+  nuniforms: cint,
+  boundTexture: GLuint,
+  stencilMask: GLuint,
+  stencilFunc: GLenum,
+  stencilFuncRef: GLint,
+  stencilFuncMask: GLuint,
+  blendFunc: GLNVGblend,
+  dummyTex: cint
+}
+global function glActiveTexture(texture: GLenum): void <cimport,nodecl> end
+global function glAttachShader(program: GLuint, shader: GLuint): void <cimport,nodecl> end
+global function glBindAttribLocation(program: GLuint, index: GLuint, name: *GLchar): void <cimport,nodecl> end
+global function glBindBuffer(target: GLenum, buffer: GLuint): void <cimport,nodecl> end
+global function glBindFramebuffer(target: GLenum, framebuffer: GLuint): void <cimport,nodecl> end
+global function glBindRenderbuffer(target: GLenum, renderbuffer: GLuint): void <cimport,nodecl> end
+global function glBindTexture(target: GLenum, texture: GLuint): void <cimport,nodecl> end
+global function glBlendColor(red: GLfloat, green: GLfloat, blue: GLfloat, alpha: GLfloat): void <cimport,nodecl> end
+global function glBlendEquation(mode: GLenum): void <cimport,nodecl> end
+global function glBlendEquationSeparate(modeRGB: GLenum, modeAlpha: GLenum): void <cimport,nodecl> end
+global function glBlendFunc(sfactor: GLenum, dfactor: GLenum): void <cimport,nodecl> end
+global function glBlendFuncSeparate(sfactorRGB: GLenum, dfactorRGB: GLenum, sfactorAlpha: GLenum, dfactorAlpha: GLenum): void <cimport,nodecl> end
+global function glBufferData(target: GLenum, size: GLsizeiptr, data: pointer, usage: GLenum): void <cimport,nodecl> end
+global function glBufferSubData(target: GLenum, offset: GLintptr, size: GLsizeiptr, data: pointer): void <cimport,nodecl> end
+global function glCheckFramebufferStatus(target: GLenum): GLenum <cimport,nodecl> end
+global function glClear(mask: GLbitfield): void <cimport,nodecl> end
+global function glClearColor(red: GLfloat, green: GLfloat, blue: GLfloat, alpha: GLfloat): void <cimport,nodecl> end
+global function glClearDepthf(d: GLfloat): void <cimport,nodecl> end
+global function glClearStencil(s: GLint): void <cimport,nodecl> end
+global function glColorMask(red: GLboolean, green: GLboolean, blue: GLboolean, alpha: GLboolean): void <cimport,nodecl> end
+global function glCompileShader(shader: GLuint): void <cimport,nodecl> end
+global function glCompressedTexImage2D(target: GLenum, level: GLint, internalformat: GLenum, width: GLsizei, height: GLsizei, border: GLint, imageSize: GLsizei, data: pointer): void <cimport,nodecl> end
+global function glCompressedTexSubImage2D(target: GLenum, level: GLint, xoffset: GLint, yoffset: GLint, width: GLsizei, height: GLsizei, format: GLenum, imageSize: GLsizei, data: pointer): void <cimport,nodecl> end
+global function glCopyTexImage2D(target: GLenum, level: GLint, internalformat: GLenum, x: GLint, y: GLint, width: GLsizei, height: GLsizei, border: GLint): void <cimport,nodecl> end
+global function glCopyTexSubImage2D(target: GLenum, level: GLint, xoffset: GLint, yoffset: GLint, x: GLint, y: GLint, width: GLsizei, height: GLsizei): void <cimport,nodecl> end
+global function glCreateProgram(): GLuint <cimport,nodecl> end
+global function glCreateShader(type: GLenum): GLuint <cimport,nodecl> end
+global function glCullFace(mode: GLenum): void <cimport,nodecl> end
+global function glDeleteBuffers(n: GLsizei, buffers: *GLuint): void <cimport,nodecl> end
+global function glDeleteFramebuffers(n: GLsizei, framebuffers: *GLuint): void <cimport,nodecl> end
+global function glDeleteProgram(program: GLuint): void <cimport,nodecl> end
+global function glDeleteRenderbuffers(n: GLsizei, renderbuffers: *GLuint): void <cimport,nodecl> end
+global function glDeleteShader(shader: GLuint): void <cimport,nodecl> end
+global function glDeleteTextures(n: GLsizei, textures: *GLuint): void <cimport,nodecl> end
+global function glDepthFunc(func: GLenum): void <cimport,nodecl> end
+global function glDepthMask(flag: GLboolean): void <cimport,nodecl> end
+global function glDepthRangef(n: GLfloat, f: GLfloat): void <cimport,nodecl> end
+global function glDetachShader(program: GLuint, shader: GLuint): void <cimport,nodecl> end
+global function glDisable(cap: GLenum): void <cimport,nodecl> end
+global function glDisableVertexAttribArray(index: GLuint): void <cimport,nodecl> end
+global function glDrawArrays(mode: GLenum, first: GLint, count: GLsizei): void <cimport,nodecl> end
+global function glDrawElements(mode: GLenum, count: GLsizei, type: GLenum, indices: pointer): void <cimport,nodecl> end
+global function glEnable(cap: GLenum): void <cimport,nodecl> end
+global function glEnableVertexAttribArray(index: GLuint): void <cimport,nodecl> end
+global function glFinish(): void <cimport,nodecl> end
+global function glFlush(): void <cimport,nodecl> end
+global function glFramebufferRenderbuffer(target: GLenum, attachment: GLenum, renderbuffertarget: GLenum, renderbuffer: GLuint): void <cimport,nodecl> end
+global function glFramebufferTexture2D(target: GLenum, attachment: GLenum, textarget: GLenum, texture: GLuint, level: GLint): void <cimport,nodecl> end
+global function glFrontFace(mode: GLenum): void <cimport,nodecl> end
+global function glGenBuffers(n: GLsizei, buffers: *GLuint): void <cimport,nodecl> end
+global function glGenerateMipmap(target: GLenum): void <cimport,nodecl> end
+global function glGenFramebuffers(n: GLsizei, framebuffers: *GLuint): void <cimport,nodecl> end
+global function glGenRenderbuffers(n: GLsizei, renderbuffers: *GLuint): void <cimport,nodecl> end
+global function glGenTextures(n: GLsizei, textures: *GLuint): void <cimport,nodecl> end
+global function glGetActiveAttrib(program: GLuint, index: GLuint, bufSize: GLsizei, length: *GLsizei, size: *GLint, type: *GLenum, name: *GLchar): void <cimport,nodecl> end
+global function glGetActiveUniform(program: GLuint, index: GLuint, bufSize: GLsizei, length: *GLsizei, size: *GLint, type: *GLenum, name: *GLchar): void <cimport,nodecl> end
+global function glGetAttachedShaders(program: GLuint, maxCount: GLsizei, count: *GLsizei, shaders: *GLuint): void <cimport,nodecl> end
+global function glGetAttribLocation(program: GLuint, name: *GLchar): GLint <cimport,nodecl> end
+global function glGetBooleanv(pname: GLenum, data: *GLboolean): void <cimport,nodecl> end
+global function glGetBufferParameteriv(target: GLenum, pname: GLenum, params: *GLint): void <cimport,nodecl> end
+global function glGetError(): GLenum <cimport,nodecl> end
+global function glGetFloatv(pname: GLenum, data: *GLfloat): void <cimport,nodecl> end
+global function glGetFramebufferAttachmentParameteriv(target: GLenum, attachment: GLenum, pname: GLenum, params: *GLint): void <cimport,nodecl> end
+global function glGetIntegerv(pname: GLenum, data: *GLint): void <cimport,nodecl> end
+global function glGetProgramiv(program: GLuint, pname: GLenum, params: *GLint): void <cimport,nodecl> end
+global function glGetProgramInfoLog(program: GLuint, bufSize: GLsizei, length: *GLsizei, infoLog: *GLchar): void <cimport,nodecl> end
+global function glGetRenderbufferParameteriv(target: GLenum, pname: GLenum, params: *GLint): void <cimport,nodecl> end
+global function glGetShaderiv(shader: GLuint, pname: GLenum, params: *GLint): void <cimport,nodecl> end
+global function glGetShaderInfoLog(shader: GLuint, bufSize: GLsizei, length: *GLsizei, infoLog: *GLchar): void <cimport,nodecl> end
+global function glGetShaderPrecisionFormat(shadertype: GLenum, precisiontype: GLenum, range: *GLint, precision: *GLint): void <cimport,nodecl> end
+global function glGetShaderSource(shader: GLuint, bufSize: GLsizei, length: *GLsizei, source: *GLchar): void <cimport,nodecl> end
+global function glGetString(name: GLenum): *GLubyte <cimport,nodecl> end
+global function glGetTexParameterfv(target: GLenum, pname: GLenum, params: *GLfloat): void <cimport,nodecl> end
+global function glGetTexParameteriv(target: GLenum, pname: GLenum, params: *GLint): void <cimport,nodecl> end
+global function glGetUniformfv(program: GLuint, location: GLint, params: *GLfloat): void <cimport,nodecl> end
+global function glGetUniformiv(program: GLuint, location: GLint, params: *GLint): void <cimport,nodecl> end
+global function glGetUniformLocation(program: GLuint, name: *GLchar): GLint <cimport,nodecl> end
+global function glGetVertexAttribfv(index: GLuint, pname: GLenum, params: *GLfloat): void <cimport,nodecl> end
+global function glGetVertexAttribiv(index: GLuint, pname: GLenum, params: *GLint): void <cimport,nodecl> end
+global function glGetVertexAttribPointerv(index: GLuint, pname: GLenum, pointer: *pointer): void <cimport,nodecl> end
+global function glHint(target: GLenum, mode: GLenum): void <cimport,nodecl> end
+global function glIsBuffer(buffer: GLuint): GLboolean <cimport,nodecl> end
+global function glIsEnabled(cap: GLenum): GLboolean <cimport,nodecl> end
+global function glIsFramebuffer(framebuffer: GLuint): GLboolean <cimport,nodecl> end
+global function glIsProgram(program: GLuint): GLboolean <cimport,nodecl> end
+global function glIsRenderbuffer(renderbuffer: GLuint): GLboolean <cimport,nodecl> end
+global function glIsShader(shader: GLuint): GLboolean <cimport,nodecl> end
+global function glIsTexture(texture: GLuint): GLboolean <cimport,nodecl> end
+global function glLineWidth(width: GLfloat): void <cimport,nodecl> end
+global function glLinkProgram(program: GLuint): void <cimport,nodecl> end
+global function glPixelStorei(pname: GLenum, param: GLint): void <cimport,nodecl> end
+global function glPolygonOffset(factor: GLfloat, units: GLfloat): void <cimport,nodecl> end
+global function glReadPixels(x: GLint, y: GLint, width: GLsizei, height: GLsizei, format: GLenum, type: GLenum, pixels: pointer): void <cimport,nodecl> end
+global function glReleaseShaderCompiler(): void <cimport,nodecl> end
+global function glRenderbufferStorage(target: GLenum, internalformat: GLenum, width: GLsizei, height: GLsizei): void <cimport,nodecl> end
+global function glSampleCoverage(value: GLfloat, invert: GLboolean): void <cimport,nodecl> end
+global function glScissor(x: GLint, y: GLint, width: GLsizei, height: GLsizei): void <cimport,nodecl> end
+global function glShaderBinary(count: GLsizei, shaders: *GLuint, binaryformat: GLenum, binary: pointer, length: GLsizei): void <cimport,nodecl> end
+global function glShaderSource(shader: GLuint, count: GLsizei, string: **GLchar, length: *GLint): void <cimport,nodecl> end
+global function glStencilFunc(func: GLenum, ref: GLint, mask: GLuint): void <cimport,nodecl> end
+global function glStencilFuncSeparate(face: GLenum, func: GLenum, ref: GLint, mask: GLuint): void <cimport,nodecl> end
+global function glStencilMask(mask: GLuint): void <cimport,nodecl> end
+global function glStencilMaskSeparate(face: GLenum, mask: GLuint): void <cimport,nodecl> end
+global function glStencilOp(fail: GLenum, zfail: GLenum, zpass: GLenum): void <cimport,nodecl> end
+global function glStencilOpSeparate(face: GLenum, sfail: GLenum, dpfail: GLenum, dppass: GLenum): void <cimport,nodecl> end
+global function glTexImage2D(target: GLenum, level: GLint, internalformat: GLint, width: GLsizei, height: GLsizei, border: GLint, format: GLenum, type: GLenum, pixels: pointer): void <cimport,nodecl> end
+global function glTexParameterf(target: GLenum, pname: GLenum, param: GLfloat): void <cimport,nodecl> end
+global function glTexParameterfv(target: GLenum, pname: GLenum, params: *GLfloat): void <cimport,nodecl> end
+global function glTexParameteri(target: GLenum, pname: GLenum, param: GLint): void <cimport,nodecl> end
+global function glTexParameteriv(target: GLenum, pname: GLenum, params: *GLint): void <cimport,nodecl> end
+global function glTexSubImage2D(target: GLenum, level: GLint, xoffset: GLint, yoffset: GLint, width: GLsizei, height: GLsizei, format: GLenum, type: GLenum, pixels: pointer): void <cimport,nodecl> end
+global function glUniform1f(location: GLint, v0: GLfloat): void <cimport,nodecl> end
+global function glUniform1fv(location: GLint, count: GLsizei, value: *GLfloat): void <cimport,nodecl> end
+global function glUniform1i(location: GLint, v0: GLint): void <cimport,nodecl> end
+global function glUniform1iv(location: GLint, count: GLsizei, value: *GLint): void <cimport,nodecl> end
+global function glUniform2f(location: GLint, v0: GLfloat, v1: GLfloat): void <cimport,nodecl> end
+global function glUniform2fv(location: GLint, count: GLsizei, value: *GLfloat): void <cimport,nodecl> end
+global function glUniform2i(location: GLint, v0: GLint, v1: GLint): void <cimport,nodecl> end
+global function glUniform2iv(location: GLint, count: GLsizei, value: *GLint): void <cimport,nodecl> end
+global function glUniform3f(location: GLint, v0: GLfloat, v1: GLfloat, v2: GLfloat): void <cimport,nodecl> end
+global function glUniform3fv(location: GLint, count: GLsizei, value: *GLfloat): void <cimport,nodecl> end
+global function glUniform3i(location: GLint, v0: GLint, v1: GLint, v2: GLint): void <cimport,nodecl> end
+global function glUniform3iv(location: GLint, count: GLsizei, value: *GLint): void <cimport,nodecl> end
+global function glUniform4f(location: GLint, v0: GLfloat, v1: GLfloat, v2: GLfloat, v3: GLfloat): void <cimport,nodecl> end
+global function glUniform4fv(location: GLint, count: GLsizei, value: *GLfloat): void <cimport,nodecl> end
+global function glUniform4i(location: GLint, v0: GLint, v1: GLint, v2: GLint, v3: GLint): void <cimport,nodecl> end
+global function glUniform4iv(location: GLint, count: GLsizei, value: *GLint): void <cimport,nodecl> end
+global function glUniformMatrix2fv(location: GLint, count: GLsizei, transpose: GLboolean, value: *GLfloat): void <cimport,nodecl> end
+global function glUniformMatrix3fv(location: GLint, count: GLsizei, transpose: GLboolean, value: *GLfloat): void <cimport,nodecl> end
+global function glUniformMatrix4fv(location: GLint, count: GLsizei, transpose: GLboolean, value: *GLfloat): void <cimport,nodecl> end
+global function glUseProgram(program: GLuint): void <cimport,nodecl> end
+global function glValidateProgram(program: GLuint): void <cimport,nodecl> end
+global function glVertexAttrib1f(index: GLuint, x: GLfloat): void <cimport,nodecl> end
+global function glVertexAttrib1fv(index: GLuint, v: *GLfloat): void <cimport,nodecl> end
+global function glVertexAttrib2f(index: GLuint, x: GLfloat, y: GLfloat): void <cimport,nodecl> end
+global function glVertexAttrib2fv(index: GLuint, v: *GLfloat): void <cimport,nodecl> end
+global function glVertexAttrib3f(index: GLuint, x: GLfloat, y: GLfloat, z: GLfloat): void <cimport,nodecl> end
+global function glVertexAttrib3fv(index: GLuint, v: *GLfloat): void <cimport,nodecl> end
+global function glVertexAttrib4f(index: GLuint, x: GLfloat, y: GLfloat, z: GLfloat, w: GLfloat): void <cimport,nodecl> end
+global function glVertexAttrib4fv(index: GLuint, v: *GLfloat): void <cimport,nodecl> end
+global function glVertexAttribPointer(index: GLuint, size: GLint, type: GLenum, normalized: GLboolean, stride: GLsizei, pointer: pointer): void <cimport,nodecl> end
+global function glViewport(x: GLint, y: GLint, width: GLsizei, height: GLsizei): void <cimport,nodecl> end
+global function glReadBuffer(src: GLenum): void <cimport,nodecl> end
+global function glDrawRangeElements(mode: GLenum, start: GLuint, end_: GLuint, count: GLsizei, type: GLenum, indices: pointer): void <cimport,nodecl> end
+global function glTexImage3D(target: GLenum, level: GLint, internalformat: GLint, width: GLsizei, height: GLsizei, depth: GLsizei, border: GLint, format: GLenum, type: GLenum, pixels: pointer): void <cimport,nodecl> end
+global function glTexSubImage3D(target: GLenum, level: GLint, xoffset: GLint, yoffset: GLint, zoffset: GLint, width: GLsizei, height: GLsizei, depth: GLsizei, format: GLenum, type: GLenum, pixels: pointer): void <cimport,nodecl> end
+global function glCopyTexSubImage3D(target: GLenum, level: GLint, xoffset: GLint, yoffset: GLint, zoffset: GLint, x: GLint, y: GLint, width: GLsizei, height: GLsizei): void <cimport,nodecl> end
+global function glCompressedTexImage3D(target: GLenum, level: GLint, internalformat: GLenum, width: GLsizei, height: GLsizei, depth: GLsizei, border: GLint, imageSize: GLsizei, data: pointer): void <cimport,nodecl> end
+global function glCompressedTexSubImage3D(target: GLenum, level: GLint, xoffset: GLint, yoffset: GLint, zoffset: GLint, width: GLsizei, height: GLsizei, depth: GLsizei, format: GLenum, imageSize: GLsizei, data: pointer): void <cimport,nodecl> end
+global function glGenQueries(n: GLsizei, ids: *GLuint): void <cimport,nodecl> end
+global function glDeleteQueries(n: GLsizei, ids: *GLuint): void <cimport,nodecl> end
+global function glIsQuery(id: GLuint): GLboolean <cimport,nodecl> end
+global function glBeginQuery(target: GLenum, id: GLuint): void <cimport,nodecl> end
+global function glEndQuery(target: GLenum): void <cimport,nodecl> end
+global function glGetQueryiv(target: GLenum, pname: GLenum, params: *GLint): void <cimport,nodecl> end
+global function glGetQueryObjectuiv(id: GLuint, pname: GLenum, params: *GLuint): void <cimport,nodecl> end
+global function glUnmapBuffer(target: GLenum): GLboolean <cimport,nodecl> end
+global function glGetBufferPointerv(target: GLenum, pname: GLenum, params: *pointer): void <cimport,nodecl> end
+global function glDrawBuffers(n: GLsizei, bufs: *GLenum): void <cimport,nodecl> end
+global function glUniformMatrix2x3fv(location: GLint, count: GLsizei, transpose: GLboolean, value: *GLfloat): void <cimport,nodecl> end
+global function glUniformMatrix3x2fv(location: GLint, count: GLsizei, transpose: GLboolean, value: *GLfloat): void <cimport,nodecl> end
+global function glUniformMatrix2x4fv(location: GLint, count: GLsizei, transpose: GLboolean, value: *GLfloat): void <cimport,nodecl> end
+global function glUniformMatrix4x2fv(location: GLint, count: GLsizei, transpose: GLboolean, value: *GLfloat): void <cimport,nodecl> end
+global function glUniformMatrix3x4fv(location: GLint, count: GLsizei, transpose: GLboolean, value: *GLfloat): void <cimport,nodecl> end
+global function glUniformMatrix4x3fv(location: GLint, count: GLsizei, transpose: GLboolean, value: *GLfloat): void <cimport,nodecl> end
+global function glBlitFramebuffer(srcX0: GLint, srcY0: GLint, srcX1: GLint, srcY1: GLint, dstX0: GLint, dstY0: GLint, dstX1: GLint, dstY1: GLint, mask: GLbitfield, filter: GLenum): void <cimport,nodecl> end
+global function glRenderbufferStorageMultisample(target: GLenum, samples: GLsizei, internalformat: GLenum, width: GLsizei, height: GLsizei): void <cimport,nodecl> end
+global function glFramebufferTextureLayer(target: GLenum, attachment: GLenum, texture: GLuint, level: GLint, layer: GLint): void <cimport,nodecl> end
+global function glMapBufferRange(target: GLenum, offset: GLintptr, length: GLsizeiptr, access: GLbitfield): pointer <cimport,nodecl> end
+global function glFlushMappedBufferRange(target: GLenum, offset: GLintptr, length: GLsizeiptr): void <cimport,nodecl> end
+global function glBindVertexArray(array: GLuint): void <cimport,nodecl> end
+global function glDeleteVertexArrays(n: GLsizei, arrays: *GLuint): void <cimport,nodecl> end
+global function glGenVertexArrays(n: GLsizei, arrays: *GLuint): void <cimport,nodecl> end
+global function glIsVertexArray(array: GLuint): GLboolean <cimport,nodecl> end
+global function glGetIntegeri_v(target: GLenum, index: GLuint, data: *GLint): void <cimport,nodecl> end
+global function glBeginTransformFeedback(primitiveMode: GLenum): void <cimport,nodecl> end
+global function glEndTransformFeedback(): void <cimport,nodecl> end
+global function glBindBufferRange(target: GLenum, index: GLuint, buffer: GLuint, offset: GLintptr, size: GLsizeiptr): void <cimport,nodecl> end
+global function glBindBufferBase(target: GLenum, index: GLuint, buffer: GLuint): void <cimport,nodecl> end
+global function glTransformFeedbackVaryings(program: GLuint, count: GLsizei, varyings: **GLchar, bufferMode: GLenum): void <cimport,nodecl> end
+global function glGetTransformFeedbackVarying(program: GLuint, index: GLuint, bufSize: GLsizei, length: *GLsizei, size: *GLsizei, type: *GLenum, name: *GLchar): void <cimport,nodecl> end
+global function glVertexAttribIPointer(index: GLuint, size: GLint, type: GLenum, stride: GLsizei, pointer: pointer): void <cimport,nodecl> end
+global function glGetVertexAttribIiv(index: GLuint, pname: GLenum, params: *GLint): void <cimport,nodecl> end
+global function glGetVertexAttribIuiv(index: GLuint, pname: GLenum, params: *GLuint): void <cimport,nodecl> end
+global function glVertexAttribI4i(index: GLuint, x: GLint, y: GLint, z: GLint, w: GLint): void <cimport,nodecl> end
+global function glVertexAttribI4ui(index: GLuint, x: GLuint, y: GLuint, z: GLuint, w: GLuint): void <cimport,nodecl> end
+global function glVertexAttribI4iv(index: GLuint, v: *GLint): void <cimport,nodecl> end
+global function glVertexAttribI4uiv(index: GLuint, v: *GLuint): void <cimport,nodecl> end
+global function glGetUniformuiv(program: GLuint, location: GLint, params: *GLuint): void <cimport,nodecl> end
+global function glGetFragDataLocation(program: GLuint, name: *GLchar): GLint <cimport,nodecl> end
+global function glUniform1ui(location: GLint, v0: GLuint): void <cimport,nodecl> end
+global function glUniform2ui(location: GLint, v0: GLuint, v1: GLuint): void <cimport,nodecl> end
+global function glUniform3ui(location: GLint, v0: GLuint, v1: GLuint, v2: GLuint): void <cimport,nodecl> end
+global function glUniform4ui(location: GLint, v0: GLuint, v1: GLuint, v2: GLuint, v3: GLuint): void <cimport,nodecl> end
+global function glUniform1uiv(location: GLint, count: GLsizei, value: *GLuint): void <cimport,nodecl> end
+global function glUniform2uiv(location: GLint, count: GLsizei, value: *GLuint): void <cimport,nodecl> end
+global function glUniform3uiv(location: GLint, count: GLsizei, value: *GLuint): void <cimport,nodecl> end
+global function glUniform4uiv(location: GLint, count: GLsizei, value: *GLuint): void <cimport,nodecl> end
+global function glClearBufferiv(buffer: GLenum, drawbuffer: GLint, value: *GLint): void <cimport,nodecl> end
+global function glClearBufferuiv(buffer: GLenum, drawbuffer: GLint, value: *GLuint): void <cimport,nodecl> end
+global function glClearBufferfv(buffer: GLenum, drawbuffer: GLint, value: *GLfloat): void <cimport,nodecl> end
+global function glClearBufferfi(buffer: GLenum, drawbuffer: GLint, depth: GLfloat, stencil: GLint): void <cimport,nodecl> end
+global function glGetStringi(name: GLenum, index: GLuint): *GLubyte <cimport,nodecl> end
+global function glCopyBufferSubData(readTarget: GLenum, writeTarget: GLenum, readOffset: GLintptr, writeOffset: GLintptr, size: GLsizeiptr): void <cimport,nodecl> end
+global function glGetUniformIndices(program: GLuint, uniformCount: GLsizei, uniformNames: **GLchar, uniformIndices: *GLuint): void <cimport,nodecl> end
+global function glGetActiveUniformsiv(program: GLuint, uniformCount: GLsizei, uniformIndices: *GLuint, pname: GLenum, params: *GLint): void <cimport,nodecl> end
+global function glGetUniformBlockIndex(program: GLuint, uniformBlockName: *GLchar): GLuint <cimport,nodecl> end
+global function glGetActiveUniformBlockiv(program: GLuint, uniformBlockIndex: GLuint, pname: GLenum, params: *GLint): void <cimport,nodecl> end
+global function glGetActiveUniformBlockName(program: GLuint, uniformBlockIndex: GLuint, bufSize: GLsizei, length: *GLsizei, uniformBlockName: *GLchar): void <cimport,nodecl> end
+global function glUniformBlockBinding(program: GLuint, uniformBlockIndex: GLuint, uniformBlockBinding: GLuint): void <cimport,nodecl> end
+global function glDrawArraysInstanced(mode: GLenum, first: GLint, count: GLsizei, instancecount: GLsizei): void <cimport,nodecl> end
+global function glDrawElementsInstanced(mode: GLenum, count: GLsizei, type: GLenum, indices: pointer, instancecount: GLsizei): void <cimport,nodecl> end
+global function glFenceSync(condition: GLenum, flags: GLbitfield): GLsync <cimport,nodecl> end
+global function glIsSync(sync: GLsync): GLboolean <cimport,nodecl> end
+global function glDeleteSync(sync: GLsync): void <cimport,nodecl> end
+global function glClientWaitSync(sync: GLsync, flags: GLbitfield, timeout: GLuint64): GLenum <cimport,nodecl> end
+global function glWaitSync(sync: GLsync, flags: GLbitfield, timeout: GLuint64): void <cimport,nodecl> end
+global function glGetInteger64v(pname: GLenum, data: *GLint64): void <cimport,nodecl> end
+global function glGetSynciv(sync: GLsync, pname: GLenum, count: GLsizei, length: *GLsizei, values: *GLint): void <cimport,nodecl> end
+global function glGetInteger64i_v(target: GLenum, index: GLuint, data: *GLint64): void <cimport,nodecl> end
+global function glGetBufferParameteri64v(target: GLenum, pname: GLenum, params: *GLint64): void <cimport,nodecl> end
+global function glGenSamplers(count: GLsizei, samplers: *GLuint): void <cimport,nodecl> end
+global function glDeleteSamplers(count: GLsizei, samplers: *GLuint): void <cimport,nodecl> end
+global function glIsSampler(sampler: GLuint): GLboolean <cimport,nodecl> end
+global function glBindSampler(unit: GLuint, sampler: GLuint): void <cimport,nodecl> end
+global function glSamplerParameteri(sampler: GLuint, pname: GLenum, param: GLint): void <cimport,nodecl> end
+global function glSamplerParameteriv(sampler: GLuint, pname: GLenum, param: *GLint): void <cimport,nodecl> end
+global function glSamplerParameterf(sampler: GLuint, pname: GLenum, param: GLfloat): void <cimport,nodecl> end
+global function glSamplerParameterfv(sampler: GLuint, pname: GLenum, param: *GLfloat): void <cimport,nodecl> end
+global function glGetSamplerParameteriv(sampler: GLuint, pname: GLenum, params: *GLint): void <cimport,nodecl> end
+global function glGetSamplerParameterfv(sampler: GLuint, pname: GLenum, params: *GLfloat): void <cimport,nodecl> end
+global function glVertexAttribDivisor(index: GLuint, divisor: GLuint): void <cimport,nodecl> end
+global function glBindTransformFeedback(target: GLenum, id: GLuint): void <cimport,nodecl> end
+global function glDeleteTransformFeedbacks(n: GLsizei, ids: *GLuint): void <cimport,nodecl> end
+global function glGenTransformFeedbacks(n: GLsizei, ids: *GLuint): void <cimport,nodecl> end
+global function glIsTransformFeedback(id: GLuint): GLboolean <cimport,nodecl> end
+global function glPauseTransformFeedback(): void <cimport,nodecl> end
+global function glResumeTransformFeedback(): void <cimport,nodecl> end
+global function glGetProgramBinary(program: GLuint, bufSize: GLsizei, length: *GLsizei, binaryFormat: *GLenum, binary: pointer): void <cimport,nodecl> end
+global function glProgramBinary(program: GLuint, binaryFormat: GLenum, binary: pointer, length: GLsizei): void <cimport,nodecl> end
+global function glProgramParameteri(program: GLuint, pname: GLenum, value: GLint): void <cimport,nodecl> end
+global function glInvalidateFramebuffer(target: GLenum, numAttachments: GLsizei, attachments: *GLenum): void <cimport,nodecl> end
+global function glInvalidateSubFramebuffer(target: GLenum, numAttachments: GLsizei, attachments: *GLenum, x: GLint, y: GLint, width: GLsizei, height: GLsizei): void <cimport,nodecl> end
+global function glTexStorage2D(target: GLenum, levels: GLsizei, internalformat: GLenum, width: GLsizei, height: GLsizei): void <cimport,nodecl> end
+global function glTexStorage3D(target: GLenum, levels: GLsizei, internalformat: GLenum, width: GLsizei, height: GLsizei, depth: GLsizei): void <cimport,nodecl> end
+global function glGetInternalformativ(target: GLenum, internalformat: GLenum, pname: GLenum, count: GLsizei, params: *GLint): void <cimport,nodecl> end
+global function nvgBeginFrame(ctx: *NVGcontext, windowWidth: float32, windowHeight: float32, devicePixelRatio: float32): void <cimport,nodecl> end
+global function nvgCancelFrame(ctx: *NVGcontext): void <cimport,nodecl> end
+global function nvgEndFrame(ctx: *NVGcontext): void <cimport,nodecl> end
+global function nvgGlobalCompositeOperation(ctx: *NVGcontext, op: cint): void <cimport,nodecl> end
+global function nvgGlobalCompositeBlendFunc(ctx: *NVGcontext, sfactor: cint, dfactor: cint): void <cimport,nodecl> end
+global function nvgGlobalCompositeBlendFuncSeparate(ctx: *NVGcontext, srcRGB: cint, dstRGB: cint, srcAlpha: cint, dstAlpha: cint): void <cimport,nodecl> end
+global function nvgRGB(r: cuchar, g: cuchar, b: cuchar): NVGcolor <cimport,nodecl> end
+global function nvgRGBf(r: float32, g: float32, b: float32): NVGcolor <cimport,nodecl> end
+global function nvgRGBA(r: cuchar, g: cuchar, b: cuchar, a: cuchar): NVGcolor <cimport,nodecl> end
+global function nvgRGBAf(r: float32, g: float32, b: float32, a: float32): NVGcolor <cimport,nodecl> end
+global function nvgLerpRGBA(c0: NVGcolor, c1: NVGcolor, u: float32): NVGcolor <cimport,nodecl> end
+global function nvgTransRGBA(c0: NVGcolor, a: cuchar): NVGcolor <cimport,nodecl> end
+global function nvgTransRGBAf(c0: NVGcolor, a: float32): NVGcolor <cimport,nodecl> end
+global function nvgHSL(h: float32, s: float32, l: float32): NVGcolor <cimport,nodecl> end
+global function nvgHSLA(h: float32, s: float32, l: float32, a: cuchar): NVGcolor <cimport,nodecl> end
+global function nvgSave(ctx: *NVGcontext): void <cimport,nodecl> end
+global function nvgRestore(ctx: *NVGcontext): void <cimport,nodecl> end
+global function nvgReset(ctx: *NVGcontext): void <cimport,nodecl> end
+global function nvgShapeAntiAlias(ctx: *NVGcontext, enabled: cint): void <cimport,nodecl> end
+global function nvgStrokeColor(ctx: *NVGcontext, color: NVGcolor): void <cimport,nodecl> end
+global function nvgStrokePaint(ctx: *NVGcontext, paint: NVGpaint): void <cimport,nodecl> end
+global function nvgFillColor(ctx: *NVGcontext, color: NVGcolor): void <cimport,nodecl> end
+global function nvgFillPaint(ctx: *NVGcontext, paint: NVGpaint): void <cimport,nodecl> end
+global function nvgMiterLimit(ctx: *NVGcontext, limit: float32): void <cimport,nodecl> end
+global function nvgStrokeWidth(ctx: *NVGcontext, size: float32): void <cimport,nodecl> end
+global function nvgLineCap(ctx: *NVGcontext, cap: cint): void <cimport,nodecl> end
+global function nvgLineJoin(ctx: *NVGcontext, join: cint): void <cimport,nodecl> end
+global function nvgGlobalAlpha(ctx: *NVGcontext, alpha: float32): void <cimport,nodecl> end
+global function nvgResetTransform(ctx: *NVGcontext): void <cimport,nodecl> end
+global function nvgTransform(ctx: *NVGcontext, a: float32, b: float32, c: float32, d: float32, e: float32, f: float32): void <cimport,nodecl> end
+global function nvgTranslate(ctx: *NVGcontext, x: float32, y: float32): void <cimport,nodecl> end
+global function nvgRotate(ctx: *NVGcontext, angle: float32): void <cimport,nodecl> end
+global function nvgSkewX(ctx: *NVGcontext, angle: float32): void <cimport,nodecl> end
+global function nvgSkewY(ctx: *NVGcontext, angle: float32): void <cimport,nodecl> end
+global function nvgScale(ctx: *NVGcontext, x: float32, y: float32): void <cimport,nodecl> end
+global function nvgCurrentTransform(ctx: *NVGcontext, xform: *float32): void <cimport,nodecl> end
+global function nvgTransformIdentity(dst: *float32): void <cimport,nodecl> end
+global function nvgTransformTranslate(dst: *float32, tx: float32, ty: float32): void <cimport,nodecl> end
+global function nvgTransformScale(dst: *float32, sx: float32, sy: float32): void <cimport,nodecl> end
+global function nvgTransformRotate(dst: *float32, a: float32): void <cimport,nodecl> end
+global function nvgTransformSkewX(dst: *float32, a: float32): void <cimport,nodecl> end
+global function nvgTransformSkewY(dst: *float32, a: float32): void <cimport,nodecl> end
+global function nvgTransformMultiply(dst: *float32, src: *float32): void <cimport,nodecl> end
+global function nvgTransformPremultiply(dst: *float32, src: *float32): void <cimport,nodecl> end
+global function nvgTransformInverse(dst: *float32, src: *float32): cint <cimport,nodecl> end
+global function nvgTransformPoint(dstx: *float32, dsty: *float32, xform: *float32, srcx: float32, srcy: float32): void <cimport,nodecl> end
+global function nvgDegToRad(deg: float32): float32 <cimport,nodecl> end
+global function nvgRadToDeg(rad: float32): float32 <cimport,nodecl> end
+global function nvgCreateImage(ctx: *NVGcontext, filename: cstring, imageFlags: cint): cint <cimport,nodecl> end
+global function nvgCreateImageMem(ctx: *NVGcontext, imageFlags: cint, data: *cuchar, ndata: cint): cint <cimport,nodecl> end
+global function nvgCreateImageRGBA(ctx: *NVGcontext, w: cint, h: cint, imageFlags: cint, data: *cuchar): cint <cimport,nodecl> end
+global function nvgUpdateImage(ctx: *NVGcontext, image: cint, data: *cuchar): void <cimport,nodecl> end
+global function nvgImageSize(ctx: *NVGcontext, image: cint, w: *cint, h: *cint): void <cimport,nodecl> end
+global function nvgDeleteImage(ctx: *NVGcontext, image: cint): void <cimport,nodecl> end
+global function nvgLinearGradient(ctx: *NVGcontext, sx: float32, sy: float32, ex: float32, ey: float32, icol: NVGcolor, ocol: NVGcolor): NVGpaint <cimport,nodecl> end
+global function nvgBoxGradient(ctx: *NVGcontext, x: float32, y: float32, w: float32, h: float32, r: float32, f: float32, icol: NVGcolor, ocol: NVGcolor): NVGpaint <cimport,nodecl> end
+global function nvgRadialGradient(ctx: *NVGcontext, cx: float32, cy: float32, inr: float32, outr: float32, icol: NVGcolor, ocol: NVGcolor): NVGpaint <cimport,nodecl> end
+global function nvgImagePattern(ctx: *NVGcontext, ox: float32, oy: float32, ex: float32, ey: float32, angle: float32, image: cint, alpha: float32): NVGpaint <cimport,nodecl> end
+global function nvgScissor(ctx: *NVGcontext, x: float32, y: float32, w: float32, h: float32): void <cimport,nodecl> end
+global function nvgIntersectScissor(ctx: *NVGcontext, x: float32, y: float32, w: float32, h: float32): void <cimport,nodecl> end
+global function nvgResetScissor(ctx: *NVGcontext): void <cimport,nodecl> end
+global function nvgBeginPath(ctx: *NVGcontext): void <cimport,nodecl> end
+global function nvgMoveTo(ctx: *NVGcontext, x: float32, y: float32): void <cimport,nodecl> end
+global function nvgLineTo(ctx: *NVGcontext, x: float32, y: float32): void <cimport,nodecl> end
+global function nvgBezierTo(ctx: *NVGcontext, c1x: float32, c1y: float32, c2x: float32, c2y: float32, x: float32, y: float32): void <cimport,nodecl> end
+global function nvgQuadTo(ctx: *NVGcontext, cx: float32, cy: float32, x: float32, y: float32): void <cimport,nodecl> end
+global function nvgArcTo(ctx: *NVGcontext, x1: float32, y1: float32, x2: float32, y2: float32, radius: float32): void <cimport,nodecl> end
+global function nvgClosePath(ctx: *NVGcontext): void <cimport,nodecl> end
+global function nvgPathWinding(ctx: *NVGcontext, dir: cint): void <cimport,nodecl> end
+global function nvgArc(ctx: *NVGcontext, cx: float32, cy: float32, r: float32, a0: float32, a1: float32, dir: cint): void <cimport,nodecl> end
+global function nvgRect(ctx: *NVGcontext, x: float32, y: float32, w: float32, h: float32): void <cimport,nodecl> end
+global function nvgRoundedRect(ctx: *NVGcontext, x: float32, y: float32, w: float32, h: float32, r: float32): void <cimport,nodecl> end
+global function nvgRoundedRectVarying(ctx: *NVGcontext, x: float32, y: float32, w: float32, h: float32, radTopLeft: float32, radTopRight: float32, radBottomRight: float32, radBottomLeft: float32): void <cimport,nodecl> end
+global function nvgEllipse(ctx: *NVGcontext, cx: float32, cy: float32, rx: float32, ry: float32): void <cimport,nodecl> end
+global function nvgCircle(ctx: *NVGcontext, cx: float32, cy: float32, r: float32): void <cimport,nodecl> end
+global function nvgFill(ctx: *NVGcontext): void <cimport,nodecl> end
+global function nvgStroke(ctx: *NVGcontext): void <cimport,nodecl> end
+global function nvgCreateFont(ctx: *NVGcontext, name: cstring, filename: cstring): cint <cimport,nodecl> end
+global function nvgCreateFontAtIndex(ctx: *NVGcontext, name: cstring, filename: cstring, fontIndex: cint): cint <cimport,nodecl> end
+global function nvgCreateFontMem(ctx: *NVGcontext, name: cstring, data: *cuchar, ndata: cint, freeData: cint): cint <cimport,nodecl> end
+global function nvgCreateFontMemAtIndex(ctx: *NVGcontext, name: cstring, data: *cuchar, ndata: cint, freeData: cint, fontIndex: cint): cint <cimport,nodecl> end
+global function nvgFindFont(ctx: *NVGcontext, name: cstring): cint <cimport,nodecl> end
+global function nvgAddFallbackFontId(ctx: *NVGcontext, baseFont: cint, fallbackFont: cint): cint <cimport,nodecl> end
+global function nvgAddFallbackFont(ctx: *NVGcontext, baseFont: cstring, fallbackFont: cstring): cint <cimport,nodecl> end
+global function nvgResetFallbackFontsId(ctx: *NVGcontext, baseFont: cint): void <cimport,nodecl> end
+global function nvgResetFallbackFonts(ctx: *NVGcontext, baseFont: cstring): void <cimport,nodecl> end
+global function nvgFontSize(ctx: *NVGcontext, size: float32): void <cimport,nodecl> end
+global function nvgFontBlur(ctx: *NVGcontext, blur: float32): void <cimport,nodecl> end
+global function nvgTextLetterSpacing(ctx: *NVGcontext, spacing: float32): void <cimport,nodecl> end
+global function nvgTextLineHeight(ctx: *NVGcontext, lineHeight: float32): void <cimport,nodecl> end
+global function nvgTextAlign(ctx: *NVGcontext, align: cint): void <cimport,nodecl> end
+global function nvgFontFaceId(ctx: *NVGcontext, font: cint): void <cimport,nodecl> end
+global function nvgFontFace(ctx: *NVGcontext, font: cstring): void <cimport,nodecl> end
+global function nvgText(ctx: *NVGcontext, x: float32, y: float32, string: cstring, end_: cstring): float32 <cimport,nodecl> end
+global function nvgTextBox(ctx: *NVGcontext, x: float32, y: float32, breakRowWidth: float32, string: cstring, end_: cstring): void <cimport,nodecl> end
+global function nvgTextBounds(ctx: *NVGcontext, x: float32, y: float32, string: cstring, end_: cstring, bounds: *float32): float32 <cimport,nodecl> end
+global function nvgTextBoxBounds(ctx: *NVGcontext, x: float32, y: float32, breakRowWidth: float32, string: cstring, end_: cstring, bounds: *float32): void <cimport,nodecl> end
+global function nvgTextGlyphPositions(ctx: *NVGcontext, x: float32, y: float32, string: cstring, end_: cstring, positions: *NVGglyphPosition, maxPositions: cint): cint <cimport,nodecl> end
+global function nvgTextMetrics(ctx: *NVGcontext, ascender: *float32, descender: *float32, lineh: *float32): void <cimport,nodecl> end
+global function nvgTextBreakLines(ctx: *NVGcontext, string: cstring, end_: cstring, breakRowWidth: float32, rows: *NVGtextRow, maxRows: cint): cint <cimport,nodecl> end
+global function nvgCreateInternal(params: *NVGparams): *NVGcontext <cimport,nodecl> end
+global function nvgDeleteInternal(ctx: *NVGcontext): void <cimport,nodecl> end
+global function nvgInternalParams(ctx: *NVGcontext): *NVGparams <cimport,nodecl> end
+global function nvgDebugDumpPathCache(ctx: *NVGcontext): void <cimport,nodecl> end
+global function getloadavg(loadavg: *[0]float64, nelem: cint): cint <cimport,nodecl> end
+global function atoi(a1: cstring): cint <cimport,nodecl> end
+global function atol(a1: cstring): clong <cimport,nodecl> end
+global function atoll(a1: cstring): clonglong <cimport,nodecl> end
+global function atof(a1: cstring): float64 <cimport,nodecl> end
+global function strtof(a1: cstring, a2: *cstring): float32 <cimport,nodecl> end
+global function strtod(a1: cstring, a2: *cstring): float64 <cimport,nodecl> end
+global function strtold(a1: cstring, a2: *cstring): clongdouble <cimport,nodecl> end
+global function strtol(a1: cstring, a2: *cstring, a3: cint): clong <cimport,nodecl> end
+global function strtoul(a1: cstring, a2: *cstring, a3: cint): culong <cimport,nodecl> end
+global function strtoll(a1: cstring, a2: *cstring, a3: cint): clonglong <cimport,nodecl> end
+global function strtoull(a1: cstring, a2: *cstring, a3: cint): culonglong <cimport,nodecl> end
+global function rand(): cint <cimport,nodecl> end
+global function srand(a1: cuint): void <cimport,nodecl> end
+global function malloc(a1: csize): pointer <cimport,nodecl> end
+global function calloc(a1: csize, a2: csize): pointer <cimport,nodecl> end
+global function realloc(a1: pointer, a2: csize): pointer <cimport,nodecl> end
+global function free(a1: pointer): void <cimport,nodecl> end
+global function aligned_alloc(a1: csize, a2: csize): pointer <cimport,nodecl> end
+global function abort(): void <cimport,nodecl> end
+global function atexit(a1: function(): void): cint <cimport,nodecl> end
+global function exit(a1: cint): void <cimport,nodecl> end
+global function _Exit(a1: cint): void <cimport,nodecl> end
+global function at_quick_exit(a1: function(): void): cint <cimport,nodecl> end
+global function quick_exit(a1: cint): void <cimport,nodecl> end
+global function getenv(a1: cstring): cstring <cimport,nodecl> end
+global function system(a1: cstring): cint <cimport,nodecl> end
+global function bsearch(a1: pointer, a2: pointer, a3: csize, a4: csize, a5: function(a1: pointer, a2: pointer): cint): pointer <cimport,nodecl> end
+global function qsort(a1: pointer, a2: csize, a3: csize, a4: function(a1: pointer, a2: pointer): cint): void <cimport,nodecl> end
+global function abs(a1: cint): cint <cimport,nodecl> end
+global function labs(a1: clong): clong <cimport,nodecl> end
+global function llabs(a1: clonglong): clonglong <cimport,nodecl> end
+global function div(a1: cint, a2: cint): div_t <cimport,nodecl> end
+global function ldiv(a1: clong, a2: clong): ldiv_t <cimport,nodecl> end
+global function lldiv(a1: clonglong, a2: clonglong): lldiv_t <cimport,nodecl> end
+global function mblen(a1: cstring, a2: csize): cint <cimport,nodecl> end
+global function mbtowc(a1: *cwchar_t, a2: cstring, a3: csize): cint <cimport,nodecl> end
+global function wctomb(a1: cstring, a2: cwchar_t): cint <cimport,nodecl> end
+global function mbstowcs(a1: *cwchar_t, a2: cstring, a3: csize): csize <cimport,nodecl> end
+global function wcstombs(a1: cstring, a2: *cwchar_t, a3: csize): csize <cimport,nodecl> end
+global stdin: *FILE <cimport,nodecl>
+global stdout: *FILE <cimport,nodecl>
+global stderr: *FILE <cimport,nodecl>
+global function fopen(a1: cstring, a2: cstring): *FILE <cimport,nodecl> end
+global function freopen(a1: cstring, a2: cstring, a3: *FILE): *FILE <cimport,nodecl> end
+global function fclose(a1: *FILE): cint <cimport,nodecl> end
+global function remove(a1: cstring): cint <cimport,nodecl> end
+global function rename(a1: cstring, a2: cstring): cint <cimport,nodecl> end
+global function feof(a1: *FILE): cint <cimport,nodecl> end
+global function ferror(a1: *FILE): cint <cimport,nodecl> end
+global function fflush(a1: *FILE): cint <cimport,nodecl> end
+global function clearerr(a1: *FILE): void <cimport,nodecl> end
+global function fseek(a1: *FILE, a2: clong, a3: cint): cint <cimport,nodecl> end
+global function ftell(a1: *FILE): clong <cimport,nodecl> end
+global function rewind(a1: *FILE): void <cimport,nodecl> end
+global function fgetpos(a1: *FILE, a2: *fpos_t): cint <cimport,nodecl> end
+global function fsetpos(a1: *FILE, a2: *fpos_t): cint <cimport,nodecl> end
+global function fread(a1: pointer, a2: csize, a3: csize, a4: *FILE): csize <cimport,nodecl> end
+global function fwrite(a1: pointer, a2: csize, a3: csize, a4: *FILE): csize <cimport,nodecl> end
+global function fgetc(a1: *FILE): cint <cimport,nodecl> end
+global function getc(a1: *FILE): cint <cimport,nodecl> end
+global function getchar(): cint <cimport,nodecl> end
+global function ungetc(a1: cint, a2: *FILE): cint <cimport,nodecl> end
+global function fputc(a1: cint, a2: *FILE): cint <cimport,nodecl> end
+global function putc(a1: cint, a2: *FILE): cint <cimport,nodecl> end
+global function putchar(a1: cint): cint <cimport,nodecl> end
+global function fgets(a1: cstring, a2: cint, a3: *FILE): cstring <cimport,nodecl> end
+global function fputs(a1: cstring, a2: *FILE): cint <cimport,nodecl> end
+global function puts(a1: cstring): cint <cimport,nodecl> end
+global function printf(a1: cstring, ...: cvarargs): cint <cimport,nodecl> end
+global function fprintf(a1: *FILE, a2: cstring, ...: cvarargs): cint <cimport,nodecl> end
+global function sprintf(a1: cstring, a2: cstring, ...: cvarargs): cint <cimport,nodecl> end
+global function snprintf(a1: cstring, a2: csize, a3: cstring, ...: cvarargs): cint <cimport,nodecl> end
+global function vprintf(a1: cstring, a2: cvalist): cint <cimport,nodecl> end
+global function vfprintf(a1: *FILE, a2: cstring, a3: cvalist): cint <cimport,nodecl> end
+global function vsprintf(a1: cstring, a2: cstring, a3: cvalist): cint <cimport,nodecl> end
+global function vsnprintf(a1: cstring, a2: csize, a3: cstring, a4: cvalist): cint <cimport,nodecl> end
+global function scanf(a1: cstring, ...: cvarargs): cint <cimport,nodecl> end
+global function fscanf(a1: *FILE, a2: cstring, ...: cvarargs): cint <cimport,nodecl> end
+global function sscanf(a1: cstring, a2: cstring, ...: cvarargs): cint <cimport,nodecl> end
+global function vscanf(a1: cstring, a2: cvalist): cint <cimport,nodecl> end
+global function vfscanf(a1: *FILE, a2: cstring, a3: cvalist): cint <cimport,nodecl> end
+global function vsscanf(a1: cstring, a2: cstring, a3: cvalist): cint <cimport,nodecl> end
+global function perror(a1: cstring): void <cimport,nodecl> end
+global function setvbuf(a1: *FILE, a2: cstring, a3: cint, a4: csize): cint <cimport,nodecl> end
+global function setbuf(a1: *FILE, a2: cstring): void <cimport,nodecl> end
+global function tmpnam(a1: cstring): cstring <cimport,nodecl> end
+global function tmpfile(): *FILE <cimport,nodecl> end
+global function strlwr(a1: cstring): cstring <cimport,nodecl> end
+global function strupr(a1: cstring): cstring <cimport,nodecl> end
+global function memcpy(a1: pointer, a2: pointer, a3: csize): pointer <cimport,nodecl> end
+global function memmove(a1: pointer, a2: pointer, a3: csize): pointer <cimport,nodecl> end
+global function memset(a1: pointer, a2: cint, a3: csize): pointer <cimport,nodecl> end
+global function memcmp(a1: pointer, a2: pointer, a3: csize): cint <cimport,nodecl> end
+global function memchr(a1: pointer, a2: cint, a3: csize): pointer <cimport,nodecl> end
+global function strcpy(a1: cstring, a2: cstring): cstring <cimport,nodecl> end
+global function strncpy(a1: cstring, a2: cstring, a3: csize): cstring <cimport,nodecl> end
+global function strcat(a1: cstring, a2: cstring): cstring <cimport,nodecl> end
+global function strncat(a1: cstring, a2: cstring, a3: csize): cstring <cimport,nodecl> end
+global function strcmp(a1: cstring, a2: cstring): cint <cimport,nodecl> end
+global function strncmp(a1: cstring, a2: cstring, a3: csize): cint <cimport,nodecl> end
+global function strcoll(a1: cstring, a2: cstring): cint <cimport,nodecl> end
+global function strxfrm(a1: cstring, a2: cstring, a3: csize): csize <cimport,nodecl> end
+global function strchr(a1: cstring, a2: cint): cstring <cimport,nodecl> end
+global function strrchr(a1: cstring, a2: cint): cstring <cimport,nodecl> end
+global function strcspn(a1: cstring, a2: cstring): csize <cimport,nodecl> end
+global function strspn(a1: cstring, a2: cstring): csize <cimport,nodecl> end
+global function strpbrk(a1: cstring, a2: cstring): cstring <cimport,nodecl> end
+global function strstr(a1: cstring, a2: cstring): cstring <cimport,nodecl> end
+global function strtok(a1: cstring, a2: cstring): cstring <cimport,nodecl> end
+global function strlen(a1: cstring): csize <cimport,nodecl> end
+global function strerror(a1: cint): cstring <cimport,nodecl> end
+global function acos(a1: float64): float64 <cimport,nodecl> end
+global function acosf(a1: float32): float32 <cimport,nodecl> end
+global function acosl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function acosh(a1: float64): float64 <cimport,nodecl> end
+global function acoshf(a1: float32): float32 <cimport,nodecl> end
+global function acoshl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function asin(a1: float64): float64 <cimport,nodecl> end
+global function asinf(a1: float32): float32 <cimport,nodecl> end
+global function asinl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function asinh(a1: float64): float64 <cimport,nodecl> end
+global function asinhf(a1: float32): float32 <cimport,nodecl> end
+global function asinhl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function atan(a1: float64): float64 <cimport,nodecl> end
+global function atanf(a1: float32): float32 <cimport,nodecl> end
+global function atanl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function atan2(a1: float64, a2: float64): float64 <cimport,nodecl> end
+global function atan2f(a1: float32, a2: float32): float32 <cimport,nodecl> end
+global function atan2l(a1: clongdouble, a2: clongdouble): clongdouble <cimport,nodecl> end
+global function atanh(a1: float64): float64 <cimport,nodecl> end
+global function atanhf(a1: float32): float32 <cimport,nodecl> end
+global function atanhl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function cbrt(a1: float64): float64 <cimport,nodecl> end
+global function cbrtf(a1: float32): float32 <cimport,nodecl> end
+global function cbrtl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function ceil(a1: float64): float64 <cimport,nodecl> end
+global function ceilf(a1: float32): float32 <cimport,nodecl> end
+global function ceill(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function copysign(a1: float64, a2: float64): float64 <cimport,nodecl> end
+global function copysignf(a1: float32, a2: float32): float32 <cimport,nodecl> end
+global function copysignl(a1: clongdouble, a2: clongdouble): clongdouble <cimport,nodecl> end
+global function cos(a1: float64): float64 <cimport,nodecl> end
+global function cosf(a1: float32): float32 <cimport,nodecl> end
+global function cosl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function cosh(a1: float64): float64 <cimport,nodecl> end
+global function coshf(a1: float32): float32 <cimport,nodecl> end
+global function coshl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function erf(a1: float64): float64 <cimport,nodecl> end
+global function erff(a1: float32): float32 <cimport,nodecl> end
+global function erfl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function erfc(a1: float64): float64 <cimport,nodecl> end
+global function erfcf(a1: float32): float32 <cimport,nodecl> end
+global function erfcl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function exp(a1: float64): float64 <cimport,nodecl> end
+global function expf(a1: float32): float32 <cimport,nodecl> end
+global function expl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function exp2(a1: float64): float64 <cimport,nodecl> end
+global function exp2f(a1: float32): float32 <cimport,nodecl> end
+global function exp2l(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function expm1(a1: float64): float64 <cimport,nodecl> end
+global function expm1f(a1: float32): float32 <cimport,nodecl> end
+global function expm1l(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function fabs(a1: float64): float64 <cimport,nodecl> end
+global function fabsf(a1: float32): float32 <cimport,nodecl> end
+global function fabsl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function fdim(a1: float64, a2: float64): float64 <cimport,nodecl> end
+global function fdimf(a1: float32, a2: float32): float32 <cimport,nodecl> end
+global function fdiml(a1: clongdouble, a2: clongdouble): clongdouble <cimport,nodecl> end
+global function floor(a1: float64): float64 <cimport,nodecl> end
+global function floorf(a1: float32): float32 <cimport,nodecl> end
+global function floorl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function fma(a1: float64, a2: float64, a3: float64): float64 <cimport,nodecl> end
+global function fmaf(a1: float32, a2: float32, a3: float32): float32 <cimport,nodecl> end
+global function fmal(a1: clongdouble, a2: clongdouble, a3: clongdouble): clongdouble <cimport,nodecl> end
+global function fmax(a1: float64, a2: float64): float64 <cimport,nodecl> end
+global function fmaxf(a1: float32, a2: float32): float32 <cimport,nodecl> end
+global function fmaxl(a1: clongdouble, a2: clongdouble): clongdouble <cimport,nodecl> end
+global function fmin(a1: float64, a2: float64): float64 <cimport,nodecl> end
+global function fminf(a1: float32, a2: float32): float32 <cimport,nodecl> end
+global function fminl(a1: clongdouble, a2: clongdouble): clongdouble <cimport,nodecl> end
+global function fmod(a1: float64, a2: float64): float64 <cimport,nodecl> end
+global function fmodf(a1: float32, a2: float32): float32 <cimport,nodecl> end
+global function fmodl(a1: clongdouble, a2: clongdouble): clongdouble <cimport,nodecl> end
+global function frexp(a1: float64, a2: *cint): float64 <cimport,nodecl> end
+global function frexpf(a1: float32, a2: *cint): float32 <cimport,nodecl> end
+global function frexpl(a1: clongdouble, a2: *cint): clongdouble <cimport,nodecl> end
+global function hypot(a1: float64, a2: float64): float64 <cimport,nodecl> end
+global function hypotf(a1: float32, a2: float32): float32 <cimport,nodecl> end
+global function hypotl(a1: clongdouble, a2: clongdouble): clongdouble <cimport,nodecl> end
+global function ilogb(a1: float64): cint <cimport,nodecl> end
+global function ilogbf(a1: float32): cint <cimport,nodecl> end
+global function ilogbl(a1: clongdouble): cint <cimport,nodecl> end
+global function ldexp(a1: float64, a2: cint): float64 <cimport,nodecl> end
+global function ldexpf(a1: float32, a2: cint): float32 <cimport,nodecl> end
+global function ldexpl(a1: clongdouble, a2: cint): clongdouble <cimport,nodecl> end
+global function lgamma(a1: float64): float64 <cimport,nodecl> end
+global function lgammaf(a1: float32): float32 <cimport,nodecl> end
+global function lgammal(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function llrint(a1: float64): clonglong <cimport,nodecl> end
+global function llrintf(a1: float32): clonglong <cimport,nodecl> end
+global function llrintl(a1: clongdouble): clonglong <cimport,nodecl> end
+global function llround(a1: float64): clonglong <cimport,nodecl> end
+global function llroundf(a1: float32): clonglong <cimport,nodecl> end
+global function llroundl(a1: clongdouble): clonglong <cimport,nodecl> end
+global function log(a1: float64): float64 <cimport,nodecl> end
+global function logf(a1: float32): float32 <cimport,nodecl> end
+global function logl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function log10(a1: float64): float64 <cimport,nodecl> end
+global function log10f(a1: float32): float32 <cimport,nodecl> end
+global function log10l(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function log1p(a1: float64): float64 <cimport,nodecl> end
+global function log1pf(a1: float32): float32 <cimport,nodecl> end
+global function log1pl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function log2(a1: float64): float64 <cimport,nodecl> end
+global function log2f(a1: float32): float32 <cimport,nodecl> end
+global function log2l(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function logb(a1: float64): float64 <cimport,nodecl> end
+global function logbf(a1: float32): float32 <cimport,nodecl> end
+global function logbl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function lrint(a1: float64): clong <cimport,nodecl> end
+global function lrintf(a1: float32): clong <cimport,nodecl> end
+global function lrintl(a1: clongdouble): clong <cimport,nodecl> end
+global function lround(a1: float64): clong <cimport,nodecl> end
+global function lroundf(a1: float32): clong <cimport,nodecl> end
+global function lroundl(a1: clongdouble): clong <cimport,nodecl> end
+global function modf(a1: float64, a2: *float64): float64 <cimport,nodecl> end
+global function modff(a1: float32, a2: *float32): float32 <cimport,nodecl> end
+global function modfl(a1: clongdouble, a2: *clongdouble): clongdouble <cimport,nodecl> end
+global function nan(a1: cstring): float64 <cimport,nodecl> end
+global function nanf(a1: cstring): float32 <cimport,nodecl> end
+global function nanl(a1: cstring): clongdouble <cimport,nodecl> end
+global function nearbyint(a1: float64): float64 <cimport,nodecl> end
+global function nearbyintf(a1: float32): float32 <cimport,nodecl> end
+global function nearbyintl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function nextafter(a1: float64, a2: float64): float64 <cimport,nodecl> end
+global function nextafterf(a1: float32, a2: float32): float32 <cimport,nodecl> end
+global function nextafterl(a1: clongdouble, a2: clongdouble): clongdouble <cimport,nodecl> end
+global function nexttoward(a1: float64, a2: clongdouble): float64 <cimport,nodecl> end
+global function nexttowardf(a1: float32, a2: clongdouble): float32 <cimport,nodecl> end
+global function nexttowardl(a1: clongdouble, a2: clongdouble): clongdouble <cimport,nodecl> end
+global function pow(a1: float64, a2: float64): float64 <cimport,nodecl> end
+global function powf(a1: float32, a2: float32): float32 <cimport,nodecl> end
+global function powl(a1: clongdouble, a2: clongdouble): clongdouble <cimport,nodecl> end
+global function remainder(a1: float64, a2: float64): float64 <cimport,nodecl> end
+global function remainderf(a1: float32, a2: float32): float32 <cimport,nodecl> end
+global function remainderl(a1: clongdouble, a2: clongdouble): clongdouble <cimport,nodecl> end
+global function remquo(a1: float64, a2: float64, a3: *cint): float64 <cimport,nodecl> end
+global function remquof(a1: float32, a2: float32, a3: *cint): float32 <cimport,nodecl> end
+global function remquol(a1: clongdouble, a2: clongdouble, a3: *cint): clongdouble <cimport,nodecl> end
+global function rint(a1: float64): float64 <cimport,nodecl> end
+global function rintf(a1: float32): float32 <cimport,nodecl> end
+global function rintl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function round(a1: float64): float64 <cimport,nodecl> end
+global function roundf(a1: float32): float32 <cimport,nodecl> end
+global function roundl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function scalbln(a1: float64, a2: clong): float64 <cimport,nodecl> end
+global function scalblnf(a1: float32, a2: clong): float32 <cimport,nodecl> end
+global function scalblnl(a1: clongdouble, a2: clong): clongdouble <cimport,nodecl> end
+global function scalbn(a1: float64, a2: cint): float64 <cimport,nodecl> end
+global function scalbnf(a1: float32, a2: cint): float32 <cimport,nodecl> end
+global function scalbnl(a1: clongdouble, a2: cint): clongdouble <cimport,nodecl> end
+global function sin(a1: float64): float64 <cimport,nodecl> end
+global function sinf(a1: float32): float32 <cimport,nodecl> end
+global function sinl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function sinh(a1: float64): float64 <cimport,nodecl> end
+global function sinhf(a1: float32): float32 <cimport,nodecl> end
+global function sinhl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function sqrt(a1: float64): float64 <cimport,nodecl> end
+global function sqrtf(a1: float32): float32 <cimport,nodecl> end
+global function sqrtl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function tan(a1: float64): float64 <cimport,nodecl> end
+global function tanf(a1: float32): float32 <cimport,nodecl> end
+global function tanl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function tanh(a1: float64): float64 <cimport,nodecl> end
+global function tanhf(a1: float32): float32 <cimport,nodecl> end
+global function tanhl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function tgamma(a1: float64): float64 <cimport,nodecl> end
+global function tgammaf(a1: float32): float32 <cimport,nodecl> end
+global function tgammal(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function trunc(a1: float64): float64 <cimport,nodecl> end
+global function truncf(a1: float32): float32 <cimport,nodecl> end
+global function truncl(a1: clongdouble): clongdouble <cimport,nodecl> end
+global function glnvg__maxi(a: cint, b: cint): cint <cimport,nodecl> end
+global function glnvg__bindTexture(gl: *GLNVGcontext, tex: GLuint): void <cimport,nodecl> end
+global function glnvg__stencilMask(gl: *GLNVGcontext, mask: GLuint): void <cimport,nodecl> end
+global function glnvg__stencilFunc(gl: *GLNVGcontext, func: GLenum, ref: GLint, mask: GLuint): void <cimport,nodecl> end
+global function glnvg__blendFuncSeparate(gl: *GLNVGcontext, blend: *GLNVGblend): void <cimport,nodecl> end
+global function glnvg__allocTexture(gl: *GLNVGcontext): *GLNVGtexture <cimport,nodecl> end
+global function glnvg__findTexture(gl: *GLNVGcontext, id: cint): *GLNVGtexture <cimport,nodecl> end
+global function glnvg__deleteTexture(gl: *GLNVGcontext, id: cint): cint <cimport,nodecl> end
+global function glnvg__dumpShaderError(shader: GLuint, name: cstring, type: cstring): void <cimport,nodecl> end
+global function glnvg__dumpProgramError(prog: GLuint, name: cstring): void <cimport,nodecl> end
+global function glnvg__checkError(gl: *GLNVGcontext, str: cstring): void <cimport,nodecl> end
+global function glnvg__createShader(shader: *GLNVGshader, name: cstring, header: cstring, opts: cstring, vshader: cstring, fshader: cstring): cint <cimport,nodecl> end
+global function glnvg__deleteShader(shader: *GLNVGshader): void <cimport,nodecl> end
+global function glnvg__getUniforms(shader: *GLNVGshader): void <cimport,nodecl> end
+global function glnvg__renderCreate(uptr: pointer): cint <cimport,nodecl> end
+global function glnvg__renderCreateTexture(uptr: pointer, type: cint, w: cint, h: cint, imageFlags: cint, data: *cuchar): cint <cimport,nodecl> end
+global function glnvg__renderDeleteTexture(uptr: pointer, image: cint): cint <cimport,nodecl> end
+global function glnvg__renderUpdateTexture(uptr: pointer, image: cint, x: cint, y: cint, w: cint, h: cint, data: *cuchar): cint <cimport,nodecl> end
+global function glnvg__renderGetTextureSize(uptr: pointer, image: cint, w: *cint, h: *cint): cint <cimport,nodecl> end
+global function glnvg__xformToMat3x4(m3: *float32, t: *float32): void <cimport,nodecl> end
+global function glnvg__premulColor(c: NVGcolor): NVGcolor <cimport,nodecl> end
+global function glnvg__convertPaint(gl: *GLNVGcontext, frag: *GLNVGfragUniforms, paint: *NVGpaint, scissor: *NVGscissor, width: float32, fringe: float32, strokeThr: float32): cint <cimport,nodecl> end
+global function glnvg__setUniforms(gl: *GLNVGcontext, uniformOffset: cint, image: cint): void <cimport,nodecl> end
+global function glnvg__renderViewport(uptr: pointer, width: float32, height: float32, devicePixelRatio: float32): void <cimport,nodecl> end
+global function glnvg__fill(gl: *GLNVGcontext, call: *GLNVGcall): void <cimport,nodecl> end
+global function glnvg__convexFill(gl: *GLNVGcontext, call: *GLNVGcall): void <cimport,nodecl> end
+global function glnvg__stroke(gl: *GLNVGcontext, call: *GLNVGcall): void <cimport,nodecl> end
+global function glnvg__triangles(gl: *GLNVGcontext, call: *GLNVGcall): void <cimport,nodecl> end
+global function glnvg__renderCancel(uptr: pointer): void <cimport,nodecl> end
+global function glnvg_convertBlendFuncFactor(factor: cint): GLenum <cimport,nodecl> end
+global function glnvg__blendCompositeOperation(op: NVGcompositeOperationState): GLNVGblend <cimport,nodecl> end
+global function glnvg__renderFlush(uptr: pointer): void <cimport,nodecl> end
+global function glnvg__maxVertCount(paths: *NVGpath, npaths: cint): cint <cimport,nodecl> end
+global function glnvg__allocCall(gl: *GLNVGcontext): *GLNVGcall <cimport,nodecl> end
+global function glnvg__allocPaths(gl: *GLNVGcontext, n: cint): cint <cimport,nodecl> end
+global function glnvg__allocVerts(gl: *GLNVGcontext, n: cint): cint <cimport,nodecl> end
+global function glnvg__allocFragUniforms(gl: *GLNVGcontext, n: cint): cint <cimport,nodecl> end
+global function nvg__fragUniformPtr(gl: *GLNVGcontext, i: cint): *GLNVGfragUniforms <cimport,nodecl> end
+global function glnvg__vset(vtx: *NVGvertex, x: float32, y: float32, u: float32, v: float32): void <cimport,nodecl> end
+global function glnvg__renderFill(uptr: pointer, paint: *NVGpaint, compositeOperation: NVGcompositeOperationState, scissor: *NVGscissor, fringe: float32, bounds: *float32, paths: *NVGpath, npaths: cint): void <cimport,nodecl> end
+global function glnvg__renderStroke(uptr: pointer, paint: *NVGpaint, compositeOperation: NVGcompositeOperationState, scissor: *NVGscissor, fringe: float32, strokeWidth: float32, paths: *NVGpath, npaths: cint): void <cimport,nodecl> end
+global function glnvg__renderTriangles(uptr: pointer, paint: *NVGpaint, compositeOperation: NVGcompositeOperationState, scissor: *NVGscissor, verts: *NVGvertex, nverts: cint, fringe: float32): void <cimport,nodecl> end
+global function glnvg__renderDelete(uptr: pointer): void <cimport,nodecl> end
+global function nvgCreateGLES3(flags: cint): *NVGcontext <cimport,nodecl> end
+global function nvgDeleteGLES3(ctx: *NVGcontext): void <cimport,nodecl> end
+global function nvglCreateImageFromHandleGLES3(ctx: *NVGcontext, textureId: GLuint, w: cint, h: cint, imageFlags: cint): cint <cimport,nodecl> end
+global function nvglImageHandleGLES3(ctx: *NVGcontext, image: cint): GLuint <cimport,nodecl> end
+global INT8_MIN: cint <comptime> = -128
+global INT16_MIN: cint <comptime> = -32768
+global INT32_MIN: cint <comptime> = -2147483648
+global INT8_MAX: cint <comptime> = 127
+global INT16_MAX: cint <comptime> = 32767
+global INT32_MAX: cint <comptime> = 2147483647
+global INT64_MAX: clonglong <comptime> = 9223372036854775807
+global UINT8_MAX: cint <comptime> = 255
+global UINT16_MAX: cint <comptime> = 65535
+global UINT32_MAX: cuint <comptime> = 4294967295
+global UINT64_MAX: culonglong <cimport,nodecl,const>
+global INT_FAST8_MIN: cint <comptime> = -128
+global INT_FAST16_MIN: cint <comptime> = -32768
+global INT_FAST32_MIN: cint <comptime> = -2147483648
+global INT_LEAST8_MIN: cint <comptime> = -128
+global INT_LEAST16_MIN: cint <comptime> = -32768
+global INT_LEAST32_MIN: cint <comptime> = -2147483648
+global INT_FAST8_MAX: cint <comptime> = 127
+global INT_FAST16_MAX: cint <comptime> = 32767
+global INT_FAST32_MAX: cint <comptime> = 2147483647
+global INT_FAST64_MAX: clonglong <comptime> = 9223372036854775807
+global INT_LEAST8_MAX: cint <comptime> = 127
+global INT_LEAST16_MAX: cint <comptime> = 32767
+global INT_LEAST32_MAX: cint <comptime> = 2147483647
+global INT_LEAST64_MAX: clonglong <comptime> = 9223372036854775807
+global UINT_FAST8_MAX: cint <comptime> = 255
+global UINT_FAST16_MAX: cint <comptime> = 65535
+global UINT_FAST32_MAX: cuint <comptime> = 4294967295
+global UINT_FAST64_MAX: culonglong <cimport,nodecl,const>
+global UINT_LEAST8_MAX: cint <comptime> = 255
+global UINT_LEAST16_MAX: cint <comptime> = 65535
+global UINT_LEAST32_MAX: cuint <comptime> = 4294967295
+global UINT_LEAST64_MAX: culonglong <cimport,nodecl,const>
+global INTMAX_MAX: clonglong <comptime> = 9223372036854775807
+global UINTMAX_MAX: culonglong <cimport,nodecl,const>
+global WCHAR_MAX: cint <comptime> = 2147483647
+global WINT_MAX: cint <comptime> = 2147483647
+global INTPTR_MAX: clong <comptime> = 2147483647
+global UINTPTR_MAX: culong <comptime> = 4294967295
+global PTRDIFF_MAX: clong <comptime> = 2147483647
+global SIZE_MAX: culong <comptime> = 4294967295
+global WINT_MIN: cint <comptime> = -2147483648
+global WCHAR_MIN: cint <comptime> = -2147483648
+global SIG_ATOMIC_MIN: cint <comptime> = -2147483648
+global SIG_ATOMIC_MAX: cint <comptime> = 2147483647
+global KHRONOS_SUPPORT_INT64: cint <comptime> = 1
+global KHRONOS_SUPPORT_FLOAT: cint <comptime> = 1
+global KHRONOS_MAX_ENUM: cint <comptime> = 2147483647
+global GL_GLES_PROTOTYPES: cint <comptime> = 1
+global GL_ES_VERSION_2_0: cint <comptime> = 1
+global GL_DEPTH_BUFFER_BIT: cint <comptime> = 256
+global GL_STENCIL_BUFFER_BIT: cint <comptime> = 1024
+global GL_COLOR_BUFFER_BIT: cint <comptime> = 16384
+global GL_FALSE: cint <comptime> = 0
+global GL_TRUE: cint <comptime> = 1
+global GL_POINTS: cint <comptime> = 0
+global GL_LINES: cint <comptime> = 1
+global GL_LINE_LOOP: cint <comptime> = 2
+global GL_LINE_STRIP: cint <comptime> = 3
+global GL_TRIANGLES: cint <comptime> = 4
+global GL_TRIANGLE_STRIP: cint <comptime> = 5
+global GL_TRIANGLE_FAN: cint <comptime> = 6
+global GL_ZERO: cint <comptime> = 0
+global GL_ONE: cint <comptime> = 1
+global GL_SRC_COLOR: cint <comptime> = 768
+global GL_ONE_MINUS_SRC_COLOR: cint <comptime> = 769
+global GL_SRC_ALPHA: cint <comptime> = 770
+global GL_ONE_MINUS_SRC_ALPHA: cint <comptime> = 771
+global GL_DST_ALPHA: cint <comptime> = 772
+global GL_ONE_MINUS_DST_ALPHA: cint <comptime> = 773
+global GL_DST_COLOR: cint <comptime> = 774
+global GL_ONE_MINUS_DST_COLOR: cint <comptime> = 775
+global GL_SRC_ALPHA_SATURATE: cint <comptime> = 776
+global GL_FUNC_ADD: cint <comptime> = 32774
+global GL_BLEND_EQUATION: cint <comptime> = 32777
+global GL_BLEND_EQUATION_RGB: cint <comptime> = 32777
+global GL_BLEND_EQUATION_ALPHA: cint <comptime> = 34877
+global GL_FUNC_SUBTRACT: cint <comptime> = 32778
+global GL_FUNC_REVERSE_SUBTRACT: cint <comptime> = 32779
+global GL_BLEND_DST_RGB: cint <comptime> = 32968
+global GL_BLEND_SRC_RGB: cint <comptime> = 32969
+global GL_BLEND_DST_ALPHA: cint <comptime> = 32970
+global GL_BLEND_SRC_ALPHA: cint <comptime> = 32971
+global GL_CONSTANT_COLOR: cint <comptime> = 32769
+global GL_ONE_MINUS_CONSTANT_COLOR: cint <comptime> = 32770
+global GL_CONSTANT_ALPHA: cint <comptime> = 32771
+global GL_ONE_MINUS_CONSTANT_ALPHA: cint <comptime> = 32772
+global GL_BLEND_COLOR: cint <comptime> = 32773
+global GL_ARRAY_BUFFER: cint <comptime> = 34962
+global GL_ELEMENT_ARRAY_BUFFER: cint <comptime> = 34963
+global GL_ARRAY_BUFFER_BINDING: cint <comptime> = 34964
+global GL_ELEMENT_ARRAY_BUFFER_BINDING: cint <comptime> = 34965
+global GL_STREAM_DRAW: cint <comptime> = 35040
+global GL_STATIC_DRAW: cint <comptime> = 35044
+global GL_DYNAMIC_DRAW: cint <comptime> = 35048
+global GL_BUFFER_SIZE: cint <comptime> = 34660
+global GL_BUFFER_USAGE: cint <comptime> = 34661
+global GL_CURRENT_VERTEX_ATTRIB: cint <comptime> = 34342
+global GL_FRONT: cint <comptime> = 1028
+global GL_BACK: cint <comptime> = 1029
+global GL_FRONT_AND_BACK: cint <comptime> = 1032
+global GL_TEXTURE_2D: cint <comptime> = 3553
+global GL_CULL_FACE: cint <comptime> = 2884
+global GL_BLEND: cint <comptime> = 3042
+global GL_DITHER: cint <comptime> = 3024
+global GL_STENCIL_TEST: cint <comptime> = 2960
+global GL_DEPTH_TEST: cint <comptime> = 2929
+global GL_SCISSOR_TEST: cint <comptime> = 3089
+global GL_POLYGON_OFFSET_FILL: cint <comptime> = 32823
+global GL_SAMPLE_ALPHA_TO_COVERAGE: cint <comptime> = 32926
+global GL_SAMPLE_COVERAGE: cint <comptime> = 32928
+global GL_NO_ERROR: cint <comptime> = 0
+global GL_INVALID_ENUM: cint <comptime> = 1280
+global GL_INVALID_VALUE: cint <comptime> = 1281
+global GL_INVALID_OPERATION: cint <comptime> = 1282
+global GL_OUT_OF_MEMORY: cint <comptime> = 1285
+global GL_CW: cint <comptime> = 2304
+global GL_CCW: cint <comptime> = 2305
+global GL_LINE_WIDTH: cint <comptime> = 2849
+global GL_ALIASED_POINT_SIZE_RANGE: cint <comptime> = 33901
+global GL_ALIASED_LINE_WIDTH_RANGE: cint <comptime> = 33902
+global GL_CULL_FACE_MODE: cint <comptime> = 2885
+global GL_FRONT_FACE: cint <comptime> = 2886
+global GL_DEPTH_RANGE: cint <comptime> = 2928
+global GL_DEPTH_WRITEMASK: cint <comptime> = 2930
+global GL_DEPTH_CLEAR_VALUE: cint <comptime> = 2931
+global GL_DEPTH_FUNC: cint <comptime> = 2932
+global GL_STENCIL_CLEAR_VALUE: cint <comptime> = 2961
+global GL_STENCIL_FUNC: cint <comptime> = 2962
+global GL_STENCIL_FAIL: cint <comptime> = 2964
+global GL_STENCIL_PASS_DEPTH_FAIL: cint <comptime> = 2965
+global GL_STENCIL_PASS_DEPTH_PASS: cint <comptime> = 2966
+global GL_STENCIL_REF: cint <comptime> = 2967
+global GL_STENCIL_VALUE_MASK: cint <comptime> = 2963
+global GL_STENCIL_WRITEMASK: cint <comptime> = 2968
+global GL_STENCIL_BACK_FUNC: cint <comptime> = 34816
+global GL_STENCIL_BACK_FAIL: cint <comptime> = 34817
+global GL_STENCIL_BACK_PASS_DEPTH_FAIL: cint <comptime> = 34818
+global GL_STENCIL_BACK_PASS_DEPTH_PASS: cint <comptime> = 34819
+global GL_STENCIL_BACK_REF: cint <comptime> = 36003
+global GL_STENCIL_BACK_VALUE_MASK: cint <comptime> = 36004
+global GL_STENCIL_BACK_WRITEMASK: cint <comptime> = 36005
+global GL_VIEWPORT: cint <comptime> = 2978
+global GL_SCISSOR_BOX: cint <comptime> = 3088
+global GL_COLOR_CLEAR_VALUE: cint <comptime> = 3106
+global GL_COLOR_WRITEMASK: cint <comptime> = 3107
+global GL_UNPACK_ALIGNMENT: cint <comptime> = 3317
+global GL_PACK_ALIGNMENT: cint <comptime> = 3333
+global GL_MAX_TEXTURE_SIZE: cint <comptime> = 3379
+global GL_MAX_VIEWPORT_DIMS: cint <comptime> = 3386
+global GL_SUBPIXEL_BITS: cint <comptime> = 3408
+global GL_RED_BITS: cint <comptime> = 3410
+global GL_GREEN_BITS: cint <comptime> = 3411
+global GL_BLUE_BITS: cint <comptime> = 3412
+global GL_ALPHA_BITS: cint <comptime> = 3413
+global GL_DEPTH_BITS: cint <comptime> = 3414
+global GL_STENCIL_BITS: cint <comptime> = 3415
+global GL_POLYGON_OFFSET_UNITS: cint <comptime> = 10752
+global GL_POLYGON_OFFSET_FACTOR: cint <comptime> = 32824
+global GL_TEXTURE_BINDING_2D: cint <comptime> = 32873
+global GL_SAMPLE_BUFFERS: cint <comptime> = 32936
+global GL_SAMPLES: cint <comptime> = 32937
+global GL_SAMPLE_COVERAGE_VALUE: cint <comptime> = 32938
+global GL_SAMPLE_COVERAGE_INVERT: cint <comptime> = 32939
+global GL_NUM_COMPRESSED_TEXTURE_FORMATS: cint <comptime> = 34466
+global GL_COMPRESSED_TEXTURE_FORMATS: cint <comptime> = 34467
+global GL_DONT_CARE: cint <comptime> = 4352
+global GL_FASTEST: cint <comptime> = 4353
+global GL_NICEST: cint <comptime> = 4354
+global GL_GENERATE_MIPMAP_HINT: cint <comptime> = 33170
+global GL_BYTE: cint <comptime> = 5120
+global GL_UNSIGNED_BYTE: cint <comptime> = 5121
+global GL_SHORT: cint <comptime> = 5122
+global GL_UNSIGNED_SHORT: cint <comptime> = 5123
+global GL_INT: cint <comptime> = 5124
+global GL_UNSIGNED_INT: cint <comptime> = 5125
+global GL_FLOAT: cint <comptime> = 5126
+global GL_FIXED: cint <comptime> = 5132
+global GL_DEPTH_COMPONENT: cint <comptime> = 6402
+global GL_ALPHA: cint <comptime> = 6406
+global GL_RGB: cint <comptime> = 6407
+global GL_RGBA: cint <comptime> = 6408
+global GL_LUMINANCE: cint <comptime> = 6409
+global GL_LUMINANCE_ALPHA: cint <comptime> = 6410
+global GL_UNSIGNED_SHORT_4_4_4_4: cint <comptime> = 32819
+global GL_UNSIGNED_SHORT_5_5_5_1: cint <comptime> = 32820
+global GL_UNSIGNED_SHORT_5_6_5: cint <comptime> = 33635
+global GL_FRAGMENT_SHADER: cint <comptime> = 35632
+global GL_VERTEX_SHADER: cint <comptime> = 35633
+global GL_MAX_VERTEX_ATTRIBS: cint <comptime> = 34921
+global GL_MAX_VERTEX_UNIFORM_VECTORS: cint <comptime> = 36347
+global GL_MAX_VARYING_VECTORS: cint <comptime> = 36348
+global GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS: cint <comptime> = 35661
+global GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS: cint <comptime> = 35660
+global GL_MAX_TEXTURE_IMAGE_UNITS: cint <comptime> = 34930
+global GL_MAX_FRAGMENT_UNIFORM_VECTORS: cint <comptime> = 36349
+global GL_SHADER_TYPE: cint <comptime> = 35663
+global GL_DELETE_STATUS: cint <comptime> = 35712
+global GL_LINK_STATUS: cint <comptime> = 35714
+global GL_VALIDATE_STATUS: cint <comptime> = 35715
+global GL_ATTACHED_SHADERS: cint <comptime> = 35717
+global GL_ACTIVE_UNIFORMS: cint <comptime> = 35718
+global GL_ACTIVE_UNIFORM_MAX_LENGTH: cint <comptime> = 35719
+global GL_ACTIVE_ATTRIBUTES: cint <comptime> = 35721
+global GL_ACTIVE_ATTRIBUTE_MAX_LENGTH: cint <comptime> = 35722
+global GL_SHADING_LANGUAGE_VERSION: cint <comptime> = 35724
+global GL_CURRENT_PROGRAM: cint <comptime> = 35725
+global GL_NEVER: cint <comptime> = 512
+global GL_LESS: cint <comptime> = 513
+global GL_EQUAL: cint <comptime> = 514
+global GL_LEQUAL: cint <comptime> = 515
+global GL_GREATER: cint <comptime> = 516
+global GL_NOTEQUAL: cint <comptime> = 517
+global GL_GEQUAL: cint <comptime> = 518
+global GL_ALWAYS: cint <comptime> = 519
+global GL_KEEP: cint <comptime> = 7680
+global GL_REPLACE: cint <comptime> = 7681
+global GL_INCR: cint <comptime> = 7682
+global GL_DECR: cint <comptime> = 7683
+global GL_INVERT: cint <comptime> = 5386
+global GL_INCR_WRAP: cint <comptime> = 34055
+global GL_DECR_WRAP: cint <comptime> = 34056
+global GL_VENDOR: cint <comptime> = 7936
+global GL_RENDERER: cint <comptime> = 7937
+global GL_VERSION: cint <comptime> = 7938
+global GL_EXTENSIONS: cint <comptime> = 7939
+global GL_NEAREST: cint <comptime> = 9728
+global GL_LINEAR: cint <comptime> = 9729
+global GL_NEAREST_MIPMAP_NEAREST: cint <comptime> = 9984
+global GL_LINEAR_MIPMAP_NEAREST: cint <comptime> = 9985
+global GL_NEAREST_MIPMAP_LINEAR: cint <comptime> = 9986
+global GL_LINEAR_MIPMAP_LINEAR: cint <comptime> = 9987
+global GL_TEXTURE_MAG_FILTER: cint <comptime> = 10240
+global GL_TEXTURE_MIN_FILTER: cint <comptime> = 10241
+global GL_TEXTURE_WRAP_S: cint <comptime> = 10242
+global GL_TEXTURE_WRAP_T: cint <comptime> = 10243
+global GL_TEXTURE: cint <comptime> = 5890
+global GL_TEXTURE_CUBE_MAP: cint <comptime> = 34067
+global GL_TEXTURE_BINDING_CUBE_MAP: cint <comptime> = 34068
+global GL_TEXTURE_CUBE_MAP_POSITIVE_X: cint <comptime> = 34069
+global GL_TEXTURE_CUBE_MAP_NEGATIVE_X: cint <comptime> = 34070
+global GL_TEXTURE_CUBE_MAP_POSITIVE_Y: cint <comptime> = 34071
+global GL_TEXTURE_CUBE_MAP_NEGATIVE_Y: cint <comptime> = 34072
+global GL_TEXTURE_CUBE_MAP_POSITIVE_Z: cint <comptime> = 34073
+global GL_TEXTURE_CUBE_MAP_NEGATIVE_Z: cint <comptime> = 34074
+global GL_MAX_CUBE_MAP_TEXTURE_SIZE: cint <comptime> = 34076
+global GL_TEXTURE0: cint <comptime> = 33984
+global GL_TEXTURE1: cint <comptime> = 33985
+global GL_TEXTURE2: cint <comptime> = 33986
+global GL_TEXTURE3: cint <comptime> = 33987
+global GL_TEXTURE4: cint <comptime> = 33988
+global GL_TEXTURE5: cint <comptime> = 33989
+global GL_TEXTURE6: cint <comptime> = 33990
+global GL_TEXTURE7: cint <comptime> = 33991
+global GL_TEXTURE8: cint <comptime> = 33992
+global GL_TEXTURE9: cint <comptime> = 33993
+global GL_TEXTURE10: cint <comptime> = 33994
+global GL_TEXTURE11: cint <comptime> = 33995
+global GL_TEXTURE12: cint <comptime> = 33996
+global GL_TEXTURE13: cint <comptime> = 33997
+global GL_TEXTURE14: cint <comptime> = 33998
+global GL_TEXTURE15: cint <comptime> = 33999
+global GL_TEXTURE16: cint <comptime> = 34000
+global GL_TEXTURE17: cint <comptime> = 34001
+global GL_TEXTURE18: cint <comptime> = 34002
+global GL_TEXTURE19: cint <comptime> = 34003
+global GL_TEXTURE20: cint <comptime> = 34004
+global GL_TEXTURE21: cint <comptime> = 34005
+global GL_TEXTURE22: cint <comptime> = 34006
+global GL_TEXTURE23: cint <comptime> = 34007
+global GL_TEXTURE24: cint <comptime> = 34008
+global GL_TEXTURE25: cint <comptime> = 34009
+global GL_TEXTURE26: cint <comptime> = 34010
+global GL_TEXTURE27: cint <comptime> = 34011
+global GL_TEXTURE28: cint <comptime> = 34012
+global GL_TEXTURE29: cint <comptime> = 34013
+global GL_TEXTURE30: cint <comptime> = 34014
+global GL_TEXTURE31: cint <comptime> = 34015
+global GL_ACTIVE_TEXTURE: cint <comptime> = 34016
+global GL_REPEAT: cint <comptime> = 10497
+global GL_CLAMP_TO_EDGE: cint <comptime> = 33071
+global GL_MIRRORED_REPEAT: cint <comptime> = 33648
+global GL_FLOAT_VEC2: cint <comptime> = 35664
+global GL_FLOAT_VEC3: cint <comptime> = 35665
+global GL_FLOAT_VEC4: cint <comptime> = 35666
+global GL_INT_VEC2: cint <comptime> = 35667
+global GL_INT_VEC3: cint <comptime> = 35668
+global GL_INT_VEC4: cint <comptime> = 35669
+global GL_BOOL: cint <comptime> = 35670
+global GL_BOOL_VEC2: cint <comptime> = 35671
+global GL_BOOL_VEC3: cint <comptime> = 35672
+global GL_BOOL_VEC4: cint <comptime> = 35673
+global GL_FLOAT_MAT2: cint <comptime> = 35674
+global GL_FLOAT_MAT3: cint <comptime> = 35675
+global GL_FLOAT_MAT4: cint <comptime> = 35676
+global GL_SAMPLER_2D: cint <comptime> = 35678
+global GL_SAMPLER_CUBE: cint <comptime> = 35680
+global GL_VERTEX_ATTRIB_ARRAY_ENABLED: cint <comptime> = 34338
+global GL_VERTEX_ATTRIB_ARRAY_SIZE: cint <comptime> = 34339
+global GL_VERTEX_ATTRIB_ARRAY_STRIDE: cint <comptime> = 34340
+global GL_VERTEX_ATTRIB_ARRAY_TYPE: cint <comptime> = 34341
+global GL_VERTEX_ATTRIB_ARRAY_NORMALIZED: cint <comptime> = 34922
+global GL_VERTEX_ATTRIB_ARRAY_POINTER: cint <comptime> = 34373
+global GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING: cint <comptime> = 34975
+global GL_IMPLEMENTATION_COLOR_READ_TYPE: cint <comptime> = 35738
+global GL_IMPLEMENTATION_COLOR_READ_FORMAT: cint <comptime> = 35739
+global GL_COMPILE_STATUS: cint <comptime> = 35713
+global GL_INFO_LOG_LENGTH: cint <comptime> = 35716
+global GL_SHADER_SOURCE_LENGTH: cint <comptime> = 35720
+global GL_SHADER_COMPILER: cint <comptime> = 36346
+global GL_SHADER_BINARY_FORMATS: cint <comptime> = 36344
+global GL_NUM_SHADER_BINARY_FORMATS: cint <comptime> = 36345
+global GL_LOW_FLOAT: cint <comptime> = 36336
+global GL_MEDIUM_FLOAT: cint <comptime> = 36337
+global GL_HIGH_FLOAT: cint <comptime> = 36338
+global GL_LOW_INT: cint <comptime> = 36339
+global GL_MEDIUM_INT: cint <comptime> = 36340
+global GL_HIGH_INT: cint <comptime> = 36341
+global GL_FRAMEBUFFER: cint <comptime> = 36160
+global GL_RENDERBUFFER: cint <comptime> = 36161
+global GL_RGBA4: cint <comptime> = 32854
+global GL_RGB5_A1: cint <comptime> = 32855
+global GL_RGB565: cint <comptime> = 36194
+global GL_DEPTH_COMPONENT16: cint <comptime> = 33189
+global GL_STENCIL_INDEX8: cint <comptime> = 36168
+global GL_RENDERBUFFER_WIDTH: cint <comptime> = 36162
+global GL_RENDERBUFFER_HEIGHT: cint <comptime> = 36163
+global GL_RENDERBUFFER_INTERNAL_FORMAT: cint <comptime> = 36164
+global GL_RENDERBUFFER_RED_SIZE: cint <comptime> = 36176
+global GL_RENDERBUFFER_GREEN_SIZE: cint <comptime> = 36177
+global GL_RENDERBUFFER_BLUE_SIZE: cint <comptime> = 36178
+global GL_RENDERBUFFER_ALPHA_SIZE: cint <comptime> = 36179
+global GL_RENDERBUFFER_DEPTH_SIZE: cint <comptime> = 36180
+global GL_RENDERBUFFER_STENCIL_SIZE: cint <comptime> = 36181
+global GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE: cint <comptime> = 36048
+global GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME: cint <comptime> = 36049
+global GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL: cint <comptime> = 36050
+global GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE: cint <comptime> = 36051
+global GL_COLOR_ATTACHMENT0: cint <comptime> = 36064
+global GL_DEPTH_ATTACHMENT: cint <comptime> = 36096
+global GL_STENCIL_ATTACHMENT: cint <comptime> = 36128
+global GL_NONE: cint <comptime> = 0
+global GL_FRAMEBUFFER_COMPLETE: cint <comptime> = 36053
+global GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: cint <comptime> = 36054
+global GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: cint <comptime> = 36055
+global GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS: cint <comptime> = 36057
+global GL_FRAMEBUFFER_UNSUPPORTED: cint <comptime> = 36061
+global GL_FRAMEBUFFER_BINDING: cint <comptime> = 36006
+global GL_RENDERBUFFER_BINDING: cint <comptime> = 36007
+global GL_MAX_RENDERBUFFER_SIZE: cint <comptime> = 34024
+global GL_INVALID_FRAMEBUFFER_OPERATION: cint <comptime> = 1286
+global GL_ES_VERSION_3_0: cint <comptime> = 1
+global GL_READ_BUFFER: cint <comptime> = 3074
+global GL_UNPACK_ROW_LENGTH: cint <comptime> = 3314
+global GL_UNPACK_SKIP_ROWS: cint <comptime> = 3315
+global GL_UNPACK_SKIP_PIXELS: cint <comptime> = 3316
+global GL_PACK_ROW_LENGTH: cint <comptime> = 3330
+global GL_PACK_SKIP_ROWS: cint <comptime> = 3331
+global GL_PACK_SKIP_PIXELS: cint <comptime> = 3332
+global GL_COLOR: cint <comptime> = 6144
+global GL_DEPTH: cint <comptime> = 6145
+global GL_STENCIL: cint <comptime> = 6146
+global GL_RED: cint <comptime> = 6403
+global GL_RGB8: cint <comptime> = 32849
+global GL_RGBA8: cint <comptime> = 32856
+global GL_RGB10_A2: cint <comptime> = 32857
+global GL_TEXTURE_BINDING_3D: cint <comptime> = 32874
+global GL_UNPACK_SKIP_IMAGES: cint <comptime> = 32877
+global GL_UNPACK_IMAGE_HEIGHT: cint <comptime> = 32878
+global GL_TEXTURE_3D: cint <comptime> = 32879
+global GL_TEXTURE_WRAP_R: cint <comptime> = 32882
+global GL_MAX_3D_TEXTURE_SIZE: cint <comptime> = 32883
+global GL_UNSIGNED_INT_2_10_10_10_REV: cint <comptime> = 33640
+global GL_MAX_ELEMENTS_VERTICES: cint <comptime> = 33000
+global GL_MAX_ELEMENTS_INDICES: cint <comptime> = 33001
+global GL_TEXTURE_MIN_LOD: cint <comptime> = 33082
+global GL_TEXTURE_MAX_LOD: cint <comptime> = 33083
+global GL_TEXTURE_BASE_LEVEL: cint <comptime> = 33084
+global GL_TEXTURE_MAX_LEVEL: cint <comptime> = 33085
+global GL_MIN: cint <comptime> = 32775
+global GL_MAX: cint <comptime> = 32776
+global GL_DEPTH_COMPONENT24: cint <comptime> = 33190
+global GL_MAX_TEXTURE_LOD_BIAS: cint <comptime> = 34045
+global GL_TEXTURE_COMPARE_MODE: cint <comptime> = 34892
+global GL_TEXTURE_COMPARE_FUNC: cint <comptime> = 34893
+global GL_CURRENT_QUERY: cint <comptime> = 34917
+global GL_QUERY_RESULT: cint <comptime> = 34918
+global GL_QUERY_RESULT_AVAILABLE: cint <comptime> = 34919
+global GL_BUFFER_MAPPED: cint <comptime> = 35004
+global GL_BUFFER_MAP_POINTER: cint <comptime> = 35005
+global GL_STREAM_READ: cint <comptime> = 35041
+global GL_STREAM_COPY: cint <comptime> = 35042
+global GL_STATIC_READ: cint <comptime> = 35045
+global GL_STATIC_COPY: cint <comptime> = 35046
+global GL_DYNAMIC_READ: cint <comptime> = 35049
+global GL_DYNAMIC_COPY: cint <comptime> = 35050
+global GL_MAX_DRAW_BUFFERS: cint <comptime> = 34852
+global GL_DRAW_BUFFER0: cint <comptime> = 34853
+global GL_DRAW_BUFFER1: cint <comptime> = 34854
+global GL_DRAW_BUFFER2: cint <comptime> = 34855
+global GL_DRAW_BUFFER3: cint <comptime> = 34856
+global GL_DRAW_BUFFER4: cint <comptime> = 34857
+global GL_DRAW_BUFFER5: cint <comptime> = 34858
+global GL_DRAW_BUFFER6: cint <comptime> = 34859
+global GL_DRAW_BUFFER7: cint <comptime> = 34860
+global GL_DRAW_BUFFER8: cint <comptime> = 34861
+global GL_DRAW_BUFFER9: cint <comptime> = 34862
+global GL_DRAW_BUFFER10: cint <comptime> = 34863
+global GL_DRAW_BUFFER11: cint <comptime> = 34864
+global GL_DRAW_BUFFER12: cint <comptime> = 34865
+global GL_DRAW_BUFFER13: cint <comptime> = 34866
+global GL_DRAW_BUFFER14: cint <comptime> = 34867
+global GL_DRAW_BUFFER15: cint <comptime> = 34868
+global GL_MAX_FRAGMENT_UNIFORM_COMPONENTS: cint <comptime> = 35657
+global GL_MAX_VERTEX_UNIFORM_COMPONENTS: cint <comptime> = 35658
+global GL_SAMPLER_3D: cint <comptime> = 35679
+global GL_SAMPLER_2D_SHADOW: cint <comptime> = 35682
+global GL_FRAGMENT_SHADER_DERIVATIVE_HINT: cint <comptime> = 35723
+global GL_PIXEL_PACK_BUFFER: cint <comptime> = 35051
+global GL_PIXEL_UNPACK_BUFFER: cint <comptime> = 35052
+global GL_PIXEL_PACK_BUFFER_BINDING: cint <comptime> = 35053
+global GL_PIXEL_UNPACK_BUFFER_BINDING: cint <comptime> = 35055
+global GL_FLOAT_MAT2x3: cint <comptime> = 35685
+global GL_FLOAT_MAT2x4: cint <comptime> = 35686
+global GL_FLOAT_MAT3x2: cint <comptime> = 35687
+global GL_FLOAT_MAT3x4: cint <comptime> = 35688
+global GL_FLOAT_MAT4x2: cint <comptime> = 35689
+global GL_FLOAT_MAT4x3: cint <comptime> = 35690
+global GL_SRGB: cint <comptime> = 35904
+global GL_SRGB8: cint <comptime> = 35905
+global GL_SRGB8_ALPHA8: cint <comptime> = 35907
+global GL_COMPARE_REF_TO_TEXTURE: cint <comptime> = 34894
+global GL_MAJOR_VERSION: cint <comptime> = 33307
+global GL_MINOR_VERSION: cint <comptime> = 33308
+global GL_NUM_EXTENSIONS: cint <comptime> = 33309
+global GL_RGBA32F: cint <comptime> = 34836
+global GL_RGB32F: cint <comptime> = 34837
+global GL_RGBA16F: cint <comptime> = 34842
+global GL_RGB16F: cint <comptime> = 34843
+global GL_VERTEX_ATTRIB_ARRAY_INTEGER: cint <comptime> = 35069
+global GL_MAX_ARRAY_TEXTURE_LAYERS: cint <comptime> = 35071
+global GL_MIN_PROGRAM_TEXEL_OFFSET: cint <comptime> = 35076
+global GL_MAX_PROGRAM_TEXEL_OFFSET: cint <comptime> = 35077
+global GL_MAX_VARYING_COMPONENTS: cint <comptime> = 35659
+global GL_TEXTURE_2D_ARRAY: cint <comptime> = 35866
+global GL_TEXTURE_BINDING_2D_ARRAY: cint <comptime> = 35869
+global GL_R11F_G11F_B10F: cint <comptime> = 35898
+global GL_UNSIGNED_INT_10F_11F_11F_REV: cint <comptime> = 35899
+global GL_RGB9_E5: cint <comptime> = 35901
+global GL_UNSIGNED_INT_5_9_9_9_REV: cint <comptime> = 35902
+global GL_TRANSFORM_FEEDBACK_VARYING_MAX_LENGTH: cint <comptime> = 35958
+global GL_TRANSFORM_FEEDBACK_BUFFER_MODE: cint <comptime> = 35967
+global GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_COMPONENTS: cint <comptime> = 35968
+global GL_TRANSFORM_FEEDBACK_VARYINGS: cint <comptime> = 35971
+global GL_TRANSFORM_FEEDBACK_BUFFER_START: cint <comptime> = 35972
+global GL_TRANSFORM_FEEDBACK_BUFFER_SIZE: cint <comptime> = 35973
+global GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN: cint <comptime> = 35976
+global GL_RASTERIZER_DISCARD: cint <comptime> = 35977
+global GL_MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS: cint <comptime> = 35978
+global GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS: cint <comptime> = 35979
+global GL_INTERLEAVED_ATTRIBS: cint <comptime> = 35980
+global GL_SEPARATE_ATTRIBS: cint <comptime> = 35981
+global GL_TRANSFORM_FEEDBACK_BUFFER: cint <comptime> = 35982
+global GL_TRANSFORM_FEEDBACK_BUFFER_BINDING: cint <comptime> = 35983
+global GL_RGBA32UI: cint <comptime> = 36208
+global GL_RGB32UI: cint <comptime> = 36209
+global GL_RGBA16UI: cint <comptime> = 36214
+global GL_RGB16UI: cint <comptime> = 36215
+global GL_RGBA8UI: cint <comptime> = 36220
+global GL_RGB8UI: cint <comptime> = 36221
+global GL_RGBA32I: cint <comptime> = 36226
+global GL_RGB32I: cint <comptime> = 36227
+global GL_RGBA16I: cint <comptime> = 36232
+global GL_RGB16I: cint <comptime> = 36233
+global GL_RGBA8I: cint <comptime> = 36238
+global GL_RGB8I: cint <comptime> = 36239
+global GL_RED_INTEGER: cint <comptime> = 36244
+global GL_RGB_INTEGER: cint <comptime> = 36248
+global GL_RGBA_INTEGER: cint <comptime> = 36249
+global GL_SAMPLER_2D_ARRAY: cint <comptime> = 36289
+global GL_SAMPLER_2D_ARRAY_SHADOW: cint <comptime> = 36292
+global GL_SAMPLER_CUBE_SHADOW: cint <comptime> = 36293
+global GL_UNSIGNED_INT_VEC2: cint <comptime> = 36294
+global GL_UNSIGNED_INT_VEC3: cint <comptime> = 36295
+global GL_UNSIGNED_INT_VEC4: cint <comptime> = 36296
+global GL_INT_SAMPLER_2D: cint <comptime> = 36298
+global GL_INT_SAMPLER_3D: cint <comptime> = 36299
+global GL_INT_SAMPLER_CUBE: cint <comptime> = 36300
+global GL_INT_SAMPLER_2D_ARRAY: cint <comptime> = 36303
+global GL_UNSIGNED_INT_SAMPLER_2D: cint <comptime> = 36306
+global GL_UNSIGNED_INT_SAMPLER_3D: cint <comptime> = 36307
+global GL_UNSIGNED_INT_SAMPLER_CUBE: cint <comptime> = 36308
+global GL_UNSIGNED_INT_SAMPLER_2D_ARRAY: cint <comptime> = 36311
+global GL_BUFFER_ACCESS_FLAGS: cint <comptime> = 37151
+global GL_BUFFER_MAP_LENGTH: cint <comptime> = 37152
+global GL_BUFFER_MAP_OFFSET: cint <comptime> = 37153
+global GL_DEPTH_COMPONENT32F: cint <comptime> = 36012
+global GL_DEPTH32F_STENCIL8: cint <comptime> = 36013
+global GL_FLOAT_32_UNSIGNED_INT_24_8_REV: cint <comptime> = 36269
+global GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING: cint <comptime> = 33296
+global GL_FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE: cint <comptime> = 33297
+global GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE: cint <comptime> = 33298
+global GL_FRAMEBUFFER_ATTACHMENT_GREEN_SIZE: cint <comptime> = 33299
+global GL_FRAMEBUFFER_ATTACHMENT_BLUE_SIZE: cint <comptime> = 33300
+global GL_FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE: cint <comptime> = 33301
+global GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE: cint <comptime> = 33302
+global GL_FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE: cint <comptime> = 33303
+global GL_FRAMEBUFFER_DEFAULT: cint <comptime> = 33304
+global GL_FRAMEBUFFER_UNDEFINED: cint <comptime> = 33305
+global GL_DEPTH_STENCIL_ATTACHMENT: cint <comptime> = 33306
+global GL_DEPTH_STENCIL: cint <comptime> = 34041
+global GL_UNSIGNED_INT_24_8: cint <comptime> = 34042
+global GL_DEPTH24_STENCIL8: cint <comptime> = 35056
+global GL_UNSIGNED_NORMALIZED: cint <comptime> = 35863
+global GL_DRAW_FRAMEBUFFER_BINDING: cint <comptime> = 36006
+global GL_READ_FRAMEBUFFER: cint <comptime> = 36008
+global GL_DRAW_FRAMEBUFFER: cint <comptime> = 36009
+global GL_READ_FRAMEBUFFER_BINDING: cint <comptime> = 36010
+global GL_RENDERBUFFER_SAMPLES: cint <comptime> = 36011
+global GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER: cint <comptime> = 36052
+global GL_MAX_COLOR_ATTACHMENTS: cint <comptime> = 36063
+global GL_COLOR_ATTACHMENT1: cint <comptime> = 36065
+global GL_COLOR_ATTACHMENT2: cint <comptime> = 36066
+global GL_COLOR_ATTACHMENT3: cint <comptime> = 36067
+global GL_COLOR_ATTACHMENT4: cint <comptime> = 36068
+global GL_COLOR_ATTACHMENT5: cint <comptime> = 36069
+global GL_COLOR_ATTACHMENT6: cint <comptime> = 36070
+global GL_COLOR_ATTACHMENT7: cint <comptime> = 36071
+global GL_COLOR_ATTACHMENT8: cint <comptime> = 36072
+global GL_COLOR_ATTACHMENT9: cint <comptime> = 36073
+global GL_COLOR_ATTACHMENT10: cint <comptime> = 36074
+global GL_COLOR_ATTACHMENT11: cint <comptime> = 36075
+global GL_COLOR_ATTACHMENT12: cint <comptime> = 36076
+global GL_COLOR_ATTACHMENT13: cint <comptime> = 36077
+global GL_COLOR_ATTACHMENT14: cint <comptime> = 36078
+global GL_COLOR_ATTACHMENT15: cint <comptime> = 36079
+global GL_COLOR_ATTACHMENT16: cint <comptime> = 36080
+global GL_COLOR_ATTACHMENT17: cint <comptime> = 36081
+global GL_COLOR_ATTACHMENT18: cint <comptime> = 36082
+global GL_COLOR_ATTACHMENT19: cint <comptime> = 36083
+global GL_COLOR_ATTACHMENT20: cint <comptime> = 36084
+global GL_COLOR_ATTACHMENT21: cint <comptime> = 36085
+global GL_COLOR_ATTACHMENT22: cint <comptime> = 36086
+global GL_COLOR_ATTACHMENT23: cint <comptime> = 36087
+global GL_COLOR_ATTACHMENT24: cint <comptime> = 36088
+global GL_COLOR_ATTACHMENT25: cint <comptime> = 36089
+global GL_COLOR_ATTACHMENT26: cint <comptime> = 36090
+global GL_COLOR_ATTACHMENT27: cint <comptime> = 36091
+global GL_COLOR_ATTACHMENT28: cint <comptime> = 36092
+global GL_COLOR_ATTACHMENT29: cint <comptime> = 36093
+global GL_COLOR_ATTACHMENT30: cint <comptime> = 36094
+global GL_COLOR_ATTACHMENT31: cint <comptime> = 36095
+global GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE: cint <comptime> = 36182
+global GL_MAX_SAMPLES: cint <comptime> = 36183
+global GL_HALF_FLOAT: cint <comptime> = 5131
+global GL_MAP_READ_BIT: cint <comptime> = 1
+global GL_MAP_WRITE_BIT: cint <comptime> = 2
+global GL_MAP_INVALIDATE_RANGE_BIT: cint <comptime> = 4
+global GL_MAP_INVALIDATE_BUFFER_BIT: cint <comptime> = 8
+global GL_MAP_FLUSH_EXPLICIT_BIT: cint <comptime> = 16
+global GL_MAP_UNSYNCHRONIZED_BIT: cint <comptime> = 32
+global GL_RG: cint <comptime> = 33319
+global GL_RG_INTEGER: cint <comptime> = 33320
+global GL_R8: cint <comptime> = 33321
+global GL_RG8: cint <comptime> = 33323
+global GL_R16F: cint <comptime> = 33325
+global GL_R32F: cint <comptime> = 33326
+global GL_RG16F: cint <comptime> = 33327
+global GL_RG32F: cint <comptime> = 33328
+global GL_R8I: cint <comptime> = 33329
+global GL_R8UI: cint <comptime> = 33330
+global GL_R16I: cint <comptime> = 33331
+global GL_R16UI: cint <comptime> = 33332
+global GL_R32I: cint <comptime> = 33333
+global GL_R32UI: cint <comptime> = 33334
+global GL_RG8I: cint <comptime> = 33335
+global GL_RG8UI: cint <comptime> = 33336
+global GL_RG16I: cint <comptime> = 33337
+global GL_RG16UI: cint <comptime> = 33338
+global GL_RG32I: cint <comptime> = 33339
+global GL_RG32UI: cint <comptime> = 33340
+global GL_VERTEX_ARRAY_BINDING: cint <comptime> = 34229
+global GL_R8_SNORM: cint <comptime> = 36756
+global GL_RG8_SNORM: cint <comptime> = 36757
+global GL_RGB8_SNORM: cint <comptime> = 36758
+global GL_RGBA8_SNORM: cint <comptime> = 36759
+global GL_SIGNED_NORMALIZED: cint <comptime> = 36764
+global GL_PRIMITIVE_RESTART_FIXED_INDEX: cint <comptime> = 36201
+global GL_COPY_READ_BUFFER: cint <comptime> = 36662
+global GL_COPY_WRITE_BUFFER: cint <comptime> = 36663
+global GL_COPY_READ_BUFFER_BINDING: cint <comptime> = 36662
+global GL_COPY_WRITE_BUFFER_BINDING: cint <comptime> = 36663
+global GL_UNIFORM_BUFFER: cint <comptime> = 35345
+global GL_UNIFORM_BUFFER_BINDING: cint <comptime> = 35368
+global GL_UNIFORM_BUFFER_START: cint <comptime> = 35369
+global GL_UNIFORM_BUFFER_SIZE: cint <comptime> = 35370
+global GL_MAX_VERTEX_UNIFORM_BLOCKS: cint <comptime> = 35371
+global GL_MAX_FRAGMENT_UNIFORM_BLOCKS: cint <comptime> = 35373
+global GL_MAX_COMBINED_UNIFORM_BLOCKS: cint <comptime> = 35374
+global GL_MAX_UNIFORM_BUFFER_BINDINGS: cint <comptime> = 35375
+global GL_MAX_UNIFORM_BLOCK_SIZE: cint <comptime> = 35376
+global GL_MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS: cint <comptime> = 35377
+global GL_MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS: cint <comptime> = 35379
+global GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT: cint <comptime> = 35380
+global GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH: cint <comptime> = 35381
+global GL_ACTIVE_UNIFORM_BLOCKS: cint <comptime> = 35382
+global GL_UNIFORM_TYPE: cint <comptime> = 35383
+global GL_UNIFORM_SIZE: cint <comptime> = 35384
+global GL_UNIFORM_NAME_LENGTH: cint <comptime> = 35385
+global GL_UNIFORM_BLOCK_INDEX: cint <comptime> = 35386
+global GL_UNIFORM_OFFSET: cint <comptime> = 35387
+global GL_UNIFORM_ARRAY_STRIDE: cint <comptime> = 35388
+global GL_UNIFORM_MATRIX_STRIDE: cint <comptime> = 35389
+global GL_UNIFORM_IS_ROW_MAJOR: cint <comptime> = 35390
+global GL_UNIFORM_BLOCK_BINDING: cint <comptime> = 35391
+global GL_UNIFORM_BLOCK_DATA_SIZE: cint <comptime> = 35392
+global GL_UNIFORM_BLOCK_NAME_LENGTH: cint <comptime> = 35393
+global GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS: cint <comptime> = 35394
+global GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES: cint <comptime> = 35395
+global GL_UNIFORM_BLOCK_REFERENCED_BY_VERTEX_SHADER: cint <comptime> = 35396
+global GL_UNIFORM_BLOCK_REFERENCED_BY_FRAGMENT_SHADER: cint <comptime> = 35398
+global GL_INVALID_INDEX: cuint <comptime> = 4294967295
+global GL_MAX_VERTEX_OUTPUT_COMPONENTS: cint <comptime> = 37154
+global GL_MAX_FRAGMENT_INPUT_COMPONENTS: cint <comptime> = 37157
+global GL_MAX_SERVER_WAIT_TIMEOUT: cint <comptime> = 37137
+global GL_OBJECT_TYPE: cint <comptime> = 37138
+global GL_SYNC_CONDITION: cint <comptime> = 37139
+global GL_SYNC_STATUS: cint <comptime> = 37140
+global GL_SYNC_FLAGS: cint <comptime> = 37141
+global GL_SYNC_FENCE: cint <comptime> = 37142
+global GL_SYNC_GPU_COMMANDS_COMPLETE: cint <comptime> = 37143
+global GL_UNSIGNALED: cint <comptime> = 37144
+global GL_SIGNALED: cint <comptime> = 37145
+global GL_ALREADY_SIGNALED: cint <comptime> = 37146
+global GL_TIMEOUT_EXPIRED: cint <comptime> = 37147
+global GL_CONDITION_SATISFIED: cint <comptime> = 37148
+global GL_WAIT_FAILED: cint <comptime> = 37149
+global GL_SYNC_FLUSH_COMMANDS_BIT: cint <comptime> = 1
+global GL_TIMEOUT_IGNORED: culonglong <cimport,nodecl,const>
+global GL_VERTEX_ATTRIB_ARRAY_DIVISOR: cint <comptime> = 35070
+global GL_ANY_SAMPLES_PASSED: cint <comptime> = 35887
+global GL_ANY_SAMPLES_PASSED_CONSERVATIVE: cint <comptime> = 36202
+global GL_SAMPLER_BINDING: cint <comptime> = 35097
+global GL_RGB10_A2UI: cint <comptime> = 36975
+global GL_TEXTURE_SWIZZLE_R: cint <comptime> = 36418
+global GL_TEXTURE_SWIZZLE_G: cint <comptime> = 36419
+global GL_TEXTURE_SWIZZLE_B: cint <comptime> = 36420
+global GL_TEXTURE_SWIZZLE_A: cint <comptime> = 36421
+global GL_GREEN: cint <comptime> = 6404
+global GL_BLUE: cint <comptime> = 6405
+global GL_INT_2_10_10_10_REV: cint <comptime> = 36255
+global GL_TRANSFORM_FEEDBACK: cint <comptime> = 36386
+global GL_TRANSFORM_FEEDBACK_PAUSED: cint <comptime> = 36387
+global GL_TRANSFORM_FEEDBACK_ACTIVE: cint <comptime> = 36388
+global GL_TRANSFORM_FEEDBACK_BINDING: cint <comptime> = 36389
+global GL_PROGRAM_BINARY_RETRIEVABLE_HINT: cint <comptime> = 33367
+global GL_PROGRAM_BINARY_LENGTH: cint <comptime> = 34625
+global GL_NUM_PROGRAM_BINARY_FORMATS: cint <comptime> = 34814
+global GL_PROGRAM_BINARY_FORMATS: cint <comptime> = 34815
+global GL_COMPRESSED_R11_EAC: cint <comptime> = 37488
+global GL_COMPRESSED_SIGNED_R11_EAC: cint <comptime> = 37489
+global GL_COMPRESSED_RG11_EAC: cint <comptime> = 37490
+global GL_COMPRESSED_SIGNED_RG11_EAC: cint <comptime> = 37491
+global GL_COMPRESSED_RGB8_ETC2: cint <comptime> = 37492
+global GL_COMPRESSED_SRGB8_ETC2: cint <comptime> = 37493
+global GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2: cint <comptime> = 37494
+global GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2: cint <comptime> = 37495
+global GL_COMPRESSED_RGBA8_ETC2_EAC: cint <comptime> = 37496
+global GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC: cint <comptime> = 37497
+global GL_TEXTURE_IMMUTABLE_FORMAT: cint <comptime> = 37167
+global GL_MAX_ELEMENT_INDEX: cint <comptime> = 36203
+global GL_NUM_SAMPLE_COUNTS: cint <comptime> = 37760
+global GL_TEXTURE_IMMUTABLE_LEVELS: cint <comptime> = 33503
+global NVG_PI: float32 <comptime> = 3.141592653589793
+global NANOVG_GLES3: cint <comptime> = 1
+global NANOVG_GL_IMPLEMENTATION: cint <comptime> = 1
+global NANOVG_GL_USE_STATE_FILTER: cint <comptime> = 1
+global EXIT_FAILURE: cint <comptime> = 1
+global EXIT_SUCCESS: cint <comptime> = 0
+global MB_CUR_MAX: csize <cimport,nodecl,const>
+global RAND_MAX: cint <comptime> = 2147483647
+global EOF: cint <comptime> = -1
+global BUFSIZ: cint <comptime> = 1024
+global FILENAME_MAX: cint <comptime> = 4096
+global FOPEN_MAX: cint <comptime> = 1000
+global TMP_MAX: cint <comptime> = 10000
+global L_tmpnam: cint <comptime> = 20
+global MATH_ERRNO: cint <comptime> = 1
+global MATH_ERREXCEPT: cint <comptime> = 2
+global math_errhandling: cint <comptime> = 2
+global FP_ILOGBNAN: cint <comptime> = -2147483648
+global FP_ILOGB0: cint <comptime> = -2147483648
+global FP_NAN: cint <comptime> = 0
+global FP_INFINITE: cint <comptime> = 1
+global FP_ZERO: cint <comptime> = 2
+global FP_SUBNORMAL: cint <comptime> = 3
+global FP_NORMAL: cint <comptime> = 4
+global NANOVG_GL_UNIFORMARRAY_SIZE: cint <comptime> = 11

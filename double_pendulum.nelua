@@ -1,0 +1,98 @@
+require "common"
+require "ode"
+require "ui"
+require "scene"
+require "math"
+
+-- Physics parameters
+local m1: float64 = 10.0 -- kg
+local m2: float64 = 1.0  -- kg
+local L1: float64 = 1.5  -- m
+local L2: float64 = 2.0  -- m
+local gravity: float64 = 9.81 -- m/s^2
+
+-- Initial conditions
+local a1_0: float64 = math.pi / 2
+local a2_0: float64 = math.pi / 2
+local w1_0: float64 = 0.0
+local w2_0: float64 = 0.0
+
+-- Runtime state
+local angles: [2]float64 = { a1_0, a2_0 }
+local velocities: [2]float64 = { w1_0, w2_0 }
+local integrator = Integrator.RK4
+
+local function system(t: float64, y: [2]float64, dy: [2]float64): [2]float64
+   local a1, a2 = y[0], y[1]
+   local w1, w2 = dy[0], dy[1]
+   local g = gravity
+   local bracket = 2*m1 + m2 - m2*math.cos(2*a1 - 2*a2)
+   return {
+      (-g*(2*m1+m2)*math.sin(a1) - g*m2*math.sin(a1-2*a2) - 2*math.sin(a1-a2)*m2*(w2^2*L2 + w1^2*L1*math.cos(a1-a2))) / (L1*bracket),
+      2*math.sin(a1-a2)*(w1^2*L1*(m1+m2) + g*(m1+m2)*math.cos(a1) + w2^2*L2*m2*math.cos(a1-a2)) / (L2*bracket)
+   }
+end
+
+local function reset()
+   angles = { a1_0, a2_0 }
+   velocities = { w1_0, w2_0 }
+end
+
+local function step(t: float64, h: float64)
+   angles, velocities = integrate_2_step(integrator, system, t, h, angles, velocities)
+end
+
+local function draw(vg: *NVGcontext, w: float64, h: float64)
+   local pivot = (@Vec2){ (@float32)(w * 0.5), (@float32)(h * 0.18) }
+   local r1 = clampf(0.05 * math.cbrt(m1), 0.03, 0.3) * PX_PER_M
+   local r2 = clampf(0.05 * math.cbrt(m2), 0.03, 0.3) * PX_PER_M
+   local len1 = (@float32)(L1 * PX_PER_M)
+   local len2 = (@float32)(L2 * PX_PER_M)
+
+   local rot1 = (@float32)((math.pi/2) - angles[0])
+   local p1 = Pendulum.new { position = pivot, length = len1, rotation = rot1, ball_radius = (@float32)(r1) }
+   drawPendulum(vg, p1)
+
+   local dx1, dy1 = math.cos(rot1), math.sin(rot1)
+   local ball1_far_edge = (@Vec2){ pivot.x + (len1 + 2*r1)*dx1, pivot.y + (len1 + 2*r1)*dy1 }
+
+   local rot2 = (@float32)((math.pi/2) - angles[1])
+   local p2 = Pendulum.new { position = ball1_far_edge, length = len2, rotation = rot2, ball_radius = (@float32)(r2) }
+   drawPendulum(vg, p2)
+
+   nvgBeginPath(vg)
+   nvgCircle(vg, pivot.x, pivot.y, 5.0)
+   nvgFillColor(vg, nvgRGB(15, 15, 15))
+   nvgFill(vg)
+end
+
+local function panel(ui: *UI)
+   ui:label("Physics")
+   ui:slider("Mass 1 (kg)", &m1, 0.5, 20.0)
+   ui:slider("Mass 2 (kg)", &m2, 0.5, 20.0)
+   ui:slider("Length 1 (m)", &L1, 0.3, 2.5)
+   ui:slider("Length 2 (m)", &L2, 0.3, 2.5)
+   ui:slider("Gravity", &gravity, 1.0, 20.0)
+   ui:separator()
+   ui:label("Integrator")
+   integrator = (@Integrator)(ui:options(integrator_names, integrator))
+   ui:separator()
+   ui:label("Initial conditions")
+   local ic_changed = false
+   if ui:slider("Angle 1 (rad)", &a1_0, -math.pi, math.pi) then ic_changed = true end
+   if ui:slider("Angle 2 (rad)", &a2_0, -math.pi, math.pi) then ic_changed = true end
+   if ui:slider("Ang. vel. 1", &w1_0, -10.0, 10.0) then ic_changed = true end
+   if ui:slider("Ang. vel. 2", &w2_0, -10.0, 10.0) then ic_changed = true end
+   if ic_changed then
+      reset()
+      pause_requested = true
+   end
+end
+
+register_scene({
+   name = "Double pendulum",
+   reset = reset,
+   step = step,
+   draw = draw,
+   panel = panel,
+})

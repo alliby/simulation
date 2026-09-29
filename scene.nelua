@@ -1,0 +1,23 @@
+require "common"
+require "ui"
+
+global Scene = @record {
+   name: string,
+   reset: function(),
+   step: function(t: float64, h: float64),
+   draw: function(vg: *NVGcontext, w: float64, h: float64),
+   panel: function(ui: *UI),
+}
+
+-- Scenes set this when an initial-condition slider changes
+global pause_requested: boolean = false
+
+global MAX_SCENES <comptime> = 16
+global scenes: [MAX_SCENES]Scene
+global scene_count: integer = 0
+
+global function register_scene(s: Scene)
+   assert(scene_count < MAX_SCENES, "register_scene: MAX_SCENES exceeded")
+   scenes[scene_count] = s
+   scene_count = scene_count + 1
+end

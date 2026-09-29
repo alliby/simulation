@@ -1,33 +1,474 @@
 require "math"
 require "common"
 require "string"
+require "nvg"
+require "span"
 
-global function drawLabel(vg: *NVGcontext,rect: Rect, text: string)
-   nvgFontSize(vg, 30.0)
-   nvgFontFace(vg, "sans")
-   nvgFillColor(vg, nvgRGB(0, 0, 0))
-   nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+-- Minimal immediate-mode widget toolkit, drawn with NanoVG.
+--
+-- Widget identity is derived from call order within the enclosing window
+-- (UI:next_id), so a given panel() callback must draw the same widgets
+-- in the same order every frame -- no widgets behind a conditional that
+-- can flip mid-drag.
 
-   -- Scissoring
-   nvgScissor(vg, rect.x , rect.y, rect.w, rect.h)
-   defer nvgResetScissor(vg) end
+global UI_TEXT_SIZE <comptime> = 15.0
+global UI_ROW_H <comptime> = 24.0
+global UI_ROW_GAP <comptime> = 6.0
+global UI_PAD <comptime> = 10.0
+global UI_TITLE_H <comptime> = 26.0
+global UI_LABEL_W <comptime> = 148.0 -- slider label column width
+global UI_VALUE_W <comptime> = 46.0 -- slider value-readout column width
 
-   local text_bounds: [4]float32
-   nvgTextBounds(vg, rect.x, rect.y, text, nilptr, &text_bounds)
-   local text_width = text_bounds[2] - text_bounds[0]
-   local x = math.max(rect.x, rect.x + (rect.w - text_width) / 2)
-   local y = rect.y + rect.h / 2
-   drawRect(vg, rect)
-   nvgText(vg, x, y, text, nilptr);
+global Window = @record {
+   rect: Rect,
+   title: string,
+   collapsed: boolean,
+}
+
+global UI = @record {
+   vg: *NVGcontext,
+   mouse: Vec2,
+   mouse_down: boolean,
+   prev_mouse_down: boolean,
+   hot: usize,
+   active: usize,
+   consumed: boolean, -- pointer was claimed by some widget this frame
+   screen: Size,
+   -- layout cursor for the window currently being built
+   layout: Rect,
+   id_seed: usize,
+   id_counter: uint32,
+   drag_offset: Vec2, -- pointer offset from the dragged window's origin
+   open_dropdown: usize, -- id of the currently expanded dropdown, or 0
+}
+
+-- Sets up the widget layout cursor and id namespace for a fixed-position
+-- panel that isn't a floating Window (e.g. a top toolbar). `id_seed` must
+-- be distinct from any Window's id range (Window ids are pointer-derived,
+-- so small caller-chosen seeds like 1, 2, ... never collide with them).
+function UI:begin_panel(rect: Rect, id_seed: usize)
+   self.layout = rect
+   self.id_seed = id_seed
+   self.id_counter = 0
 end
 
-global function drawButton(vg: *NVGcontext, rect: Rect, text: string): boolean
-   drawLabel(vg, rect, text)
-   nvgFontSize(vg, 20.0)
-   nvgText(vg, 10, 20, "cursor x: " .. tostring(cursor_x), nilptr)
-   nvgText(vg, 10, 40, "cursor y: " .. tostring(cursor_y), nilptr)
-   if rect:contains({ cursor_x, cursor_y }) then
-      nvgText(vg, 10, 60, "hovered", nilptr)
+function UI:begin_frame(vg: *NVGcontext, mx: float64, my: float64, mouse_down: boolean, screen_w: float64, screen_h: float64)
+   self.vg = vg
+   self.mouse = (@Vec2){ (@float32)(mx), (@float32)(my) }
+   self.prev_mouse_down = self.mouse_down
+   self.mouse_down = mouse_down
+   self.hot = 0
+   self.consumed = false
+   self.screen = (@Size){ (@float32)(screen_w), (@float32)(screen_h) }
+end
+
+function UI:mouse_pressed(): boolean
+   return self.mouse_down and not self.prev_mouse_down
+end
+
+function UI:mouse_released(): boolean
+   return (not self.mouse_down) and self.prev_mouse_down
+end
+
+function UI:end_frame()
+   if self:mouse_released() then
+      self.active = 0
    end
-   return false
+end
+
+function UI:next_id(): usize
+   self.id_counter = self.id_counter + 1
+   return self.id_seed + (@usize)(self.id_counter)
+end
+
+-- Registers a rect as interactive for this frame; returns whether the
+-- pointer is over it. Also marks the pointer as consumed by the UI so
+-- the app knows not to route it to scene picking.
+function UI:hover(id: usize, rect: Rect): boolean
+   local hovered = rect:contains(self.mouse)
+   if hovered then
+      self.hot = id
+      self.consumed = true
+   end
+   if self.active == id then
+      self.consumed = true
+   end
+   return hovered
+end
+
+-- Keeps a window's rect fully inside the current screen bounds.
+function UI:clamp_window(win: *Window)
+   local title_only_h = UI_TITLE_H
+   local h = win.collapsed and title_only_h or win.rect.h
+   if win.rect.x < 0 then win.rect.x = 0 end
+   if win.rect.y < 0 then win.rect.y = 0 end
+   if win.rect.x + win.rect.w > self.screen.w then
+      win.rect.x = math.max(0, self.screen.w - win.rect.w)
+   end
+   if win.rect.y + h > self.screen.h then
+      win.rect.y = math.max(0, self.screen.h - h)
+   end
+end
+
+-- Starts a floating window: draws the title bar (drag + collapse toggle)
+-- and the body background, and sets up the widget layout cursor.
+-- Returns false when collapsed, in which case the caller should skip
+-- drawing body widgets.
+function UI:begin_window(win: *Window): boolean
+   self:clamp_window(win)
+
+   local id = (@usize)(win)
+   local drag_id = id
+   local collapse_id = id + 1
+   -- Widget ids for this window start well past collapse_id, with enough
+   -- headroom that two Window structs living close together in memory
+   -- (e.g. adjacent fields/array elements) can't have their widget id
+   -- ranges collide.
+   self.id_seed = id + 4096
+
+   local vg = self.vg
+
+   -- Body background (only when expanded).
+   if not win.collapsed then
+      nvgBeginPath(vg)
+      nvgRoundedRect(vg, win.rect.x, win.rect.y + UI_TITLE_H, win.rect.w, win.rect.h, 4.0)
+      nvgFillColor(vg, nvgRGBA(250, 250, 250, 235))
+      nvgFill(vg)
+      nvgStrokeWidth(vg, 1.0)
+      nvgStrokeColor(vg, nvgRGBA(120, 120, 120, 255))
+      nvgStroke(vg)
+   end
+
+   -- Title bar. The collapse toggle carves its box out of the draggable
+   -- area so a single click can't be claimed by both widgets at once.
+   local toggle_size = 16.0
+   local toggle_rect = (@Rect){
+      win.rect.x + win.rect.w - toggle_size - 6.0,
+      win.rect.y + (UI_TITLE_H - toggle_size) / 2,
+      toggle_size, toggle_size,
+   }
+   local drag_rect = (@Rect){ win.rect.x, win.rect.y, win.rect.w - toggle_size - 12.0, UI_TITLE_H }
+
+   local title_hovered = self:hover(drag_id, drag_rect)
+   if title_hovered and self:mouse_pressed() then
+      self.active = drag_id
+      self.drag_offset.x = self.mouse.x - win.rect.x
+      self.drag_offset.y = self.mouse.y - win.rect.y
+   end
+   if self.active == drag_id then
+      win.rect.x = self.mouse.x - self.drag_offset.x
+      win.rect.y = self.mouse.y - self.drag_offset.y
+      self:clamp_window(win)
+   end
+
+   nvgBeginPath(vg)
+   nvgRoundedRect(vg, win.rect.x, win.rect.y, win.rect.w, UI_TITLE_H, 4.0)
+   nvgFillColor(vg, nvgRGBA(25, 25, 25, 255))
+   nvgFill(vg)
+
+   nvgFontSize(vg, UI_TEXT_SIZE)
+   nvgFontFace(vg, "sans")
+   nvgFillColor(vg, nvgRGBA(255, 255, 255, 255))
+   nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE)
+   nvgText(vg, win.rect.x + UI_PAD, win.rect.y + UI_TITLE_H / 2, win.title, nilptr)
+
+   -- Collapse toggle (small box at the right of the title bar).
+   local toggle_hovered = self:hover(collapse_id, toggle_rect)
+   if toggle_hovered and self:mouse_pressed() then
+      win.collapsed = not win.collapsed
+      self.active = collapse_id
+   end
+   nvgBeginPath(vg)
+   nvgRoundedRect(vg, toggle_rect.x, toggle_rect.y, toggle_rect.w, toggle_rect.h, 2.0)
+   nvgStrokeColor(vg, nvgRGBA(255, 255, 255, 255))
+   nvgStrokeWidth(vg, 1.5)
+   nvgStroke(vg)
+   nvgBeginPath(vg)
+   local cx, cy = toggle_rect.x + toggle_rect.w / 2, toggle_rect.y + toggle_rect.h / 2
+   if win.collapsed then
+      nvgMoveTo(vg, cx - 4, cy) nvgLineTo(vg, cx + 4, cy)
+      nvgMoveTo(vg, cx, cy - 4) nvgLineTo(vg, cx, cy + 4)
+   else
+      nvgMoveTo(vg, cx - 4, cy) nvgLineTo(vg, cx + 4, cy)
+   end
+   nvgStroke(vg)
+
+   self.layout = (@Rect){ win.rect.x + UI_PAD, win.rect.y + UI_TITLE_H + UI_PAD, win.rect.w - 2 * UI_PAD, 0 }
+   self.id_counter = 0
+
+   return not win.collapsed
+end
+
+function UI:end_window(win: *Window)
+   if not win.collapsed then
+      -- Body height grows to fit whatever was laid out this frame.
+      local content_h = self.layout.y - (win.rect.y + UI_TITLE_H)
+      win.rect.h = math.max(content_h, UI_ROW_H)
+   end
+end
+
+-- Claims the next row of the current window's layout and advances the cursor.
+function UI:row(): Rect
+   local r = (@Rect){ self.layout.x, self.layout.y, self.layout.w, UI_ROW_H }
+   self.layout.y = self.layout.y + UI_ROW_H + UI_ROW_GAP
+   return r
+end
+
+function UI:label(text: string)
+   local r = self:row()
+   local vg = self.vg
+   nvgFontSize(vg, UI_TEXT_SIZE)
+   nvgFontFace(vg, "sans")
+   nvgFillColor(vg, nvgRGBA(30, 30, 30, 255))
+   nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE)
+   nvgText(vg, r.x, r.y + r.h / 2, text, nilptr)
+end
+
+function UI:button(text: string): boolean
+   local id = self:next_id()
+   local r = self:row()
+   local hovered = self:hover(id, r)
+   local clicked = false
+
+   if hovered and self:mouse_pressed() then
+      self.active = id
+   end
+   if hovered and self.active == id and self:mouse_released() then
+      clicked = true
+   end
+
+   local vg = self.vg
+   local pressed = self.active == id and hovered
+   nvgBeginPath(vg)
+   nvgRoundedRect(vg, r.x, r.y, r.w, r.h, 3.0)
+   if pressed then
+      nvgFillColor(vg, nvgRGBA(20, 20, 20, 255))
+   elseif hovered then
+      nvgFillColor(vg, nvgRGBA(225, 225, 225, 255))
+   else
+      nvgFillColor(vg, nvgRGBA(235, 235, 235, 255))
+   end
+   nvgFill(vg)
+   nvgStrokeWidth(vg, 1.0)
+   nvgStrokeColor(vg, nvgRGBA(150, 150, 150, 255))
+   nvgStroke(vg)
+
+   nvgFontSize(vg, UI_TEXT_SIZE)
+   nvgFontFace(vg, "sans")
+   nvgFillColor(vg, pressed and nvgRGBA(255, 255, 255, 255) or nvgRGBA(20, 20, 20, 255))
+   nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE)
+   nvgText(vg, r.x + r.w / 2, r.y + r.h / 2, text, nilptr)
+
+   return clicked
+end
+
+-- Like button(), but drawn at an explicit rect instead of the next row --
+-- for fixed-position chrome (e.g. a top toolbar) built without row().
+function UI:rect_button(rect: Rect, text: string): boolean
+   local id = self:next_id()
+   local hovered = self:hover(id, rect)
+   local clicked = false
+
+   if hovered and self:mouse_pressed() then
+      self.active = id
+   end
+   if hovered and self.active == id and self:mouse_released() then
+      clicked = true
+   end
+
+   local vg = self.vg
+   local pressed = self.active == id and hovered
+   nvgBeginPath(vg)
+   nvgRoundedRect(vg, rect.x, rect.y, rect.w, rect.h, 3.0)
+   if pressed then
+      nvgFillColor(vg, nvgRGBA(20, 20, 20, 255))
+   elseif hovered then
+      nvgFillColor(vg, nvgRGBA(225, 225, 225, 255))
+   else
+      nvgFillColor(vg, nvgRGBA(235, 235, 235, 255))
+   end
+   nvgFill(vg)
+   nvgStrokeWidth(vg, 1.0)
+   nvgStrokeColor(vg, nvgRGBA(150, 150, 150, 255))
+   nvgStroke(vg)
+
+   nvgFontSize(vg, UI_TEXT_SIZE)
+   nvgFontFace(vg, "sans")
+   nvgFillColor(vg, pressed and nvgRGBA(255, 255, 255, 255) or nvgRGBA(20, 20, 20, 255))
+   nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE)
+   nvgText(vg, rect.x + rect.w / 2, rect.y + rect.h / 2, text, nilptr)
+
+   return clicked
+end
+
+-- A dropdown at an explicit rect (fixed-position chrome, see rect_button).
+-- Expands a list below `rect` on click; closes on re-click or on any
+-- click outside its own (header + list) area. Returns the selected index.
+function UI:dropdown(rect: Rect, options: span(string), selected: integer): integer
+   local id = self:next_id()
+   local n = #options
+   local is_open = self.open_dropdown == id
+   local hovered = self:hover(id, rect)
+
+   local full_rect = rect
+   if is_open then
+      full_rect.h = rect.h * ((@float32)(n) + 1.0) + 2.0
+   end
+
+   if self:mouse_pressed() then
+      if hovered then
+         self.open_dropdown = is_open and 0 or id
+      elseif is_open and not full_rect:contains(self.mouse) then
+         self.open_dropdown = 0
+      end
+   end
+
+   local vg = self.vg
+   nvgBeginPath(vg)
+   nvgRoundedRect(vg, rect.x, rect.y, rect.w, rect.h, 3.0)
+   nvgFillColor(vg, hovered and nvgRGBA(225, 225, 225, 255) or nvgRGBA(245, 245, 245, 255))
+   nvgFill(vg)
+   nvgStrokeWidth(vg, 1.0)
+   nvgStrokeColor(vg, nvgRGBA(150, 150, 150, 255))
+   nvgStroke(vg)
+
+   nvgFontSize(vg, UI_TEXT_SIZE)
+   nvgFontFace(vg, "sans")
+   nvgFillColor(vg, nvgRGBA(20, 20, 20, 255))
+   nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE)
+   nvgText(vg, rect.x + 8, rect.y + rect.h / 2, options[selected], nilptr)
+   nvgTextAlign(vg, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE)
+   nvgText(vg, rect.x + rect.w - 8, rect.y + rect.h / 2, is_open and "^" or "v", nilptr)
+
+   if is_open then
+      for i=0,n-1 do
+         local opt_id = self:next_id()
+         local opt_rect = (@Rect){ rect.x, rect.y + rect.h * (i + 1) + 2, rect.w, rect.h }
+         local opt_hovered = self:hover(opt_id, opt_rect)
+         if opt_hovered and self:mouse_pressed() then
+            selected = i
+            self.open_dropdown = 0
+         end
+
+         nvgBeginPath(vg)
+         nvgRect(vg, opt_rect.x, opt_rect.y, opt_rect.w, opt_rect.h)
+         if i == selected then
+            nvgFillColor(vg, nvgRGBA(20, 20, 20, 255))
+         elseif opt_hovered then
+            nvgFillColor(vg, nvgRGBA(225, 225, 225, 255))
+         else
+            nvgFillColor(vg, nvgRGBA(255, 255, 255, 255))
+         end
+         nvgFill(vg)
+         nvgStrokeWidth(vg, 1.0)
+         nvgStrokeColor(vg, nvgRGBA(180, 180, 180, 255))
+         nvgStroke(vg)
+
+         nvgFillColor(vg, i == selected and nvgRGBA(255, 255, 255, 255) or nvgRGBA(20, 20, 20, 255))
+         nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE)
+         nvgText(vg, opt_rect.x + 8, opt_rect.y + opt_rect.h / 2, options[i], nilptr)
+      end
+   end
+
+   return selected
+end
+
+-- A labeled slider bound to a float64 value; returns true while dragged.
+function UI:slider(label: string, value: *float64, min_v: float64, max_v: float64): boolean
+   local id = self:next_id()
+   local r = self:row()
+   local track_w = r.w - UI_LABEL_W - UI_VALUE_W
+   local track = (@Rect){ r.x + UI_LABEL_W, r.y + r.h / 2 - 3, track_w, 6 }
+   local hovered = self:hover(id, (@Rect){ r.x + UI_LABEL_W, r.y, track_w, r.h })
+   local changed = false
+
+   if hovered and self:mouse_pressed() then
+      self.active = id
+   end
+   if self.active == id then
+      local frac = clampf((self.mouse.x - track.x) / track.w, 0.0, 1.0)
+      local new_value = min_v + frac * (max_v - min_v)
+      if new_value ~= $value then
+         $value = new_value
+         changed = true
+      end
+   end
+
+   local vg = self.vg
+   nvgFontSize(vg, UI_TEXT_SIZE)
+   nvgFontFace(vg, "sans")
+   nvgFillColor(vg, nvgRGBA(30, 30, 30, 255))
+   nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE)
+   nvgText(vg, r.x, r.y + r.h / 2, label, nilptr)
+
+   nvgBeginPath(vg)
+   nvgRoundedRect(vg, track.x, track.y, track.w, track.h, 3.0)
+   nvgFillColor(vg, nvgRGBA(210, 210, 210, 255))
+   nvgFill(vg)
+
+   local frac: float64 = 0.0
+   if max_v > min_v then
+      frac = clampf(($value - min_v) / (max_v - min_v), 0.0, 1.0)
+   end
+   local handle_x = track.x + frac * track.w
+   nvgBeginPath(vg)
+   nvgCircle(vg, handle_x, track.y + track.h / 2, 7.0)
+   nvgFillColor(vg, (self.active == id or hovered) and nvgRGBA(20, 20, 20, 255) or nvgRGBA(100, 100, 100, 255))
+   nvgFill(vg)
+
+   nvgFontSize(vg, UI_TEXT_SIZE - 2)
+   nvgTextAlign(vg, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE)
+   nvgFillColor(vg, nvgRGBA(80, 80, 80, 255))
+   nvgText(vg, r.x + r.w, r.y + r.h / 2, string.format("%.3g", $value), nilptr)
+
+   return changed
+end
+
+-- A row of option buttons; returns the (possibly unchanged) selected index.
+function UI:options(labels: span(string), selected: integer): integer
+   local r = self:row()
+   local n = #labels
+   local opt_w = r.w / n
+   local vg = self.vg
+   for i=0,n-1 do
+      local id = self:next_id()
+      local opt_rect = (@Rect){ r.x + i * opt_w, r.y, opt_w - 2, r.h }
+      local hovered = self:hover(id, opt_rect)
+      if hovered and self:mouse_pressed() then
+         self.active = id
+      end
+      if hovered and self.active == id and self:mouse_released() then
+         selected = i
+      end
+
+      local is_selected = i == selected
+      nvgBeginPath(vg)
+      nvgRoundedRect(vg, opt_rect.x, opt_rect.y, opt_rect.w, opt_rect.h, 3.0)
+      if is_selected then
+         nvgFillColor(vg, nvgRGBA(20, 20, 20, 255))
+      elseif hovered then
+         nvgFillColor(vg, nvgRGBA(225, 225, 225, 255))
+      else
+         nvgFillColor(vg, nvgRGBA(235, 235, 235, 255))
+      end
+      nvgFill(vg)
+
+      nvgFontSize(vg, UI_TEXT_SIZE - 2)
+      nvgFontFace(vg, "sans")
+      nvgFillColor(vg, is_selected and nvgRGBA(255, 255, 255, 255) or nvgRGBA(20, 20, 20, 255))
+      nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE)
+      nvgText(vg, opt_rect.x + opt_rect.w / 2, opt_rect.y + opt_rect.h / 2, labels[i], nilptr)
+   end
+   return selected
+end
+
+function UI:separator()
+   local r = self:row()
+   local vg = self.vg
+   nvgBeginPath(vg)
+   nvgMoveTo(vg, r.x, r.y + r.h / 2)
+   nvgLineTo(vg, r.x + r.w, r.y + r.h / 2)
+   nvgStrokeWidth(vg, 1.0)
+   nvgStrokeColor(vg, nvgRGBA(200, 200, 200, 255))
+   nvgStroke(vg)
 end
