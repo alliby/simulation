@@ -1,173 +1,85 @@
-require "math"
 require "common"
 require "ode"
+require "ui"
+require "scene"
+require "math"
 
-global Pendulum = @record {
-   position: Vec2,
-   length: float32,
-   rotation: float32,
-   ball_radius: float32,
-}
+-- I * theta'' = -b * theta' - m*g*L*sin(theta)   (I = m*L^2)
+-- =>  theta'' = -(b/I) * theta' - (g/L) * sin(theta)
 
-## default_values(Pendulum, { ball_radius = 25 })
+-- Physics parameters
+local mass: float64 = 1.0     -- kg
+local length: float64 = 1.2   -- m
+local damping: float64 = 0.15 -- N*m*s / rad
+local gravity: float64 = 9.81 -- m/s^2
 
-global function drawPendulum(vg: *NVGcontext, pendulum: Pendulum)
-   ## unpack_fields(pendulum)
+-- Initial conditions
+local theta0: float64 = math.pi / 4
+local omega0: float64 = 0.0
 
-   nvgSave(vg)
-   defer nvgRestore(vg) end
+-- Runtime state
+local theta: float64 = theta0
+local omega: float64 = 0.0
+local integrator = Integrator.RK4
 
-   local dx = math.cos(rotation)
-   local dy = math.sin(rotation)
-
-   -- Transformations
-   nvgTranslate(vg, position.x, position.y)
-   defer nvgResetTransform(vg) end
-   -- Drawing
-   nvgBeginPath(vg)
-   nvgStrokeWidth(vg, 5.0)
-   nvgStrokeColor(vg, nvgRGB(15, 15, 15))
-   nvgLineCap(vg, NVG_ROUND)
-   nvgMoveTo(vg, 0, 0)
-   nvgLineTo(vg, length * dx, length * dy)
-   nvgStroke(vg)
-
-   nvgBeginPath(vg)
-   nvgCircle(vg, (length + ball_radius) * dx, (length + ball_radius) * dy, ball_radius)
-   nvgStroke(vg)
+local function accel(t: float64, th: float64, dth: float64): float64
+   local I = mass * length * length
+   return -(damping / I) * dth - (gravity / length) * math.sin(th)
 end
 
-local initialAngle = math.pi / 4
-local euler_angle = initialAngle
-local rk4_angle = initialAngle
-local euler_velocity = 0.0
-local rk4_velocity = 0.0
-
-local g = 981.0
-local L = 150.0
-local b = 900.0
-local mass = 1.0
-local I = mass*L^2
-local omega = math.pi / 4
-
-local function accel(t: float64, theta: float64, dtheta: float64): float64
-   return -(b/I)*dtheta -(g/L) * math.sin(theta)
+local function reset()
+   theta = theta0
+   omega = omega0
 end
 
-local function simple_solution(t: float64): float64
-   return initialAngle * math.cos(math.sqrt(g/L) * t)
+local function step(t: float64, h: float64)
+   theta, omega = integrate_2_step(integrator, accel, t, h, theta, omega)
 end
 
-global function draw_pendulum_simulation(vg: *NVGcontext, t: float64, dt: float64)
-   local w = window_w
-   -- using euler method
-   -- local euler_acceleration = accel(t, euler_angle, euler_velocity)
-   -- euler_velocity = euler_velocity + (euler_acceleration * dt)
-   -- euler_angle = euler_angle + (euler_velocity * dt)
+local function draw(vg: *NVGcontext, w: float64, h: float64)
+   local pivot = (@Vec2){ (@float32)(w * 0.5), (@float32)(h * 0.28) }
+   local radius = clampf(0.06 * math.cbrt(mass), 0.03, 0.25) * PX_PER_M
+   local rod_len = length * PX_PER_M
 
-   -- using Range-Kutta Method
-   -- rk4_angle, rk4_velocity = rk4_2_step(accel, t, dt, rk4_angle, rk4_velocity)
-
-   local angles: []float64 = { euler_angle }
-
-   for i=0,#angles-1 do
-      local angle = angles[i]
-      local g = Ground.new {
-	 position = { ((i+1) * w / (#angles+1) ) - 50, 200 },
-	 size = { 100, 30 },
-      }
-      
-      local ref_line = Dash.new {
-	 start_point = { (i+1) * w / (#angles+1), 227.5 },
-	 length = L + 100.0,
-	 rotation = math.pi / 2,
-	 segment_num = 20,
-      }
-      
-      local pendulum = Pendulum.new {
-	 position = { (i+1) * w / (#angles+1), 227.5 },
-	 length = L,
-	 rotation = (math.pi / 2) - angle,
-      }
-
-      drawDashedLine(vg, ref_line)
-      -- drawGround(vg, g)
-      drawPendulum(vg, pendulum)
-      
-      -- nvgFillColor(vg, nvgRGB(120, 120, 120))
-      -- nvgTranslate(vg, (i+1) * w / (#angles+1), 227.5)
-      -- nvgRotate(vg, math.pi / 2)
-      -- nvgBeginPath(vg)
-      -- if angle > 0 then
-      -- 	 nvgArc(vg, 0, 0, 30, -angle, 0, NVG_CW)
-      -- 	 nvgArc(vg, 0, 0, 32, 0, -angle, NVG_CCW)
-      -- else
-      -- 	 nvgArc(vg, 0, 0, 30, 0, -angle, NVG_CW)
-      -- 	 nvgArc(vg, 0, 0, 32, -angle, 0, NVG_CCW)
-      -- end
-      -- nvgClosePath(vg)
-      -- nvgFill(vg)
-      -- nvgResetTransform(vg)
-   end
-end
-
-
-local initAngle1 = math.pi / 2
-local initAngle2 = math.pi / 2
-local angles = (@[2]float64)({ initAngle1, initAngle2 })
-local velocities = (@[2]float64)({ 0.0, 0.0 })
-
-local euler_angles = angles
-local euler_velo = velocities
-
-local rk4_angles = angles
-local rk4_velo = velocities
-
-local g = 9.81
-local L1 = 1.5
-local L2 = 2.0
-local m1 = 10.0
-local m2 = 1.0
-
-local function system(t: float64, y: [2]float64, dy: [2]float64): [2]float64
-   local a1, a2 = y[0], y[1]
-   local w1, w2 = dy[0], dy[1]
-   return {
-      (-g*(2*m1 + m2)*math.sin(a1) - g*m2*math.sin(a1-2*a2) - 2*math.sin(a1-a2)*m2*(w2^2*L2+w1^2*L1*math.cos(a1-a2))) / (L1*(2*m1+m2-m2*math.cos(2*a1-2*a2))),
-      2*math.sin(a1-a2)*(w1^2*L1*(m1+m2) + g*(m1+m2)*math.cos(a1) + w2^2*L2*m2*math.cos(a1-a2)) / (L2*(2*m1+m2-m2*math.cos(2*a1-2*a2)))
+   local pend = Pendulum.new {
+      position = pivot,
+      length = (@float32)(rod_len),
+      rotation = (@float32)((math.pi / 2) - theta),
+      ball_radius = (@float32)(radius),
    }
+   drawPendulum(vg, pend)
+
+   -- pivot mount
+   nvgBeginPath(vg)
+   nvgCircle(vg, pivot.x, pivot.y, 5.0)
+   nvgFillColor(vg, nvgRGB(15, 15, 15))
+   nvgFill(vg)
 end
 
-global function draw_double_pendulum_simulation(vg: *NVGcontext, t: float64, dt: float64, w: float64)
-   rk4_angles, rk4_velo = rk4_2_step(system, t, dt, rk4_angles, rk4_velo)
-   local accel = system(t, euler_angles, euler_velo)
-   for i=0,#accel-1 do
-      euler_velo[i] = euler_velo[i] + accel[i] * dt
-      euler_angles[i] = euler_angles[i] + euler_velo[i] * dt
-   end
-
-   local angle1 = angles[0]
-   local angle2 = angles[1]
-
-   local angles = (@[][2]float64){ euler_angles, rk4_angles}
-
-   for i=0,#angles-1 do
-      local angle1 = angles[i][0]
-      local angle2 = angles[i][1]
-   
-      local p1 = Pendulum.new {
-	 position = { (1 + 2*i) * w / 4, 100.0 },
-	 length = 100 * L1,
-	 rotation = math.pi/2 - angle1
-      }
-
-      local p2 = Pendulum.new {
-	 position = { (1+2*i)*w / 4 + (p1.ball_radius+100*L1)*math.sin(angle1), 100.0 + (p1.ball_radius+100*L1)*math.cos(angle1)},
-	 length = 100*L2,
-	 rotation = math.pi/2 - angle2
-      }
-
-      drawPendulum(vg, p1);
-      drawPendulum(vg, p2);
+local function panel(ui: *UI)
+   ui:label("Physics")
+   ui:slider("Mass (kg)", &mass, 0.1, 5.0)
+   ui:slider("Length (m)", &length, 0.3, 2.5)
+   ui:slider("Damping", &damping, 0.0, 1.0)
+   ui:slider("Gravity", &gravity, 1.0, 20.0)
+   ui:separator()
+   ui:label("Integrator")
+   integrator = (@Integrator)(ui:options(integrator_names, integrator))
+   ui:separator()
+   ui:label("Initial conditions")
+   local ic_changed = false
+   if ui:slider("Angle (rad)", &theta0, -math.pi, math.pi) then ic_changed = true end
+   if ui:slider("Ang. vel.", &omega0, -10.0, 10.0) then ic_changed = true end
+   if ic_changed then
+      reset()
+      pause_requested = true
    end
 end
+
+register_scene({
+   name = "Pendulum",
+   reset = reset,
+   step = step,
+   draw = draw,
+   panel = panel,
+})

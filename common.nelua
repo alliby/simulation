@@ -1,5 +1,50 @@
-require "nanovg"
+require "nvg"
 require "math"
+
+-- SI units to pixels
+global PX_PER_M <comptime> = 100.0
+
+global FIXED_HZ <comptime> = 240.0
+global FIXED_DT: float64 <comptime> = 1.0 / FIXED_HZ
+global MAX_FRAME_DT: float64 <comptime> = 0.1
+global MAX_STEPS_PER_FRAME <comptime> = 8
+
+-- this clock struct meant to decouples the physics step from the render frame rate
+global Clock = @record {
+   t: float64,           -- accumulated simulation time
+   accumulator: float64,
+   time_scale: float64,
+   paused: boolean,
+}
+
+## default_values(Clock, { time_scale = 1.0 })
+
+function Clock:begin_frame(frame_dt: float64): integer
+   if self.paused then return 0 end
+   local dt = math.min(frame_dt, MAX_FRAME_DT) * self.time_scale
+   self.accumulator = self.accumulator + dt
+   local nsteps = 0
+   while self.accumulator >= FIXED_DT and nsteps < MAX_STEPS_PER_FRAME do
+      self.accumulator = self.accumulator - FIXED_DT
+      nsteps = nsteps + 1
+   end
+   return nsteps
+end
+
+function Clock:advance(): float64
+   local t = self.t
+   self.t = self.t + FIXED_DT
+   return t
+end
+
+function Clock:reset()
+   self.t = 0.0
+   self.accumulator = 0.0
+end
+
+global function clampf(x: float64, lo: float64, hi: float64): float64
+   return math.min(math.max(x, lo), hi)
+end
 
 global Vec2 = @record {
    x: float32,
@@ -7,8 +52,8 @@ global Vec2 = @record {
 }
 
 global Size = @record {
-   w: float32, -- width
-   h: float32, -- height
+   w: float32,
+   h: float32,
 }
 
 global Ground = @record {
@@ -58,19 +103,18 @@ global function drawDashedLine(vg: *NVGcontext, dash: Dash)
 
    nvgTranslate(vg, start_point.x, start_point.y)
    nvgRotate(vg, rotation)
-   defer nvgResetTransform(vg) end
 
    nvgStrokeWidth(vg, 2.0)
    nvgStrokeColor(vg, nvgRGB(120, 120, 120))
    nvgLineCap(vg, NVG_ROUND)
    local l = length / segment_num
-   assert(gap < l)
+   local seg_gap = math.min(gap, l * 0.5)
+   nvgBeginPath(vg)
    for i=0,segment_num do
-      nvgBeginPath(vg)
       nvgMoveTo(vg, l * i, 0)
-      nvgLineTo(vg, l * (i+1) - gap, 0)
-      nvgStroke(vg)
+      nvgLineTo(vg, l * (i+1) - seg_gap, 0)
    end
+   nvgStroke(vg)
 end
 
 global function drawGround(vg: *NVGcontext, ground: Ground)
@@ -85,8 +129,7 @@ global function drawGround(vg: *NVGcontext, ground: Ground)
       nvgTranslate(vg, -size.w/2, -size.h/2)
    else
       nvgTranslate(vg, position.x, position.y)
-   end 
-   defer nvgResetTransform(vg) end
+   end
 
    -- Scissoring
    nvgScissor(vg, 0 , 0, size.w, size.h)
@@ -100,11 +143,116 @@ global function drawGround(vg: *NVGcontext, ground: Ground)
    nvgStrokeColor(vg, nvgRGB(15, 15, 15))
    nvgStroke(vg)
    local hatch_x: float32 = 30 * math.cos(math.pi/6)
+   nvgBeginPath(vg)
+   nvgStrokeWidth(vg, 2.0)
    for i= -hatch_x, size.w + hatch_x, hatchStep  do
-      nvgBeginPath(vg)
-      nvgStrokeWidth(vg, 2.0)
       nvgMoveTo(vg, i, size.h)
       nvgLineTo(vg, i + hatch_x, 0)
-      nvgStroke(vg)
    end
+   nvgStroke(vg)
+end
+
+global Pendulum = @record {
+   position: Vec2,
+   length: float32,
+   rotation: float32,
+   ball_radius: float32,
+}
+
+## default_values(Pendulum, { ball_radius = 25 })
+
+global function drawPendulum(vg: *NVGcontext, pendulum: Pendulum)
+   ## unpack_fields(pendulum)
+
+   nvgSave(vg)
+   defer nvgRestore(vg) end
+
+   local dx = math.cos(rotation)
+   local dy = math.sin(rotation)
+
+   nvgTranslate(vg, position.x, position.y)
+
+   nvgBeginPath(vg)
+   nvgStrokeWidth(vg, 5.0)
+   nvgStrokeColor(vg, nvgRGB(15, 15, 15))
+   nvgLineCap(vg, NVG_ROUND)
+   nvgMoveTo(vg, 0, 0)
+   nvgLineTo(vg, length * dx, length * dy)
+   nvgStroke(vg)
+
+   nvgBeginPath(vg)
+   nvgCircle(vg, (length + ball_radius) * dx, (length + ball_radius) * dy, ball_radius)
+   nvgStroke(vg)
+end
+
+global Spring = @record {
+   position: Vec2,
+   length: float32,
+   rotation: float32
+}
+
+global Damper = @record {
+   position: Vec2,
+   length: float32,
+   rotation: float32
+}
+
+global function drawSpring(vg: *NVGcontext, spring: Spring)
+   ## unpack_fields(spring)
+
+   nvgSave(vg)
+   defer nvgRestore(vg) end
+
+   nvgTranslate(vg, position.x, position.y)
+   nvgRotate(vg, rotation)
+
+   nvgStrokeWidth(vg, 3.0)
+   nvgStrokeColor(vg, nvgRGB(15, 15, 15))
+   nvgLineCap(vg, NVG_ROUND)
+   nvgBeginPath(vg)
+   nvgMoveTo(vg, 0, 0)
+
+   local pitch = 25
+   for i=0,pitch do
+      local h: float32
+      if i == 0 or i == pitch then
+         h = 0.0
+      else
+         h = (i % 2 == 0) and 5.0 or -5.0
+      end
+      nvgLineTo(vg, length / 8 + 6 * i * length / (8*pitch), h)
+   end
+   nvgLineTo(vg, length, 0)
+   nvgStroke(vg)
+end
+
+global function drawDamper(vg: *NVGcontext, damper: Damper)
+   ## unpack_fields(damper)
+
+   local cr = 20.0 -- cylinder radius
+   local cl = 30.0 -- cylinder length
+   local pl = 15.0 -- piston length
+
+   nvgSave(vg)
+   defer nvgRestore(vg) end
+
+   nvgTranslate(vg, position.x, position.y)
+   nvgRotate(vg, rotation)
+
+   nvgStrokeWidth(vg, 3.0)
+   nvgStrokeColor(vg, nvgRGB(0, 0, 0))
+   nvgLineCap(vg, NVG_SQUARE)
+
+   nvgBeginPath(vg)
+   nvgMoveTo(vg, (length - pl) / 2, -cr/2)
+   nvgLineTo(vg, (length + pl) / 2 - cl, -cr/2)
+   nvgMoveTo(vg, (length - pl) / 2, cr/2)
+   nvgLineTo(vg, (length + pl) / 2 - cl, cr/2)
+
+   nvgMoveTo(vg, 0, 0)
+   nvgLineTo(vg, (length - pl) / 2, 0)
+   nvgRect(vg, (length - pl) / 2, -cr / 2, pl, cr)
+   nvgMoveTo(vg, (length + pl) / 2, 0)
+   nvgLineTo(vg, length, 0)
+   nvgStroke(vg)
 end

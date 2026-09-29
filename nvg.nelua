@@ -1,0 +1,27 @@
+-- Picks the right generated NanoVG bindings for the active target: the
+-- desktop GL3 backend natively, or the GLES3/WebGL2 backend under
+-- Emscripten (see build.lua). All the generic NanoVG API (nvgBeginPath,
+-- nvgRect, NVGcontext, ...) is identical between the two; only the
+-- backend init/teardown calls differ -- see nvg_create()/nvg_delete().
+## if ccinfo.is_emscripten then
+require "nanovg_web"
+## else
+require "nanovg"
+## end
+
+-- Creates the NanoVG context for the active GL backend.
+global function nvg_create(flags: cint): *NVGcontext
+   ## if ccinfo.is_emscripten then
+      return nvgCreateGLES3(flags)
+   ## else
+      return nvgCreateGL3(flags)
+   ## end
+end
+
+global function nvg_delete(vg: *NVGcontext)
+   ## if ccinfo.is_emscripten then
+      nvgDeleteGLES3(vg)
+   ## else
+      nvgDeleteGL3(vg)
+   ## end
+end

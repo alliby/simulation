@@ -54,3 +54,46 @@ global function rk4_2_step(f: function_concept, t: float64, h: float64, y: auto,
    return SumSystem(y, DivSystem(MulSystem(h, SumSystem(k1_1, MulSystem(2.0, k2_1), MulSystem(2.0, k3_1), k4_1)), 6.0)),
       SumSystem(dy, DivSystem(MulSystem(h, SumSystem(k1_2, MulSystem(2.0, k2_2), MulSystem(2.0, k3_2), k4_2)), 6.0))
 end
+
+-- Explicit (forward) Euler method for a second order ODE.
+-- Inexpensive but only first-order accurate and prone to energy drift.
+global function euler_2_step(f: function_concept, t: float64, h: float64, y: auto, dy: auto): (auto, auto)
+   ## static_assert(y.type == dy.type)
+
+   local accel = f(t, y, dy)
+   local new_y = SumSystem(y, MulSystem(h, dy))
+   local new_dy = SumSystem(dy, MulSystem(h, accel))
+   return new_y, new_dy
+end
+
+-- Semi-implicit (symplectic) Euler: uses the updated velocity to advance
+-- position within the same step. Same cost as forward Euler but far more
+-- stable for oscillatory systems (bounded energy instead of drifting).
+global function semi_implicit_euler_2_step(f: function_concept, t: float64, h: float64, y: auto, dy: auto): (auto, auto)
+   ## static_assert(y.type == dy.type)
+
+   local accel = f(t, y, dy)
+   local new_dy = SumSystem(dy, MulSystem(h, accel))
+   local new_y = SumSystem(y, MulSystem(h, new_dy))
+   return new_y, new_dy
+end
+
+global Integrator = @enum(int32) {
+   EULER = 0,
+   SEMI_IMPLICIT_EULER,
+   RK4,
+}
+
+global integrator_names: [3]string = { "Euler", "Semi-Euler", "RK4" }
+
+-- Dispatches to the chosen integrator for a second order ODE.
+global function integrate_2_step(kind: Integrator, f: function_concept, t: float64, h: float64, y: auto, dy: auto): (auto, auto)
+   switch kind do
+   case Integrator.EULER then
+      return euler_2_step(f, t, h, y, dy)
+   case Integrator.SEMI_IMPLICIT_EULER then
+      return semi_implicit_euler_2_step(f, t, h, y, dy)
+   else
+      return rk4_2_step(f, t, h, y, dy)
+   end
+end

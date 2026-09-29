@@ -1,0 +1,10 @@
+*.c
+!vendor/**/*.c
+simulation
+ode_test
+*.js
+*.wasm
+*.html
+!index.html
+.#*
+*~

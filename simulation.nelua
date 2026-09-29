@@ -28,32 +28,48 @@
    ## end
 ## end
 
--- Include Libraries
 require "glfw"
-require "nanovg"
+require "nvg"
+require "span"
+
+## if ccinfo.is_emscripten then
+global function emscripten_set_main_loop(fn: function(): void, fps: cint, simulate_infinite_loop: cint): void <cimport, cinclude "emscripten.h"> end
+global function emscripten_get_device_pixel_ratio(): float64 <cimport, cinclude "emscripten.h"> end
+global function emscripten_get_element_css_size(target: cstring, width: *float64, height: *float64): cint <cimport, cinclude "emscripten/html5.h"> end
+
+local function sync_window_to_viewport(window: *GLFWwindow)
+   local vw: float64, vh: float64
+   emscripten_get_element_css_size("body", &vw, &vh)
+   local w, h = (@cint)(vw), (@cint)(vh)
+   if w < 1 or h < 1 then return end
+   local cur_w: cint, cur_h: cint
+   glfwGetWindowSize(window, &cur_w, &cur_h)
+   if w ~= cur_w or h ~= cur_h then
+      glfwSetWindowSize(window, w, h)
+   end
+end
+## end
 
 -- Global variables
 global cursor_x: float64, cursor_y: float64 -- cursor position
-global window_w: cint, window_h: cint = 800, 600 -- window dimensions
-global fb_w: cint, fb_h: cint = 800, 600 -- window dimensions
+global window_w: cint, window_h: cint = 1000, 600 -- window dimensions
+global fb_w: cint, fb_h: cint = 1000, 600 -- framebuffer dimensions
 
--- load other files
+require "scene"
+-- the menu list order follow this require order
 require "pendulum"
+require "double_pendulum"
 require "spring"
+require "double_spring"
+
 require "ui"
 
 local function error_callback(error: cint, desc: cstring)
-   print("GLFW error", error, string(desc))
-end
-
-local function key_callback(window: *GLFWwindow, key: cint, scancode: cint, action: cint, mods: cint)
-   if key == GLFW_KEY_ESCAPE and action == GLFW_RELEASE then
-      glfwSetWindowShouldClose(window, GL_TRUE)
-   end
+   print("error: glfw:", string(desc))
 end
 
 if glfwInit() == 0 then
-   print("failed to init GLFW")
+   print("error: failed to initialize GLFW")
    return -1
 end
 
@@ -62,79 +78,192 @@ glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
 glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2)
 glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE)
 glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
+## if ccinfo.is_emscripten then
+glfwWindowHint(GLFW_SCALE_TO_MONITOR, GL_TRUE) -- HiDPI canvas backing store
+## end
 
-local window = glfwCreateWindow(1000, 600, "Simulation")
+local window = glfwCreateWindow(window_w, window_h, "Simulation")
 defer glfwTerminate() end
 
 if not window then
-   print("Could not initialze GLFW window")
+   print("error: could not create GLFW window")
    return -1
 end
 
 glfwMakeContextCurrent(window)
+glfwSwapInterval(1) -- vsync
 
--- Enable VSYNC
-glfwSwapInterval(1)
-
+## if not ccinfo.is_emscripten then
 if gladLoadGLLoader((@GLADloadproc)(glfwGetProcAddress)) == 0 then
-   print("could not init glad")
+   print("error: could not initialize glad")
    return -1
 end
+## end
 
-local vg = nvgCreateGL3(NVG_STENCIL_STROKES | NVG_DEBUG | NVG_ANTIALIAS)
-defer nvgDeleteGL3(vg) end
+local vg = nvg_create(NVG_STENCIL_STROKES | NVG_ANTIALIAS)
+defer nvg_delete(vg) end
 
 if vg == nilptr then
-   print("Could not init nanovg")
+   print("error: could not initialize nanovg")
    return -1
 end
 
--- Keyboard Callback
+if nvgCreateFont(vg, "sans", "assets/fonts/Roboto-Regular.ttf") == -1 then
+   print("error: could not load assets/fonts/Roboto-Regular.ttf")
+end
+
+-- simulation state
+local clock: Clock = Clock.new{}
+local current_scene: integer = 0
+local pending_single_step = false
+
+local panel_window: Window = {
+   rect = { 16, 56, 320, 0 },
+   title = "Parameters",
+}
+
+local TOP_BAR_H <comptime> = 40.0
+
+local function key_callback(window: *GLFWwindow, key: cint, scancode: cint, action: cint, mods: cint)
+   if action ~= GLFW_PRESS then return end
+   switch key do
+   case GLFW_KEY_ESCAPE then
+      glfwSetWindowShouldClose(window, GL_TRUE)
+   case GLFW_KEY_SPACE then
+      clock.paused = not clock.paused
+   case GLFW_KEY_R then
+      scenes[current_scene].reset()
+      clock:reset()
+   end
+end
+
 glfwSetKeyCallback(window, key_callback)
 
-local pxRatio = fb_w / window_w
-local fb = nvgluCreateFramebuffer(vg, 100*pxRatio,100*pxRatio, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY)
-if fb == nilptr then
-   print("Could not create FBO.")
-   return -1
+local scene_name_buf: [MAX_SCENES]string
+for i=0,scene_count-1 do
+   scene_name_buf[i] = scenes[i].name
 end
-defer nvgluDeleteFramebuffer(fb) end
+local scene_names: span(string) = { data = (@*[0]string)(&scene_name_buf[0]), size = (@usize)(scene_count) }
 
--- Set the time
+for i=0,scene_count-1 do
+   scenes[i].reset()
+end
+
+local ui: UI
+
 glfwSetTime(0)
 local prev = glfwGetTime()
 
-while glfwWindowShouldClose(window) == 0 do
-   -- Cursor Position
+local function frame()
+   ## if ccinfo.is_emscripten then
+      sync_window_to_viewport(window)
+   ## end
    glfwGetCursorPos(window, &cursor_x, &cursor_y)
-
-   -- Window Size
    glfwGetWindowSize(window, &window_w, &window_h)
    glfwGetFramebufferSize(window, &fb_w, &fb_h)
+   if window_w < 1 then window_w = 1 end
+   if window_h < 1 then window_h = 1 end
 
    local t = glfwGetTime()
    local dt = t - prev
    prev = t
 
-   pxRatio = fb_w / window_w
+   local mouse_down = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS
+
+   local pxRatio: float32 = fb_w / (@float32)(window_w)
    glViewport(0, 0, fb_w, fb_h)
    glClearColor(.92, .92, .94, 1.0)
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT)
 
    nvgBeginFrame(vg, window_w, window_h, pxRatio)
+   ui:begin_frame(vg, cursor_x, cursor_y, mouse_down, window_w, window_h)
 
-   defer
-     nvgEndFrame(vg)
-     glfwSwapBuffers(window)
-     glfwPollEvents()
+   local nsteps = 0
+   if clock.paused and pending_single_step then
+     nsteps = 1
+     pending_single_step = false
+   else
+     nsteps = clock:begin_frame(dt)
+   end
+   for i=1,nsteps do
+      local step_t = clock:advance()
+      scenes[current_scene].step(step_t, FIXED_DT)
    end
 
-   draw_pendulum_simulation(vg, t, dt)
-   draw_spring_simulation(vg, t, dt, window_w, window_h)
-   draw_double_pendulum_simulation(vg, t, dt, window_w)
-   draw_double_spring_simulation(vg, t, dt, window_w, window_h)
-   -- for idx=0,5 do
-   --    local y = 50 + 40.0 * (idx+1) + idx * 100
-   --    drawButton(vg, { 20, y, 200, 80 }, "btn_" .. tostring(idx+1))
-   -- end
+   -- World
+   scenes[current_scene].draw(vg, window_w, window_h)
+
+   -- UI Panel
+   panel_window.title = scenes[current_scene].name
+   if ui:begin_window(&panel_window) then
+      scenes[current_scene].panel(&ui)
+   end
+   ui:end_window(&panel_window)
+
+   if pause_requested then
+      clock:reset()
+      clock.paused = true
+      pause_requested = false
+   end
+
+   -- Top bar
+   do
+      nvgBeginPath(vg)
+      nvgRect(vg, 0, 0, window_w, TOP_BAR_H)
+      nvgFillColor(vg, nvgRGBA(235, 235, 235, 255))
+      nvgFill(vg)
+
+      ui:begin_panel((@Rect){ 0, 0, (@float32)(window_w), TOP_BAR_H }, 1)
+
+      local x: float32 = UI_PAD
+      local y: float32 = (TOP_BAR_H - UI_ROW_H) / 2
+
+      nvgFontSize(vg, UI_TEXT_SIZE)
+      nvgFontFace(vg, "sans")
+      nvgFillColor(vg, nvgRGBA(20, 20, 20, 255))
+      nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE)
+      nvgText(vg, x, TOP_BAR_H / 2, "Scene", nilptr)
+      x = x + 50.0
+
+      local dropdown_rect = (@Rect){ x, y, 220.0, UI_ROW_H }
+      local new_scene = ui:dropdown(dropdown_rect, scene_names, current_scene)
+      if new_scene ~= current_scene then
+         current_scene = new_scene
+         clock:reset()
+         clock.paused = false
+      end
+      x = x + dropdown_rect.w + UI_PAD
+
+      local pause_rect = (@Rect){ x, y, 110.0, UI_ROW_H }
+      if ui:rect_button(pause_rect, clock.paused and "Resume" or "Pause") then
+         clock.paused = not clock.paused
+      end
+      x = x + pause_rect.w + UI_PAD
+
+      local step_rect = (@Rect){ x, y, 70.0, UI_ROW_H }
+      if ui:rect_button(step_rect, "Step") then
+         clock.paused = true
+         pending_single_step = true
+      end
+      x = x + step_rect.w + UI_PAD
+
+      local reset_rect = (@Rect){ x, y, 70.0, UI_ROW_H }
+      if ui:rect_button(reset_rect, "Reset") then
+         scenes[current_scene].reset()
+         clock:reset()
+      end
+   end
+   ui:end_frame()
+
+   nvgEndFrame(vg)
+   glfwSwapBuffers(window)
+   glfwPollEvents()
 end
+
+## if ccinfo.is_emscripten then
+   emscripten_set_main_loop(frame, 0, 1)
+## else
+   while glfwWindowShouldClose(window) == 0 do
+      frame()
+   end
+## end

@@ -1,4 +1,5 @@
 return {
    no_color = true,
-   cc = "tcc"
+   cc = "tcc",
+   add_path = { "vendor" }
 }

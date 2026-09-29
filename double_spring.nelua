@@ -1,0 +1,114 @@
+require "common"
+require "ode"
+require "ui"
+require "scene"
+require "math"
+
+--   m1*x1'' =  k2*(x2-x1) - k1*x1 - b2*(v2-v1) - b1*v1
+--   m2*x2'' = -k2*(x2-x1)         - b2*(v2-v1)
+
+-- Physics parameters
+local m1: float64 = 3.0
+local m2: float64 = 2.0
+local k1: float64 = 100.0
+local k2: float64 = 200.0
+local b1: float64 = 1.0
+local b2: float64 = 1.0
+local L1: float64 = 1.5 -- m, spring 1 rest length
+local L2: float64 = 2.0 -- m, spring 2 rest length
+local block_w: float64 = 0.7 -- m, the anchor gap for spring 2
+
+-- Initial conditions
+local x1_0: float64 = 0.5
+local x2_0: float64 = 1.0
+local v1_0: float64 = 0.0
+local v2_0: float64 = 0.0
+
+-- Runtime state
+local pos: [2]float64 = { x1_0, x2_0 }
+local vel: [2]float64 = { v1_0, v2_0 }
+local integrator = Integrator.RK4
+
+local function system(t: float64, x: [2]float64, v: [2]float64): [2]float64
+   local x1, x2 = x[0], x[1]
+   local v1, v2 = v[0], v[1]
+   return {
+      (k2/m1)*(x2-x1) - (k1/m1)*x1 - (b2/m1)*(v2-v1) - (b1/m1)*v1,
+      -(k2/m2)*(x2-x1) - (b2/m2)*(v2-v1),
+   }
+end
+
+local function reset()
+   pos = { x1_0, x2_0 }
+   vel = { v1_0, v2_0 }
+end
+
+local function step(t: float64, h: float64)
+   pos, vel = integrate_2_step(integrator, system, t, h, pos, vel)
+end
+
+local function draw(vg: *NVGcontext, w: float64, h: float64)
+   local anchor_x = (@float32)(w / 4 - 7.5)
+   local mid_y = (@float32)(h / 2)
+   local L1_px = (@float32)(L1 * PX_PER_M)
+   local L2_px = (@float32)(L2 * PX_PER_M)
+   local block_w_px = (@float32)(block_w * PX_PER_M)
+   local x1_px = (@float32)(pos[0] * PX_PER_M)
+   local x2_px = (@float32)(pos[1] * PX_PER_M)
+
+   local spring1_len = L1_px + x1_px
+   local spring2_len = L2_px + (x2_px - x1_px)
+   local spring2_anchor_x = anchor_x + spring1_len + block_w_px
+
+   local damper1 = Damper { position = { anchor_x, mid_y - 10.0 }, length = spring1_len }
+   local spring1 = Spring { position = { anchor_x, mid_y + 30.0 }, length = spring1_len }
+   local damper2 = Damper { position = { spring2_anchor_x, mid_y - 10.0 }, length = spring2_len }
+   local spring2 = Spring { position = { spring2_anchor_x, mid_y + 30.0 }, length = spring2_len }
+
+   local h_ground = Ground.new { position = { anchor_x - 62.5, mid_y }, size = { 100.0, 30.0 }, rotation = -math.pi / 2 }
+   local v_ground = Ground.new { position = { anchor_x + 2.5, mid_y + 70.0 }, size = { 600.0, 30.0 }, rotation = math.pi }
+
+   drawGround(vg, h_ground)
+   drawGround(vg, v_ground)
+   drawSpring(vg, spring1)
+   drawDamper(vg, damper1)
+   drawSpring(vg, spring2)
+   drawDamper(vg, damper2)
+
+   local block1 = (@Rect){ anchor_x + spring1_len, mid_y - 27.5, block_w_px, 75.0 }
+   local block2 = (@Rect){ spring2_anchor_x + spring2_len, mid_y - 27.5, block_w_px, 75.0 }
+   drawRect(vg, block1)
+   drawRect(vg, block2)
+end
+
+local function panel(ui: *UI)
+   ui:label("Physics")
+   ui:slider("Mass 1 (kg)", &m1, 0.2, 10.0)
+   ui:slider("Mass 2 (kg)", &m2, 0.2, 10.0)
+   ui:slider("Stiffness k1", &k1, 1.0, 400.0)
+   ui:slider("Stiffness k2", &k2, 1.0, 400.0)
+   ui:slider("Damping b1", &b1, 0.0, 10.0)
+   ui:slider("Damping b2", &b2, 0.0, 10.0)
+   ui:separator()
+   ui:label("Integrator")
+   integrator = (@Integrator)(ui:options(integrator_names, integrator))
+   ui:separator()
+   ui:label("Initial conditions")
+   local ic_changed = false
+   if ui:slider("Disp. 1 (m)", &x1_0, -1.5, 1.5) then ic_changed = true end
+   if ui:slider("Disp. 2 (m)", &x2_0, -1.5, 1.5) then ic_changed = true end
+   if ui:slider("Vel. 1 (m/s)", &v1_0, -10.0, 10.0) then ic_changed = true end
+   if ui:slider("Vel. 2 (m/s)", &v2_0, -10.0, 10.0) then ic_changed = true end
+   if ic_changed then
+      reset()
+      pause_requested = true
+   end
+end
+
+register_scene({
+   name = "Double spring-mass-damper",
+   reset = reset,
+   step = step,
+   draw = draw,
+   panel = panel,
+})
