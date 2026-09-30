@@ -1,0 +1,197 @@
+require "common"
+require "ode"
+require "ui"
+require "scene"
+require "math"
+
+--   (M+m)*x''      + m*L*cos(theta)*theta'' = m*L*sin(theta)*theta'^2 - k*x - b*x'
+--   m*L*cos(theta)*x'' + m*L^2*theta''      = -m*g*L*sin(theta) - c*theta'
+
+-- Physics parameters
+local M: float64 = 2.0        -- kg, trolley mass
+local m: float64 = 1.0        -- kg, bob mass
+local L: float64 = 1.5        -- m, pendulum length
+local k: float64 = 20.0       -- N/m
+local b: float64 = 0.5        -- N*s/m, trolley damping
+local c: float64 = 0.0        -- N*m*s/rad, pivot damping
+local gravity: float64 = 9.81 -- m/s^2
+local rest_length: float64 = 1.5 -- m
+local cart_w: float64 = 0.8   -- m
+
+-- Initial conditions
+local x0: float64 = 0.0
+local theta0: float64 = 0.8
+local v0: float64 = 0.0
+local omega0: float64 = 0.0
+
+-- Runtime state
+local q: [2]float64 = { x0, theta0 }
+local dq: [2]float64 = { v0, omega0 }
+local integrator = Integrator.RK4
+
+local TRAIL_N <comptime> = 240
+local TRAIL_EVERY <comptime> = 2 -- 2s
+local trail: [TRAIL_N]Vec2
+local trail_head: integer = 0
+local trail_count: integer = 0
+local trail_tick: integer = 0
+local trail_enabled: integer = 1
+local trail_names: [2]string = { "Trail off", "Trail on" }
+
+local function system(t: float64, y: [2]float64, dy: [2]float64): [2]float64
+   local x, th = y[0], y[1]
+   local v, w = dy[0], dy[1]
+   local s, co = math.sin(th), math.cos(th)
+   -- solve the 2x2 mass matrix system with Cramer rule
+   local f1 = m*L*s*w*w - k*x - b*v
+   local f2 = -m*gravity*L*s - c*w
+   local det = m*L*L*(M + m*s*s)
+   return {
+      (m*L*L*f1 - m*L*co*f2) / det,
+      ((M+m)*f2 - m*L*co*f1) / det,
+   }
+end
+
+local function reset()
+   q = { x0, theta0 }
+   dq = { v0, omega0 }
+   trail_head = 0
+   trail_count = 0
+   trail_tick = 0
+end
+
+local function step(t: float64, h: float64)
+   q, dq = integrate_2_step(integrator, system, t, h, q, dq)
+
+   trail_tick = trail_tick + 1
+   if trail_tick >= TRAIL_EVERY then
+      trail_tick = 0
+      trail[trail_head] = { (@float32)(q[0] + L*math.sin(q[1])), (@float32)(L*math.cos(q[1])) }
+      trail_head = (trail_head + 1) % TRAIL_N
+      if trail_count < TRAIL_N then trail_count = trail_count + 1 end
+   end
+end
+
+local function draw(vg: *NVGcontext, w: float64, h: float64)
+   local anchor_x = (@float32)(w * 0.38)
+   local rail_y = (@float32)(h * 0.3) -- top surface of the rail
+   local rail_h: float32 = 8.0
+   local rest_px = (@float32)(rest_length * PX_PER_M)
+   local cart_w_px = (@float32)(cart_w * PX_PER_M)
+   local x_px = (@float32)(q[0] * PX_PER_M)
+
+   local wheel_r: float32 = 10.0 -- the cart sits on its wheels
+   local cart_h: float32 = 60.0
+   local cart_bottom = rail_y - 2*wheel_r
+   local cart_top = cart_bottom - cart_h
+   local cart_mid_y = cart_top + cart_h / 2
+   local cart_x = anchor_x + rest_px + x_px
+   local pivot = (@Vec2){ cart_x + cart_w_px / 2, cart_bottom }
+   local rest_pivot_x = anchor_x + rest_px + cart_w_px / 2
+
+   -- wall
+   local wall_h: float32 = 120.0
+   local wall = Ground.new {
+     position = { anchor_x - 12.5 - wall_h / 2, cart_mid_y + 10.0 - 15.0 },
+     size = { wall_h, 30.0 },
+     rotation = -math.pi / 2
+   }
+   drawGround(vg, wall)
+
+   nvgBeginPath(vg)
+   nvgRect(vg, anchor_x, rail_y, (@float32)(w) - anchor_x - 20.0, rail_h)
+   nvgFillColor(vg, nvgRGB(190, 190, 195))
+   nvgFill(vg)
+   nvgStrokeWidth(vg, 2.0)
+   nvgStrokeColor(vg, nvgRGB(15, 15, 15))
+   nvgStroke(vg)
+
+   -- rest position marker
+   local rest_mark = Dash.new {
+     start_point = { rest_pivot_x, pivot.y + 10.0 },
+     length = (@float32)(L * PX_PER_M),
+     rotation = math.pi / 2
+   }
+   drawDashedLine(vg, rest_mark)
+
+   -- trail
+   if trail_enabled == 1 and trail_count > 1 then
+      nvgStrokeWidth(vg, 2.0)
+      nvgLineCap(vg, NVG_ROUND)
+      local start = (trail_head - trail_count + TRAIL_N) % TRAIL_N
+      for i=1,trail_count-1 do
+         local p0 = trail[(start + i - 1) % TRAIL_N]
+         local p1 = trail[(start + i) % TRAIL_N]
+         local alpha = (@uint8)(200 * i / trail_count)
+         nvgBeginPath(vg)
+         nvgMoveTo(vg, rest_pivot_x + p0.x * PX_PER_M, pivot.y + p0.y * PX_PER_M)
+         nvgLineTo(vg, rest_pivot_x + p1.x * PX_PER_M, pivot.y + p1.y * PX_PER_M)
+         nvgStrokeColor(vg, nvgRGBA(40, 110, 200, alpha))
+         nvgStroke(vg)
+      end
+   end
+
+   local damper = Damper { position = { anchor_x, cart_mid_y - 14.0 }, length = rest_px + x_px }
+   local spring = Spring { position = { anchor_x, cart_mid_y + 16.0 }, length = rest_px + x_px }
+   drawSpring(vg, spring)
+   drawDamper(vg, damper)
+
+   -- cart and wheels
+   nvgStrokeColor(vg, nvgRGB(15, 15, 15))
+   drawRect(vg, { cart_x, cart_top, cart_w_px, cart_h })
+   nvgStrokeWidth(vg, 3.0)
+   for i=0,1 do
+      nvgBeginPath(vg)
+      nvgCircle(vg, cart_x + cart_w_px * (0.2 + 0.6*i), rail_y - wheel_r, wheel_r - 1.5)
+      nvgStroke(vg)
+   end
+
+   local radius = (@float32)(clampf(0.06 * math.cbrt(m), 0.03, 0.25) * PX_PER_M)
+   local pend = Pendulum.new {
+      position = pivot,
+      length = (@float32)(L * PX_PER_M) - radius,
+      rotation = (@float32)((math.pi / 2) - q[1]),
+      ball_radius = radius,
+   }
+   drawPendulum(vg, pend)
+
+   nvgBeginPath(vg)
+   nvgCircle(vg, pivot.x, pivot.y, 5.0)
+   nvgFillColor(vg, nvgRGB(15, 15, 15))
+   nvgFill(vg)
+end
+
+local function panel(ui: *UI)
+   ui:label("Physics")
+   ui:slider("Cart mass (kg)", &M, 0.2, 10.0)
+   ui:slider("Bob mass (kg)", &m, 0.1, 10.0)
+   ui:slider("Length (m)", &L, 0.3, 2.0)
+   ui:slider("Stiffness k", &k, 1.0, 200.0)
+   ui:slider("Cart damping b", &b, 0.0, 10.0)
+   ui:slider("Pivot damping", &c, 0.0, 2.0)
+   ui:slider("Gravity", &gravity, 1.0, 20.0)
+   ui:separator()
+   ui:label("Integrator")
+   integrator = (@Integrator)(ui:options(integrator_names, integrator))
+   ui:separator()
+   trail_enabled = ui:options(trail_names, trail_enabled)
+   ui:separator()
+   ui:label("Initial conditions")
+   local ic_changed = false
+   if ui:slider("Disp. (m)", &x0, -1.2, 1.2) then ic_changed = true end
+   if ui:slider("Angle (rad)", &theta0, -math.pi, math.pi) then ic_changed = true end
+   if ui:slider("Vel. (m/s)", &v0, -10.0, 10.0) then ic_changed = true end
+   if ui:slider("Ang. vel.", &omega0, -10.0, 10.0) then ic_changed = true end
+   if ic_changed then
+      reset()
+      pause_requested = true
+   end
+end
+
+register_scene({
+   name = "Cart-pendulum",
+   reset = reset,
+   step = step,
+   draw = draw,
+   panel = panel,
+})

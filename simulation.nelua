@@ -61,6 +61,7 @@ require "pendulum"
 require "double_pendulum"
 require "spring"
 require "double_spring"
+require "cart_pendulum"
 
 require "ui"
 
